@@ -1,0 +1,155 @@
+<project name="DBFlute WWW Factory" default="html" basedir=".">
+
+	<property name="resource.dir" value="../resource"/>
+	<property name="preview.dir" value="../preview"/>
+	<property name="www.dir" value="../../dbflute-www"/>
+	<property name="script.dir" value="./"/>
+	<property name="createhtml.script" value="createhtml.groovy"/>
+	<property name="deletetmpfile.script" value="deletetmpfile.groovy"/>
+	<property name="resourcechecker.script" value="resourcechecker.groovy"/>
+
+	<target name="resource" description="==> manage resource">
+		<echo message="+----------------------+"/>
+		<echo message="|                      |"/>
+		<echo message="| Deleting tmp files!  |"/>
+		<echo message="|                      |"/>
+		<echo message="+----------------------+"/>
+
+		<apply executable="groovy" parallel="false">
+			<fileset dir="${script.dir}" includes="${deletetmpfile.script}"/>
+		</apply>
+
+		<echo message="+------------------------+"/>
+		<echo message="|                        |"/>
+		<echo message="| Check resource files!  |"/>
+		<echo message="|                        |"/>
+		<echo message="+------------------------+"/>
+
+		<apply executable="groovy" parallel="false">
+			<fileset dir="${script.dir}" includes="${resourcechecker.script}"/>
+		</apply>
+	</target>
+
+	<target name="html" description="==> create and deploy html">
+		<delete dir="./output" quiet="true"/>
+
+		<echo message="+----------------------+"/>
+		<echo message="|                      |"/>
+		<echo message="| Deleting tmp files!  |"/>
+		<echo message="|                      |"/>
+		<echo message="+----------------------+"/>
+
+		<apply executable="groovy" parallel="false">
+			<fileset dir="${script.dir}" includes="${deletetmpfile.script}"/>
+		</apply>
+
+		<echo message="+------------------+"/>
+		<echo message="|                  |"/>
+		<echo message="| Creating htmls!  |"/>
+		<echo message="|                  |"/>
+		<echo message="+------------------+"/>
+
+		<apply executable="groovy" parallel="false">
+			<fileset dir="${script.dir}" includes="${createhtml.script}"/>
+		</apply>
+
+		<echo message="+---------------------------+"/>
+		<echo message="|                           |"/>
+		<echo message="| Deploying to Production ! |"/>
+		<echo message="|                           |"/>
+		<echo message="+---------------------------+"/>
+
+		<!-- not delete www contents (delete manually and safety and slowly)
+		<delete quiet="true">
+			<fileset dir="${www.dir}/css"><exclude name="**/.*"/></fileset>
+			<fileset dir="${www.dir}/image"><exclude name="**/.*"/></fileset>
+			<fileset dir="${www.dir}/ja"><exclude name="**/.*"/></fileset>
+		</delete>
+		-->
+
+		<mkdir dir="${www.dir}/css"/>
+		<copy todir="${www.dir}/css" overwrite="true">
+			<fileset dir="${resource.dir}/css">
+				<include name="**/*.css"/><include name="**/*.js"/>
+				<include name="**/*.gif"/><include name="**/*.htc"/>
+			</fileset>
+		</copy>
+
+		<mkdir dir="${www.dir}/image"/>
+		<copy todir="${www.dir}/image" overwrite="true">
+			<fileset dir="${resource.dir}/image">
+				<include name="**/*.gif"/><include name="**/*.png"/><include name="**/*.jpg"/>
+			</fileset>
+		</copy>
+
+		<mkdir dir="${www.dir}/ja"/>
+		<copy todir="${www.dir}/ja" overwrite="true">
+			<fileset dir="./output/ja"><include name="**/*.html"/><include name="**/*.png"/></fileset>
+		</copy>
+
+		<!-- index.html.ja for www  -->
+		<copy tofile="${www.dir}/index.html.ja" file="${resource.dir}/index.ja.html" overwrite="true"/>
+		<delete dir="./output" quiet="true"/>
+	</target>
+
+	<target name="previewhtml" description="==> create and deploy preview html">
+		<delete dir="./output" quiet="true"/>
+
+		<echo message="+----------------------+"/>
+		<echo message="|                      |"/>
+		<echo message="| Deleting tmp files!  |"/>
+		<echo message="|                      |"/>
+		<echo message="+----------------------+"/>
+
+		<apply executable="groovy" parallel="false">
+			<fileset dir="${script.dir}" includes="${deletetmpfile.script}"/>
+		</apply>
+
+		<echo message="+------------------+"/>
+		<echo message="|                  |"/>
+		<echo message="| Creating htmls!  |"/>
+		<echo message="|                  |"/>
+		<echo message="+------------------+"/>
+
+		<apply executable="groovy" parallel="false">
+			<fileset dir="${script.dir}" includes="${createhtml.script}"/>
+		</apply>
+
+		<echo message="+---------------------------+"/>
+		<echo message="|                           |"/>
+		<echo message="| Deploying to Production ! |"/>
+		<echo message="|                           |"/>
+		<echo message="+---------------------------+"/>
+
+		<delete quiet="true">
+			<fileset dir="${preview.dir}/css"><exclude name="**/.*"/></fileset>
+			<fileset dir="${preview.dir}/image"><exclude name="**/.*"/></fileset>
+			<fileset dir="${preview.dir}/ja"><exclude name="**/.*"/></fileset>
+		</delete>
+
+		<mkdir dir="${preview.dir}/css"/>
+		<copy todir="${preview.dir}/css" overwrite="true">
+			<fileset dir="${resource.dir}/css">
+				<include name="**/*.css"/><include name="**/*.js"/>
+				<include name="**/*.gif"/><include name="**/*.htc"/>
+			</fileset>
+		</copy>
+
+		<mkdir dir="${preview.dir}/image"/>
+		<copy todir="${preview.dir}/image" overwrite="true">
+			<fileset dir="${resource.dir}/image">
+				<include name="**/*.gif"/><include name="**/*.png"/><include name="**/*.jpg"/>
+			</fileset>
+		</copy>
+
+		<mkdir dir="${preview.dir}/ja"/>
+		<copy todir="${preview.dir}/ja" overwrite="true">
+			<fileset dir="./output/ja"><include name="**/*.html"/><include name="**/*.png"/></fileset>
+		</copy>
+
+		<!-- index.ja.html for preview  -->
+		<copy tofile="${preview.dir}/index.ja.html" file="${resource.dir}/index.ja.html" overwrite="true"/>
+		<delete dir="./output" quiet="true"/>
+	</target>
+
+</project>

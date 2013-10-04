@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,ConditionBean,where句の再利用,WhereRecycle,検索条件の再利用,条件設定の再利用,業務条件の再利用,ConditionBeanの再利用" />
+	<style type="text/css" title="currentStyle">@import "../../../../../../css/sub.css";</style>
+	<title>where句の再利用 | DBFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-install"><a href="#">Install</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>where句の再利用</h1>
+	<p>
+		ConditionBeanにおけるwhere句の再利用テクニックについて説明をします。
+	</p>
+	<p>
+		アプリケーションごとに独自のポリシーを決めることがお奨めですので、アーキテクトの方も必ずこのページをご覧下さい。<em class="keyword">プロジェクトで統一的なやり方で横展開</em>
+		することが重要です。
+	</p>
+	${indexlist}
+
+	<h2 id="solution">where句を再利用しよう</h2>
+	<p>
+		例えば、<em class="keyword">ある特別な商品を購入したことのある会員名称が "S" で始まる正式会員をサービス会員</em>
+		として扱うというような業務仕様があったとして、その会員をアプリケーション上で複数の箇所で検索することがある場合に、
+	</p>
+<pre><span class="codetitle">e.g. ある特別な商品を購入したことのある会員名称が "S" で始まる正式会員を検索 @Java</span><code>
+MemberCB cb = <span class="keyword">new</span> MemberCB();
+cb.query().setMemberName_PrefixSearch(<span class="literal">"S"</span>);
+cb.query().setMemberStatusCode_Equal_Formalized();
+cb.query().existsPurchaseList(<span class="keyword">new</span> SubQuery&lt;PurchaseCB&gt;() {
+    <span class="keyword">public void</span> query(PurchaseCB subCB) {
+        subCB.query().setProductId_Equal(SPECIAL_PRODUCT_ID);
+    }
+});
+</code></pre>
+	<p>
+		という実装になりますが、これを各ディベロッパーが複数の箇所で同じように実装するのではなく、<em class="keyword">誰か一人が実装してそれを再利用</em>
+		するのが一番です。
+	</p>
+	<p>
+		もし、このサービス会員の条件を利用する複数箇所において、取得したいテーブル(select句)やソート順までが全く同じ仕様になるのであれば、
+		Behaviorの "Exクラス" に独自のメソッドを作って再利用するやり方でも問題ありません。
+	</p>
+	<div class="relatedpage"><a href="../domainlogicrecycle/index.html">現場フィット - ドメインロジックの再利用</a></div>
+	<p>
+		しかし、業務仕様はなかなかそういうものではなく、プロセス毎に "サービス会員"
+		のソートの仕方が違ったり、一緒に取得したい関連テーブルが違ったり、そもそも検索の基点テーブルが違ったり(例えば、"サービス会員"
+		の購入リストを検索するとか)と、"サービス会員"
+		という検索条件は様々な場面で様々な利用方法が考えられます。つまり、<em class="keyword">再利用したいポイントはwhere句の一部条件</em>
+		なのです。
+	</p>
+	<div class="relatedword"><a href="../../../../reference/dictionary/alphabet/wp.html#process">Process (プロセス)</a></div>
+	<p>
+		そのような場合は、<em class="keyword">ConditionQuery の "Exクラス" にまとまった条件を設定するメソッド</em>
+		を作って再利用するのが一番です。そのようにしておくことで、DB変更などでサービス会員の条件が変わった場合も修正は一箇所で済みます。
+	</p>
+	<div class="relatedpage"><a href="../../../ormapper/conditionbean/about.html#conditionquery">ConditionQueryとは？</a></div>
+	<div class="relatedword"><a href="../../../../reference/dictionary/alphabet/we.html#exclass">ExClass (Exクラス)</a></div>
+
+	<h2 id="arrange">再利用メソッド (ArrangeQuery)</h2>
+	<p>
+		メソッド名は arrange で始まるのが習慣としてお奨めです。この再利用メソッドを定義する方法、もしくは、そのメソッド自体を
+		<em class="keyword">ArrangeQuery</em> と呼んでいます。
+	</p>
+	<p>
+		少なくとも再利用メソッドの頭文字はアプリケーション全体で合わせておくと良いでしょう。
+		再利用メソッドは、いかにディベロッパーに使ってもらうか(存在に気付いてもらうか)がキーポイントです。
+		<em class="keyword">query()と書いた後とりあえず "a" で補完すればその CQ の再利用メソッド(の一覧)が補完される</em>
+		という状態にしておけば、ディベロッパーが再利用メソッドを探す手間が無くなります(補完されなければ何もないということで)。
+		さらには JavaDoc がしっかり書かれていれば、ディベロッパーは補完するだけで自分が必要なメソッドかどうかが判断できます。
+	</p>
+<pre><span class="codetitle">e.g. ある特別な商品を購入したことのある会員名称が "S" で始まる正式会員という条件を設定するメソッド @Java</span><code>
+<span class="keyword">public class</span> MemberCQ <span class="keyword">extends</span> BsMemberCQ {
+
+    <span class="abbreviation">...</span>
+
+    <span class="comment">/**</span>
+    <span class="comment"> * Arrange the query for selecting service members.</span>
+    <span class="comment"> * o starts 'S'</span>
+    <span class="comment"> * o status 'Formalized'</span>
+    <span class="comment"> * o exists the special product</span>
+    <span class="comment"> */</span>
+    <span class="keyword">public void</span> arrangeServiceMember() {
+        setMemberName_PrefixSearch(<span class="literal">"S"</span>);
+        setMemberStatusCode_Equal_Formalized();
+        existsPurchaseList(<span class="keyword">new</span> SubQuery&lt;PurchaseCB&gt;() {
+            <span class="keyword">public void</span> query(PurchaseCB subCB) {
+                subCB.query().setProductId_Equal(<span class="attribute">SPECIAL_PRODUCT_ID</span>);
+            }
+        });
+    }
+}
+</code></pre>
+	<h3 id="use">再利用メソッドの利用</h3>
+	<p>
+		再利用メソッドが定義されていれば、後はディベロッパーはConditionBean実装時にそのメソッドを呼び出すだけです。
+		プログラム上は業務的な目的の指定だけとなり、業務仕様への依存性が減ります。
+	</p>
+<pre><span class="codetitle">e.g. サービス会員を検索 @Java</span><code>
+MemberCB cb = <span class="keyword">new</span> MemberCB();
+cb.query().<span class="point">arrangeServiceMember()</span>; 
+cb.query().addOrderBy_...();
+... = <span class="attribute">memberBhv</span>.selectList(cb);
+</code></pre>
+	<p>
+		(ConditionBeanでなく)ConditionQueryのExクラスに定義することで関連テーブルでも利用可能です。
+	</p>
+<pre><span class="codetitle">e.g. サービス会員の購入リストを検索 @Java</span><code>
+PurchaseCB cb = <span class="keyword">new</span> PurchaseCB();
+cb.query().queryMember().<span class="point">arrangeServiceMember()</span>;
+cb.query().addOrderBy_...();
+... = <span class="attribute">memberBhv</span>.selectList(cb);
+</code></pre>
+	<h3 id="orderby">order by 句も再利用</h3>
+	<p>
+		同じ仕組みで order by 句も利用することは可能です。
+	</p>
+	<h3 id="orscopecolumnquery">OrScoprQuery や ColumnQuery は？</h3>
+	<p>
+		OrScoprQuery や ColumnQuery は、ConditionBeanドリブンのメソッドであり、ConditionQuery
+		からは利用できません。なので、ConditionQueryではなく ConditionBean のExクラスで再利用メソッドを定義する必要があります。
+		<span class="freecomment">(ちょっと残念ですが、ここはAPI設計がうまくいきませんでした)</span>
+	</p>
+
+	<h2 id="example">Exampleのススメ</h2>
+	<p>
+		dbflute-basic-example では、実際に ArrangeQuery を定義し、テストケースで利用しています。
+	</p>
+	<div class="detailpage"><a href="../../../../reference/example/index.html#dicontainer">DBFlute Example - DIコンテナ</a></div>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">inu</a></li>
+		<li><a href="#">neko</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>

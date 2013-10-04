@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,セットアップ,Setup,DI環境,DI設定,コンポーネント定義,Seasar,S2Container,Spring Framework,T2,Lucy,Guice" />
+	<style type="text/css" title="currentStyle">@import "../../../css/sub.css";</style>
+	<title>セットアップ - DI環境の調整 | DBFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-setup"><a href="#">Setup</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>セットアップ - DI環境の調整</h1>
+	<p>
+		アプリケーションで利用しているDIコンテナの環境にDBFluteのクラスを認識させて下さい。
+	</p>
+	<div class="relatedpage"><a href="./emecha.html">EMechaによるセットアップ</a></div>
+	${indexlist}
+
+	<h2 id="precondition">DIコンテナとの連携</h2>
+	<p>
+		DBFluteは、<em class="keyword">DIコンテナと連携して利用されることを前提</em>
+		としています。アプリでDIコンテナを利用しない場合でも、DBFlute内部での管理用としてDIコンテナが必要となります。
+	</p>
+	<div class="detailpage"><a href="../../manual/reference/diway/index.html#nodiapp">アプリでDIコンテナを利用しない場合</a></div>
+
+	<h2 id="seasar">Seasar(S2Container)</h2>
+	<p>
+		Genreateタスクで自動生成されるDI設定ファイル <em class="keyword">dbflute.dicon</em>
+		を、アプリケーションのDI設定ファイル(app.diconなど)でインクルードするようにして下さい。
+	</p>
+	<div class="detailpage"><a href="../../manual/reference/diway/seasar/index.html#disetting">Seasar(S2Container) - DI設定ファイル</a></div>
+<pre><span class="codetitle">e.g. app.dicon にて dbfluteBeans.xml をインクルード @app.dicon</span><code>
+&lt;components&gt;
+    &lt;include path="convention.dicon"/&gt;
+    &lt;include path="aop.dicon"/&gt;
+    <span class="point">&lt;include path="dbflute.dicon"/&gt;</span>
+    ...
+&lt;/components&gt;
+</code></pre>
+
+	<h2 id="spring">Spring Framework</h2>
+	<p>
+		Genreateタスクで自動生成されるDI設定ファイル <em class="keyword">dbfluteBeans.xml</em>
+		を、アプリケーションのDI設定ファイル(Beans定義)から参照するようにして下さい。
+	</p>
+	<div class="detailpage"><a href="../../manual/reference/diway/spring/index.html#disetting">Spring Framework - DI設定ファイル</a></div>
+<pre><span class="codetitle">e.g. beanRefContext.xml にて dbfluteBeans.dicon を参照 @app.dicon</span><code>
+&lt;beans>
+    &lt;bean id="context" class="<span class="abbreviation">...</span>context.support.ClassPathXmlApplicationContext"&gt;
+        &lt;constructor-arg&gt;
+            &lt;list&gt;
+                <span class="point">&lt;value&gt;dbfluteBeans.xml&lt;/value&gt;</span>
+                &lt;value&gt;jdbcBeans.xml&lt;/value&gt;
+            &lt;/list&gt;
+        &lt;/constructor-arg&gt;
+    &lt;/bean&gt;
+&lt;/beans&gt;
+</code></pre>
+
+	<h2 id="guice">Google Guice</h2>
+	<p>
+		Genreateタスクで自動生成されるDI設定クラス <em class="keyword">DBFluteModule</em>
+		を、アプリケーションでコンポーネントを初期化するときに、一緒にこのクラスを組み込んで下さい。
+		コンストラクタの必須パラメータとして対象となるデータソースの指定します。
+	</p>
+	<div class="detailpage"><a href="../../manual/reference/diway/guice/index.html#disetting">Google Guice - DI設定クラス</a></div>
+<pre><span class="codetitle">e.g. DBFluteモジュールの初期化 @Java</span><code>
+List&lt;Module&gt; moduleList = <span class="abbreviation">...</span>
+DataSource dataSource = <span class="abbreviation">...</span>
+moduleList.add(<span class="point">new DBFluteModule(dataSource)</span>);
+Injector injector = Guice.createInjector(moduleList.toArray(<span class="keyword">new</span> Module[]{}));
+</code></pre>
+
+	<h2 id="lucy">T2 Lucy</h2>
+	<p>
+		Genreateタスクで自動生成されるDI設定ファイル <em class="keyword">dbfluteBeans.xml</em>
+		を、アプリケーションのDI環境から参照されるようにして下さい。
+	</p>
+	<div class="relatedpage"><a href="../../manual/reference/diway/lucy/index.html#disetting">T2 Lucy - DI設定ファイル</a></div>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">inu</a></li>
+		<li><a href="#">neko</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>

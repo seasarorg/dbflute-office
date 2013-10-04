@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,タスク,Task,Doc,SchemaSyncCheck,スキーマ同期,スキーマの違い,同期チェック,二つのスキーマ,テスト環境とローカル環境" />
+	<style type="text/css" title="currentStyle">@import "../../../../../../css/sub.css";</style>
+	<title>SchemaSyncCheck | DBFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-install"><a href="#">Install</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>SchemaSyncCheck</h1>
+	<p>
+		Alto DBFlute のパートです。
+	</p>
+	<div class="relatedpage"><a href="../../../../../introduction/altodbflute.html">Alto DBFlute</a></div>
+	${indexlist}
+
+	<h2 id="about">SchemaSyncCheckとは？</h2>
+	<p>
+		二つのスキーマの構造が同期されているのかどうかをチェックする機能です<span class="freecomment">(@since 0.9.8.4)</span>。
+	</p>
+	<h3 id="integration">結合DBと開発DBの比較</h3>
+	<p>
+		例えば、結合DBと開発DBで本当に同じスキーマ構造をしているのかどうか不明なときに、確認作業の支援機能として利用できます。
+		本来はそのような状況が発生しないような仕組み作りが必要ですが(例えば、ReplaceSchema を活用するなど)、
+		どうしてもズレが発生する可能性のある仕組みが既にでき上がってしまっている場合に SchemaSyncCheck を使ってチェックすると良いでしょう。
+	</p>
+	<div class="relatedpage"><a href="../replaceschema/index.html">ReplaceSchema</a></div>
+	<h3 id="integration">本番DBと開発DBの比較</h3>
+	<p>
+		また、本番運用をしているうちに、どうしても本番DBと開発DBがズレていってしまうこともあるでしょう。もしくは、ズレてるのかどうかがわからなくて不安だったり。
+		こちらも同じく AlterCheck などを使ってズレが発生させないような仕組み作りが大切ですが、その仕組みがどうしても利用できない場合や、その仕組みを導入する段階で現状のズレを直す必要がある場合に
+		SchemaSyncCheck を使ってチェックすると良いでしょう。
+	</p>
+	<div class="relatedpage"><a href="../replaceschema/altercheck.html">AlterCheck</a></div>
+	<p>
+		本番DBは運用していますので直接接続はできませんし、接続すべきではないでしょう。この場合は、本番DBのスキーマ構造だけを DBMS の機能を使ってダンプしてテスト環境に復元して
+		SchemaSyncCheck を使うと良いでしょう。
+	</p>
+
+	<h2 id="howto">利用方法</h2>
+	<p>
+		この機能は、オプションです。documentDefinitionMap.dfprop の schemaSyncCheckMap
+		で同期チェック対象スキーマの情報を設定し、Manageタスクで
+		schema-sync-check を実行すると<span class="freecomment">(@since 0.9.9.7B)</span>、チェック処理が行われるようになります。
+		もし、同期されていない(構造に違いがある)場合はManageタスクがエラーで中断し、[DBFluteクライアント]/output/doc
+		配下に sync-check-result.html <span class="freecomment">(@since 0.9.9.7F)</span> という形式の名前で差分が出力されます。
+	</p>
+	<div class="relatedpage"><a href="../../../../reference/dfprop/documentdefinition/index.html#schemasynccheckmap">dfprop - schemaSyncCheckMap</a></div>
+	<div class="relatedpage"><a href="../manage/index.html">Manageタスク</a></div>
+<pre><span class="codetitle">e.g. Manageタスクで SchemaSyncCheck の実行 (シェル) @Command</span><code>
+<span class="abbreviation">...</span>$ <span class="keyword">sh</span> manage.sh schema-sync-check
+
+ or
+
+<span class="abbreviation">...</span>$ <span class="keyword">sh</span> manage.sh   <span class="comment">// Enter, and then select the number</span>
+</code></pre>
+	<div class="inucolumn">
+		<h4>0.9.9.7B より前ではDocタスクにて</h4>
+		<p>
+			0.9.9.7B より前のバージョンでは、Manageタスクでの実行ではなく、
+			プロパティの設定を有効にしてDocタスクを実行すると SchemaSyncCheck が実行されました。
+		</p>
+	</div>
+	<h3 id="diff">スキーマ差分の確認</h3>
+	<p>
+		previous がメインとして接続しているスキーマ、databaseInfoMap.dfprop にて定義されているものとなります。
+		next は、schemaSyncCheckMap で定義した同期チェック対象スキーマです。
+	</p>
+	<p>
+		同期チェックの仕様は、HistoryHTMLでの差分抽出ロジックと(制限も含めて)同じです。
+	</p>
+	<div class="relatedpage"><a href="./historyhtml.html">HistoryHTML</a></div>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">Under Construction</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>

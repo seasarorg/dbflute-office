@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,環境,セットアップ,Setup,DBFluteモジュール,DBFluteクライアント,DBFluteランタイム,EMecha,Maven" />
+	<style type="text/css" title="currentStyle">@import "../../../css/sub.css";</style>
+	<title>DBFluteのセットアップ | DBFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-setup"><a href="#">Setup</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>DBFluteのセットアップ</h1>
+	${indexlist}
+
+	<h2 id="target">セットアップの定義</h2>
+	<p>
+		DBFluteのセットアップは、三つのメインコンポーネントを準備し、クラスを自動生成してコンパイルが通り、
+		現場フィットな機能を設定してディベロッパーに横展開できるようになるまでを示します。
+	</p>
+	<dl class="textlist">
+		<dt><a href="../../manual/function/generator/client/index.html">DBFluteクライアント</a></dt>
+		<dd>
+			DBFluteを利用するためのアプリケーション独自の設定が含まれるディレクトリです。
+		</dd>
+		<dt><a href="../../manual/function/generator/module/index.html">DBFluteモジュール</a></dt>
+		<dd>
+			DBFluteの本体で、自動生成などの実処理を行うモジュールです。
+		</dd>
+		<dt><a href="../../manual/function/ormapper/runtime/index.html">DBFluteランタイム</a></dt>
+		<dd>
+			アプリケーションの実行時に必要なライブラリ(JAR)です。
+		</dd>
+	</dl>
+	<div class="relatedpage"><a href="../../introduction/gendriven.html">自動生成ドリブン</a></div>
+
+	<h2 id="way">セットアップ方法</h2>
+	<p>
+		DBFluteのセットアップには大きく三つの方法があります。(事前に)DBFluteのサポート情報を確認の上、いずれかを選んで下さい。
+	</p>
+	<div class="detailpage"><a href="../supported.html">DBFluteのサポート情報</a></div>
+	<dl class="textlist">
+		<dt><a href="./emecha.html"><em class="keyword">EMecha(Eclipse Plugin)</em> でウィザード画面からセットアップ</a></dt>
+		<dd>
+			Eclipse上でウィザード画面から必要な情報を入力し、DBFluteクライアント作成とDBFluteモジュールのダウンロードと配置が可能です。
+			一番オーソドックスであり、DBFluteが最も推奨する方法です。
+		</dd>
+		<dt><a href="./maven.html"><em class="keyword">Maven DBFlute Plugin</em> でコマンドからセットアップ</a></dt>
+		<dd>
+			Mavenのpom.xmlに必要な情報を記述し、DBFluteクライアント作成とDBFluteモジュールのダウンロードと配置が可能です。
+			Mavenが得意な方もしくは好きな方にお奨めです。(この方法を利用したとしても EMecha(Eclipse Plugin)
+			自体は色々な場面で役に立つものなので併用することをお奨めします)
+		</dd>
+		<dt><a href="./plain.html">テンプレートを利用して <em class="keyword">手動</em> でセットアップ</a></dt>
+		<dd>
+			DBFluteモジュールをサイト上のリンクからダウンロードし、その中に含まれているDBFluteクライアントのテンプレートを修正して、
+			アプリケーション用のDBFluteクライアントを作成します。他の方法が利用出来ない場合のための方法です。
+		</dd>
+	</dl>
+	<p>
+		どの方法においてもDBFluteランタイムは、Mavenでクラスパスを管理する場合は pom.xml
+		にて指定し、そうでない場合はリンクからダウンロードして手動でクラスパスに追加する、という形になります。
+	</p>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">inu</a></li>
+		<li><a href="#">neko</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>

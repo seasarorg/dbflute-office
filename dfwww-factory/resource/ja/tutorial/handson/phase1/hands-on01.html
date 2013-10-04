@@ -1,0 +1,465 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,チュートリアル,ハンズオン,hands-on" />
+	<style type="text/css" title="currentStyle">@import "../../../../css/sub.css";</style>
+	<title>ハンズオン セクション 1 | DBFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-install"><a href="#">Install</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>ハンズオン セクション 1</h1>
+	${indexlist}
+
+	<h2 id="overview">概要</h2>
+	<p>
+		まずは環境構築、そして、"DBFluteのセットアップから自動生成まで" を体験してみましょう。
+	</p>
+
+	<h2 id="firstenv">前提環境</h2>
+	<p>
+		Eclipse-3.5 以上が利用できること。
+		幾つかの Eclipse プラグインをインストールするため、ハンズオン専用の Eclipse を用意することが推奨されます。
+	</p>
+	<p>
+		Maven2 がインストールされていること。(コマンドラインで mvn コマンドが利用できること)
+	</p>
+
+	<h2 id="prepare">環境準備</h2>
+	<h3 id="workspace">ワークスペースの作成</h3>
+	<p>
+		新規でハンズオン専用のワークスペースを任意の場所に作成してください。あらかじめディレクトリを作成し、Eclipse
+		を起動して、そのディレクトリ(ワークスペース)を選んでください。起動直後に既に別のワークスペースが開く場合は、メニューの
+		"File" - "Switch Workspace" からワークスペースを切り替えてください。
+		(ワークスペースの設定もハンズオン内で変更するので、独立したワークスペースが推奨されます)
+	</p>
+<pre><span class="codetitle">e.g. DBFlute勉強用のワークスペース @Directory</span><code>
+/xxx/yyy/dbflute/workspace
+</code></pre>
+	<p>
+		この時点ではプロジェクトは一つもなく空っぽのワークスペースとなります。
+	</p>
+	<h3 id="checkout">プロジェクトのチェックアウト</h3>
+	<dl class="valuemainlist">
+		<dt>GITリポジトリURL</dt><dd>
+		<a href="http://www.codebreak.com/git/jflute/dbflute/tree/master/">https://git.codebreak.com/jflute/dbflute.git</a></dd>
+		<dt>プロジェクト</dt>
+		<dd>dbflute-hands-on</dd>
+	</dl>
+	<p>
+		EGit (GitクライアントのEclipseプラグイン) を使う場合は、以下のような手順になります。
+	</p>
+	<ol>
+		<li>Preferences の Team - Git - Configuration にて autocrlf が "もし" true になら false に</li>
+		<li><em class="keyword">Gitリポジトリエクスプローラー</em>にてリポジトリのクローン (ユーザー・パスワードなし)</li>
+		<li><em class="keyword">Working Directory</em> の <em class="keyword">dbflute-hands-on</em> を選択して右クリック <em class="keyword">Import Projects...</em></li>
+		<li><em class="keyword">Import as general project</em> を選択して Next, そして次も Finish でおしまい</li>
+	</ol>
+	<p>
+		<span class="freecomment">(<em class="keyword">dbflute-hands-on</em> を選択して右クリック、ってのが大事...あとその後、<em class="keyword">general project</em> ってのがポイント)</span>
+	</p>
+	<p>
+		※他のプロジェクトも Import してしまっても、非常に参考になるのでそれはそれでOKです。ただ、ハンズオン中はプロジェクトを Close しておくと良いでしょう。
+	</p>
+	<h3 id="mysql">MySQLのセットアップ</h3>
+	<p>
+		MySQLのオフィシャルサイトからローカル環境に対応する MySQL のインストーラー無し版(ZIPアーカイブ版など)をダウンロードし、localdb/mysql に配置します。
+		そして、localdb/boot-mysql.bat|sh を実行し、MySQL を起動してください。
+	</p>
+	<div class="detailpage"><a href="http://dev.mysql.com/downloads/mysql/">Official Site - MySQL Download</a></div>
+<pre><span class="codetitle">e.g. MySQLの配置場所 @Directory</span><code>
+PROJECT_ROOT
+ |-<span class="abbreviation">...</span>
+ |-localdb
+ |  |-<span class="point">mysql</span>
+ |     |-bin
+ |     |-data
+ |     |-docs
+ |     |-<span class="abbreviation">...</span>
+ |-script
+ |-tutorial
+</code></pre>
+	<p>
+		さらに、login-mysql-root.bat|sh を実行し、MySQLのコマンドコンソールにて "show databases;" と打って enter
+		して、作成されているデータベースは特にないこと(デフォルトのデータベースだけが存在)を確認してください。 
+	</p>
+	<p>
+		今後、ハンズオンを中断する場合は、localdb/close-mysql.bat|sh
+		を実行し、MySQLをシャットダウンし、そして、またハンズオンを再開するときは、boot-mysql.bat|sh を実行してください。
+	</p>
+	<h3 id="plugin">プラグインのセットアップ</h3>
+	<p>
+		以下のプラグインをそれぞれの更新サイトからインストールしてください。
+	</p>
+	<dl class="textlist">
+		<dt>EMecha</dt>
+		<dd>
+			DBFluteライフを支援するプラグイン
+		</dd>
+		<dd>
+			Seasar Eclipse 3.3 - <em class="keyword">http://eclipse.seasar.org/updates/3.3</em>
+			<div class="relatedpage"><a href="../../../manual/function/helper/emecha/index.html">EMechaプラグイン</a></div>
+		</dd>
+		<dt>ResourceSynchronizer</dt>
+		<dd>リソースの同期化プラグイン。要は、Eclipse上の F5 を自動化してくれる</dd>
+		<dd>*URLはEMechaと同じ</dd>
+		<dt>Quick JUnit</dt>
+		<dd>JUnitを使う際のちょっとした便利プラグイン</dd>
+		<dd>Quick JUnit - <em class="keyword">http://quick-junit.sourceforge.jp/updates/current</em></dd>
+	</dl>
+
+	<h2 id="project">プロジェクトのセットアップ</h2>
+	<h3 id="eclipse">Eclipseプロジェクトの作成</h3>
+	<p>
+		tutorial/material/eclipse/prototype-pom.xml をプロジェクト直下に pom.xml
+		という名前でコピーしましょう。ちなみに、pom.xml やその他幾つかのリソースは SVN-Ignore 設定となっています。
+		<span class="freecomment">(講師による Maven のお話あり)</span>
+	</p>
+	<p>
+		script 配下の maven-eclipse.bat|sh を実行し、コンソールのログを見て正常終了が確認できたらリフレッシュ(F5)し、その後 Eclipse
+		を再起動してしてください。ただし、M2_REPO が既に登録されている環境ではリフレッシュするだけでOKです。すると、そのプロジェクトが
+		Maven 管理された Java プロジェクトになり、既に存在している UnitContainerTestCase がコンパイルされます。
+		(ただし、この時点ではコンパイルエラーになっているはずです)
+	</p>
+	<h3 id="encoding">エンコーディングの調整 <span class="freecomment">#workspace</span></h3>
+	<p>
+		プロジェクトのエンコーディングを UTF-8 にしてください。プロジェクトを選択して、"alt + enter"
+		すると、プロジェクトの設定画面が開きますので、Resource の "Text file encoding" で UTF-8 を指定。
+	</p>
+	<p>
+		また、参照ライブラリのJavaDocコメントなどが UTF-8 であることが多いため、ワークスペースのエンコーディングも
+		UTF-8 にします。メニューの Window - Preferences の <em class="keyword">General - Workspace</em>
+		にて同じ要領で設定できます。(Mac なら メニューの Eclipse - 環境設定...)
+	</p>
+	<p>
+		Windows なら流れるように <em class="keyword">alt -&gt; W -&gt; P</em> を押せば、Macなら <em class="keyword">command + , (カンマ)</em>
+		を押せば Preferences を開けます。<span class="freecomment">(この後、何度も開きますので...)</span>
+	</p>
+	<h3 id="linecolor">行番号の表示、背景色の設定 <span class="freecomment">#workspace</span></h3>
+	<p>
+		メニューの Window - Preferences の <em class="keyword">General - Editors - Text Editors</em> を選択。
+		ここでは、テキストエディターに関する様々な調整ができます。
+	</p>
+	<p>
+		行番号は必ず表示しておきましょう。スタックトレースやログなどからソースコードを追うために行番号は頻繁に利用します。"Show line numbers"
+		にチェックを入れます。また、Background color で好きな背景色を設定するととても落ち着くでしょう。
+	</p>
+	<h3 id="templates">エディターテンプレートを設定 <span class="freecomment">#workspace</span></h3>
+	<p>
+		メニューの Window - Preferences の <em class="keyword">Java - Editor - Templates</em> を選択。
+		ここでは、コード補完のテンプレートを独自に定義することができます。
+	</p>
+	<p>
+		"Import..." にて tutorial/material/eclipse/java-editor-templates.xml を取り込んでください。
+		あとでちょっとだけ良いことがあります。<span class="freecomment">(まあ、セクション２にて)</span>
+	</p>
+	<h3 id="typefilters">Type Filters を設定 <span class="freecomment">#workspace</span></h3>
+	<p>
+		メニューの Window - Preferences の <em class="keyword">Java - Appearance - Type Filters</em> を選択。ここでは、クラス型の補完で "表示させたくない"
+		パッケージやクラスを定義することができます。
+	</p>
+	<p>
+		例えば java.util.List は、毎度毎度 "java.awt.Listとどっちを選ぶ？"
+		と聞かれてしまいます。Type Filters にて "java.awt.*" と設定すれば、そんなことはもう聞かれません。
+		もう、絶対に使わないのにも関わらず、わりとよく出てくる紛らわしいものを設定しておくと良いでしょう。 
+	</p>
+	<dl class="keymainlist">
+		<dt>java.awt.*</dt><dd>awtパッケージを使うことは今の開発ではまずない</dd>
+		<dt>com.sun.*</dt><dd>sunパッケージのクラスを使うことはほとんどない</dd>
+		<dt>sun.*</dt><dd>sunパッケージが意外と紛らわしい!?</dd>
+		<dt>java.sql.Date</dt><dd>業務のプログラムでjava.sql.Dateを使うことはまずない</dd>
+	</dl>
+	<h3 id="mavensources">Maven の Download Artifact Sources を <span class="freecomment">#workspace</span></h3>
+	<p>
+		Maven で管理されたライブラリのソースコードは、デフォルトではダウンロードされず関連付けもない状態である可能性があります。
+		すると、ソースコードが見られないだけでなく、パラメーターの補完などで変数名が arg0 とかになってしまうことがあります。
+	</p>
+	<p>
+		もし、ctrl + shift + T (Open Type) で HandyDate クラスを開いて、ソースが表示されないか、ソースが表示されても JavaDoc
+		が表示されていなければ、ソースコードがダウンロードされていません。
+	</p>
+	<p>
+		メニューの Window - Preferences の Maven にて、Download Artifact Sources のチェックが外れていたらチェックを付けます。
+		そして、maven-eclipse.bat(sh) をもう一度叩いて、プロジェクトをF5してみましょう。
+		<span class="freecomment">(M2Eであれば、プロジェクトを右クリックして Maven の Download Sources となる)</span>
+	</p>
+	<h3 id="hierarchical">Package Presentation を Hierarchical に <span class="freecomment">#workspace</span></h3>
+	<p>
+		これは好みによるので任意ですが、特にFlat形式にこだわりがなければやってみましょう。
+	</p>
+	<p>
+		Eclipse のデフォルトは、Package Presentation が Flat
+		で、パッケージがたくさんあるプロジェクトだと、ずらーっと並んで見づらいと感じることがあります。
+		特にDBFluteで自動生成されるクラスは、パッケージをたくさん持っているので Hierarchical の方が扱いやすくなります。
+	</p>
+	<p>
+		Hierarchical に変更する場合は、(Java パースペクティブの)パッケージエクスプローラの右上の下矢印っぽいマークの部分 (View Menu)
+		から、Package Presentation の Hierarchical を選択します。
+	</p>
+	<p>
+		この時点では、"わからない人はまだよくわからない" と思われるので、この後DBFluteのクラスを自動生成した後に試してみると良いでしょう。
+	</p>
+	<div class="relatedpage"><a href="#generate">this - Generateタスクの実行</a></div>
+	<h3 id="formatter">フォーマッタのインポート <span class="freecomment">#project</span></h3>
+	<p>
+		試しに、src/test/java 配下にある UnitContainerTestCase を開いて適当にプログラムを書いてみて "ctrl + shift + F" と打ってみましょう。
+		確認したら、すぐに ctrl + Z でもとに戻して下さい。
+	</p>
+	<div class="relatedpage"><a href="../../../manual/topic/programming/shortcut/codejustcut.html">コード調整ショートカット</a></div>
+	<p>
+		Eclipseのデフォルトのフォーマット定義は <em class="keyword">かなり</em> 使いづらいため、プロジェクトのプロパティの "Java Code Style" の Formatter
+		にて、"Enable project specific settings" にチェックを入れ、import にて tutorial/material/eclipse/formatter-profile.xml
+		を指定して適用してください。
+	</p>
+	<p>
+		再度 UnitContainerTestCase でフォーマットをやってみましょう。ちょっとだけフォーマットの仕方が変わっています。
+		(最後に適当に書いたプログラムを消すのを忘れずに)
+	</p>
+	<p>
+		このフォーマット定義は、横幅を 120 に、コメント内のフォーマットを OFF にしています。 
+	</p>
+	<h3 id="saveaction">フォーマッタ・インポート調整の自動化 <span class="freecomment">#project</span></h3>
+	<p>
+		フォーマッタ設定やショートカットを実践したばかりでなんですが、保管時(保存: ctrl +
+		S)に自動でフォーマッタが動くように設定することができます。わざわざショートカットを打つ必要もありません。
+	</p>
+	<p>
+		プロジェクトのプロパティの "Java Editor" の "Save Actions"
+		にて、"Enable project specific settings" にチェックを入れ、さらに "Perform the selected actions on
+		save"、および、"Format source code"
+		にチェックを入れましょう。
+	</p>
+	<p>
+		さらに "Organize imports" にもチェックを入れましょう。これは import
+		文を整理してくれるアクション(ctrl + shift + O)です。
+	</p>
+	<div class="relatedpage"><a href="../../../manual/topic/programming/shortcut/codejustcut.html">コード調整ショートカット</a></div>
+	<p>
+		そして 適用させます。再度、UnitContainerTestCase でフォーマットをやってみましょう。適当に崩して、保存してみてください。
+		保存した瞬間にフォーマットされるようになったかと思います。ハンズオンではずっとこの設定でやっていきます。
+	</p>
+	<p>
+		※UnitContainerTestCaseに、Gitの修正マークが付いてしまった場合は、ローカル修正を破棄してください。
+		そのファイルを右クリックして Replace With - HEAD Revision でサーバーの最新に戻せます。
+	</p>
+	<h3 id="srcfolder">ソースフォルダの順序調整 <span class="freecomment">#omake</span></h3>
+	<p>
+		ソースフォルダの順序がいまいちな場合は、.classpath を修正して順序を調整してください。
+		具体的には、src/main/java, src/main/resources, src/test/java, src/test/resource の順に直します。
+		<span class="freecomment">(ただ、maven-eclipse.bat|sh を実行する度に戻ってしまいますので、そのときは好きなように)</span>
+	</p>
+	<p>
+		デフォルトではドット "." で始まるファイルは見えないようになっているので、パッケージエクスプローラのフィルタの設定で一時的に見えるようにします。
+		(Java パースペクティブの)パッケージエクスプローラの右上の下矢印っぽいマークの部分 (View Menu) から Filters
+		を選択すると、フィルタ対象の設定が調整できます。".* resource" のチェックを外すと "." で始まるファイルが見るようになります。
+	</p>
+<pre><span class="codetitle">e.g. ソースフォルダの順序をいい感じに直す @Java</span><code>
+  &lt;classpathentry kind="src" path="src/main/java" including=<span class="abbreviation">...</span>
+  &lt;classpathentry kind="src" path="src/main/resources" excluding=<span class="abbreviation">...</span>
+  &lt;classpathentry kind="src" path="src/test/java" output=<span class="abbreviation">...</span>
+  &lt;classpathentry kind="src" path="src/test/resources" output=-<span class="abbreviation">...</span>
+</code></pre>
+	<p>
+		.classpath の修正では、Eclipse のエディタ上のショートカット "alt + 上矢印", "alt + 下矢印"
+		と有効に使うと良いでしょう。現在カーソルのある行が矢印の方向に移動します。
+	</p>
+	<div class="relatedpage"><a href="../../../manual/topic/programming/shortcut/editorcut.html">エディタショートカット</a></div>
+
+	<h2 id="dfsetup">DBFluteのセットアップ</h2>
+	<h3 id="dfclient">DBFluteクライアントの作成</h3>
+	<p>
+		EMechaの機能を利用して、DBFluteクライアントとDBFluteモジュールを作成、配置します。
+		<span class="freecomment">(講師によるDBFlute環境のお話あり)</span>
+	</p>
+	<div class="relatedpage"><a href="../../../manual/function/generator/client/index.html">DBFluteクライアント</a></div>
+	<div class="relatedpage"><a href="../../../manual/function/generator/module/index.html">DBFluteモジュール</a></div>
+	<p>
+		プロジェクトを右クリックして、"New" - "Other" で "DBFlute Wizards" の "DBFlute New Client"
+		を選択してウィザード画面を起動し、以下の内容を入力してください。
+	</p>
+	<div class="relatedpage"><a href="../../../manual/function/helper/emecha/newclient/index.html">EMecha - DBFluteクライアントの新規作成</a></div>
+	<dl class="keymainlist">
+		<dt>Client Project</dt><dd>exampledb</dd>
+		<dt>Database</dt><dd>mysql</dd>
+		<dt>DI Container</dt><dd>seasar</dd>
+		<dt>Package Base</dt><dd>org.dbflute.handson.dbflute</dd>
+		<dt>Driver</dt><dd>com.mysql.jdbc.Driver</dd>
+		<dt>Url</dt><dd>jdbc:mysql://localhost:43376/exampledb</dd>
+		<dt>Schema</dt><dd>※空っぽ</dd>
+		<dt>User</dt><dd>exampuser</dd>
+		<dt>Password</dt><dd>exampword</dd>
+		<dt>DBFlute Version</dt><dd>※"Latest Version" ボタンを押すと値が入る</dd>
+	</dl>
+	<p>
+		そして、"Download DBFlute" ボタンを押し、最新版のDBFluteがダウンロードしてください(若干待ちます)。そして、Finish
+		すると、プロジェクト直下に dbflute_example(DBFluteクライアント) と mydbflute(DBFluteモジュール) が配置されています。
+	</p>
+	<h3 id="replaceschema">ReplaceSchemaの実行</h3>
+	<p>
+		アプリユーザとスキーマ(テーブル構造を含む)を作成するために、ReplaceSchemaを利用します。
+	</p>
+	<div class="relatedpage"><a href="../../../manual/function/generator/task/replaceschema/index.html">ReplaceSchema</a></div>
+	<h4>DBユーザ自動作成のための設定</h4>
+	<p>
+		DBFluteクライアント/dfprop配下の replaceSchemaDefinitionMap.dfprop
+		の additionalUserMap プロパティを以下のように設定してください。
+		これは、システムユーザによるアプリユーザ、スキーマの作成を自動化するための準備です。
+	</p>
+	<div class="relatedpage"><a href="../../../manual/function/generator/task/replaceschema/systemuser.html">システムユーザによる実行</a></div>
+<pre><span class="codetitle">e.g. filterVariablesMap の設定 @replaceSchemaDefinitionMap.dfprop</span><code>
+    <span class="comment"># /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</span>
+    <span class="comment"># o additionalUserMap: (NotRequired - Default map:{})</span>
+    <span class="comment">#  You can set additional users.</span>
+    <span class="comment">#  Elements of this map are as below:</span>
+    <span class="comment">#   o key of map: User Definition Name (userDefName)</span>
+    <span class="comment">#   o url: (NotRequired - Default same as one of main schema)</span>
+    <span class="comment">#   o schema: (NotRequired - Default treated as no schema setting)</span>
+    <span class="comment">#   o user: (Required)</span>
+    <span class="comment">#   o password: (NotRequired - Default '')</span>
+    <span class="comment">#</span>
+    ; additionalUserMap = <span class="keyword">map:</span>{
+        ; system = <span class="keyword">map:</span>{
+            ; url = jdbc:mysql://localhost:43376
+            ; user = root
+            ; password = df:dfprop/system-password.txt|
+        }
+    }
+    <span class="comment"># - - - - - - - - - -/</span>
+</code></pre>
+	<p>
+		password に "df:dfprop/system-password.txt" と "|" を加えることで、
+		rootのパスワードは以下のようなルールで決定されます。
+	</p>
+	<dl class="keymainlist">
+		<dt>パスワードファイルがあれば</dt><dd>パスワードファイルの中のパスワードが有効</dd>
+		<dt>パスワードファイルがなければ</dt><dd>「|」より右側の文字列がパスワード (この場合は「空パスワード」)</dd>
+	</dl>
+	<p>
+		ダウンロードしたての MySQL は、パスワードが空であることが想定され、ここでは特にパスワードファイルを作成する必要はないはずですが、
+		もし違う場合は、パスワードファイルを作成してください。
+	</p>
+	<h4>DBユーザ、テーブル作成DDLの配置</h4>
+	<p>
+		tutorial/material/dbflute/playsql-createschema-ddl-1st.zip の playsql/replace-schema-00-system.sql と
+		replace-schema-10-basic.sql、この二つのファイルをDBFluteクライアントの playsql 配下に配置してください。
+	</p>
+<pre><span class="codetitle">e.g. CreateSchema用のDDLの配置場所 @Directory</span><code>
+PROJECT_ROOT
+ |-<span class="abbreviation">...</span>
+ |-dbflute_exampledb
+ |  |-dfprop
+ |  |-<span class="abbreviation">...</span>
+ |  |-playsql
+ |  |  |-<span class="point">replace-schema-00-system.sql</span>
+ |  |  |-<span class="point">replace-schema-10-basic.sql</span>
+ <span class="abbreviation">...</span>
+</code></pre>
+	<p>
+		これにて、システムユーザの権限を利用してアプリユーザと ExampleDB のテーブル作成の準備が整いました。
+		<span class="freecomment">(後の演習のために、この時点では明らかにおかしいカラム名などERDと若干の違いがあります)</span>
+	</p>
+	<div class="relatedpage"><a href="../../../manual/reference/example/exampledb.html">ExampleDB</a></div>
+	<h4>ReplaceSchemaを叩く！</h4>
+	<p>
+		DBFluteタスクである、ReplaceSchemaタスクを実行してください。Windows であれば、リソースの検索(ctrl + shift + R)で
+		"replace-schema.bat" を検索してそのまま実行すればOKです。
+	</p>
+	<div class="relatedpage"><a href="../../../manual/function/generator/task/index.html">DBFluteタスク</a></div>
+	<div class="relatedpage"><a href="../../../manual/function/generator/task/replaceschema/index.html">ReplaceSchemaタスク</a></div>
+	<p>
+		コンソールのログを見て、正常終了していることを確認してください。
+		DBFluteタスクのログファイルである、DBFluteクライアント/log/dbflute.log でも確認することができます。
+	</p>
+	<p>
+		再度、MySQLにログインし、exampledb データベースが作られていることを確認してください。
+	</p>
+	<h3 id="jdbc">JDBCタスクの実行</h3>
+	<p>
+		まず、DBFluteクライアントの schema 配下には、readme しかないことを確認してください。
+	</p>
+	<p>
+		DBFluteタスクである、JDBCタスク(jdbc.bat|sh)を実行してください。実行の仕方は、ReplaceSchemaを実行したときと同じ要領で、
+		リソースの検索から実行すると良いでしょう。今後、DBFluteタスクの実行をする時はこの方法を使っていきましょう。
+	</p>
+	<div class="relatedpage"><a href="../../../manual/function/generator/task/index.html">DBFluteタスク</a></div>
+	<div class="relatedpage"><a href="../../../manual/function/generator/task/jdbc/index.html">JDBCタスク</a></div>
+	<p>
+		DBFluteクライアントの schema 配下に、テーブル構造の情報(スキーマのメタデータ)が XML 形式で出力されているはずです(Eclipse上でリフレッシュ必要)。
+	</p>
+	<h3 id="doc">Docタスクの実行</h3>
+	<p>
+		まず、DBFluteクライアントの output/doc 配下には、readme しかないことを確認してください。
+	</p>
+	<div class="relatedpage"><a href="../../../manual/function/generator/task/doc/index.html">Docタスク</a></div>
+	<p>
+		Docタスク(doc.bat|sh)を実行してください。DBFluteクライアントの output/doc 配下に、テーブル構造の情報(スキーマのメタデータ)が HTML
+		形式で出力されているはずです(Eclipse上でリフレッシュ必要)。
+	</p>
+	<h3 id="generate">Generateタスクの実行</h3>
+	<p>
+		まず、src/main/java 配下には、何もクラスがないことを確認してください。
+	</p>
+	<div class="relatedpage"><a href="../../../manual/function/generator/task/generate/index.html">Generateタスク</a></div>
+	<p>
+		そして、Generateタスク(generate.bat|sh)を実行してください。src/main/java 配下にテーブル対応のクラスが自動生成されているはずです。
+		ResourceSynchronizer が有効であれば自動でリフレッシュされます。コンパイルが正常に通っていることを確認してください。
+	</p>
+	<p>
+		<span class="freecomment">(...コンパイル確認中)</span>
+	</p>
+	<p>
+		自動生成されたクラスがコンパイルエラーになったでしょうか？
+	</p>
+	<p>
+		DBFluteモジュールとDBFluteランタイムのバージョンを確認してみてください。
+		自動生成されたクラスとDBFluteランタイムのjarファイルのバージョンは一致していなければなりません。
+		食い違っていれば、DBFluteランタイムのバージョンを修正してみましょう。
+	</p>
+	<p>
+		これで本当にコンパイルエラーなくなれば、セクション１はおしまいです！
+	</p>
+	<p>
+		そういえば、Package Presentation がよくわからなかった人は、ここで Hierarchical に変更してみましょう。
+		src/main/java配下の表現の仕方がガラリと変わるはずです。
+	</p>
+	<div class="relatedpage"><a href="#hierarchical">this - Package Presentation を Hierarchical に</a></div>
+
+	<h2 id="nextsection">次のセクション</h2>
+	<p>
+		さて、次のセクションへ
+	</p>
+	<div class="detailpage"><a href="./hands-on02.html">ハンズオン セクション 02</a></div>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">inu</a></li>
+		<li><a href="#">neko</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>
