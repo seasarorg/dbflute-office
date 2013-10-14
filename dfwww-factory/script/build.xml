@@ -2,7 +2,7 @@
 
 	<property name="resource.dir" value="../resource"/>
 	<property name="preview.dir" value="../preview"/>
-	<property name="www.dir" value="../../dbflute-www"/>
+	<property name="www.dir" value="../../../dbflute-www"/>
 	<property name="script.dir" value="./"/>
 	<property name="createhtml.script" value="createhtml.groovy"/>
 	<property name="deletetmpfile.script" value="deletetmpfile.groovy"/>
