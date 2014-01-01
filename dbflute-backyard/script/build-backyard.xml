@@ -1,4 +1,4 @@
-<project name="DBFlute WWW Factory" default="html" basedir=".">
+<project name="DBFlute Backyard" default="html" basedir=".">
 
 	<property name="resource.dir" value="../resource"/>
 	<property name="preview.dir" value="../preview"/>
