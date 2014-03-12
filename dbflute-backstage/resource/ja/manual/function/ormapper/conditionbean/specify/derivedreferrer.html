@@ -58,34 +58,50 @@
 	<div class="relatedpage"><a href="../../behavior/select/loadreferrer.html">Behavior - LoadReferrer</a></div>
 
 	<h2 id="howto">実装方法</h2>
-	<h3 id="implflow">実装の流れ</h3>
+	<h3 id="property">まずはプロパティの作成</h3>
 	<p>
-		まずは、導出カラムを受け取るためのプロパティを ExEntity に定義します。
+		まずは、導出カラムを受け取るためのプロパティを ExEntity (EntityのExクラス) に定義します。
 	</p>
 	<div class="relatedword"><a href="../../../../reference/dictionary/alphabet/we.html#exentity">ExEntity</a></div>
-	<p>
-		インスタンス変数、Getter・Setter、そしてエリアス名の定数を定義します。エリアス名の定数の値は、FlexibleName
-		としてプロパティを判断できるものであれば何でも良いですが、DB上の命名ポリシーに変換したものが推奨されます。
-		また、定数の名前は任意ですが、習慣的に以下のようにすると良いでしょう。
-	</p>
-	<div class="relatedword"><a href="../../../../reference/dictionary/alphabet/wf.html#flexiblename">FlexibleName</a></div>
 <pre><span class="codetitle">e.g. (Specify)DerivedReferrerのためのプロパティ定義 {MEMBER, MEMBER_LOGIN} @Java</span><code>
 <span class="keyword">public class</span> Member <span class="keyword">extends</span> BsMember {
     <span class="abbreviation">...</span>
     <span class="keyword">public static final</span> String ALIAS_latestLoginDatetime = <span class="literal">"LATEST_LOGIN_DATETIME"</span>;
 
-    <span class="keyword">protected</span> Date <span class="attribute">_latestLoginDatetime</span>;
+    <span class="keyword">protected</span> Date <span class="attribute">latestLoginDatetime</span>;
 
     <span class="keyword">public</span> Date getLatestLoginDatetime() {
-        <span class="keyword">return</span> <span class="attribute">_latestLoginDatetime</span>;
+        <span class="keyword">return</span> <span class="attribute">latestLoginDatetime</span>;
     }
 
     <span class="keyword">public void</span> setLatestLoginDatetime(Date latestLoginDatetime) {
-        <span class="attribute">_latestLoginDatetime</span> = latestLoginDatetime;
+        <span class="keyword">this</span>.<span class="attribute">latestLoginDatetime</span> = latestLoginDatetime;
     }
     <span class="abbreviation">...</span>
 }
 </code></pre>
+	<p>
+		こちらのプロパティ、EMechaで自動生成することができます。
+	</p>
+	<p>
+		先に、ConditionBean側の実装をして<span class="freecomment">("実装の流れ" を参考に)</span>、第二引数の aliasName
+		のところで、Member.ALIAS_latestLoginDatetime という風に、まだ存在しない定数を先に打ち込みます。
+	</p>
+	<p class="imgbox">図 : Entityでの区分値メソッドの補完
+		<a href="../../../../../data/shot/emecha/emecha-dfassist-derivedprop.png" title="Entityでの区分値メソッドの補完"><img src="../../../../../data/shot/emecha/emecha-dfassist-derivedprop.png" alt="Entityでの区分値メソッドの補完" width="540" height="180" /></a>
+	</p>
+	<p>
+		当然、コンパイルエラーにありますが、そこで ctrl + 1 を押して、想定するデータ型の "DerivedProperties" を選択すると、Exクラスにプロパティが自動生成されます。
+	</p>
+	<p>
+		もし、EMechaが利用できない場合は、手動でプロパティを作成します。
+	</p>
+	<p>
+		インスタンス変数、Getter・Setter、そしてエリアス名の定数を定義します。エリアス名の定数の値は、"LATEST_LOGIN_DATETIME"
+		という感じで、DB上の命名ポリシーに変換したものが推奨されます<span class="freecomment">(実際には、大文字小文字アンダースコア区別せず動作しますが習慣として)</span>。
+		また、定数の名前は任意ですが、習慣的に "ALIAS_latestLoginDatetime" にすると良いでしょう。
+	</p>
+	<h3 id="implflow">実装の流れ</h3>
 	<p>
 		specify() の後、<em class="keyword">derived[referrer-table]List()</em>
 		を呼び出し、その後、max() や sum() など関数メソッドを選び、SubQuery
