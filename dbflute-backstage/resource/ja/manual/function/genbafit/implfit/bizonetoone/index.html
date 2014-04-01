@@ -455,7 +455,7 @@ cb.specify().derivedMemberList().max(<span class="keyword">new</span> SubQuery&l
 	</p>
 	<div class="relatedpage"><a href="../../../ormapper/entity/relation.html">Entity間のリレーションのタイプ</a></div>
 
-	<h2 id="derivedrelation">導出的one-to-one</h2>
+	<h2 id="derivedonetoone">導出的one-to-one</h2>
 	<p>
 		何かしら導出した値に一致するレコード(導出レコード)に対する業務的one-to-one(導出的one-to-one)を利用することもできます。
 		例えば、会員を検索する際、同時に会員の最終ログインの情報も取得したい場合など。(会員IDとログイン日時でユニークであることが前提)
@@ -489,8 +489,8 @@ cb.specify().derivedMemberList().max(<span class="keyword">new</span> SubQuery&l
 		その場合は、この相関サブクエリの固定条件がインラインビューに展開されるように設定することで回避できます。
 		fixedInline を true にすることでインラインビューに展開されます。
 	</p>
-	<div class="relatedpage"><a href="../../../../reference/dbway/oracle/index.html#derivedrelation">DBMSごとの取扱い - Oracle - 導出的one-to-one</a></div>
-	<div class="relatedpage"><a href="../../../../reference/dbway/postgresql/index.html#derivedrelation">DBMSごとの取扱い - PostgreSQL - 導出的one-to-one</a></div>
+	<div class="relatedpage"><a href="../../../../reference/dbway/oracle/index.html#derivedonetoone">DBMSごとの取扱い - Oracle - 導出的one-to-one</a></div>
+	<div class="relatedpage"><a href="../../../../reference/dbway/postgresql/index.html#derivedonetoone">DBMSごとの取扱い - PostgreSQL - 導出的one-to-one</a></div>
 <pre><span class="codetitle">e.g. 最終ログインのレコードに対する業務的one-to-one(導出的one-to-one) @additionalForeignKeyMap.dfprop</span><code>
 <span class="abbreviation">...</span>
     ; FK_MEMBER_MEMBER_LOGING_LATEST = <span class="keyword">map:</span>{
@@ -544,8 +544,8 @@ cb.specify().derivedMemberList().max(<span class="keyword">new</span> SubQuery&l
 <span class="abbreviation">...</span>
     ; FK_FOO_BAR = <span class="keyword">map:</span>{
         ; localTableName  = FOO    ; foreignTableName  = BAR
-        ; localColumnName = BAR_ID ; foreignColumnName = BAR_ID
-        ; fixedCondition = <span class="attribute">$$foreignAlias$$</span>.BAR_TYPE = <span class="comment">/*$cls(BarType.Foo)*/</span>null
+        ; localColumnName = GENERAL_ID ; foreignColumnName = BAR_ID
+        ; fixedCondition = <span class="attribute">$$localAlias$$</span>.FOO_TYPE = <span class="comment">/*$cls(BarType.Foo)*/</span>null
         ; fixedSuffix = AsBar
         ; <span class="point">fixedReferrer</span> = <span class="keyword">true</span>
         ; comment = <span class="abbreviation">...</span>
