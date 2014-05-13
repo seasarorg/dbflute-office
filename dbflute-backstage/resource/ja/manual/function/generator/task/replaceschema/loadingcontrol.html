@@ -24,7 +24,7 @@
 </div>
 
 <div id="content"><!-- __content-start__ -->
-	<h1>データ登録制御</h1>
+	<h1>データ登録制御 (loadingControl)</h1>
 	${indexlist}
 
 	<h2 id="overview">処理概要</h2>
@@ -133,6 +133,14 @@
 	<p>
 		デフォルトでは、エクセルデータやTSVデータなどのカラム定義で、DB上に存在しないカラムがある場合はエラーとなります<span class="freecomment">(@since 1.0.4A)</span>。
 		そのチェックを抑制して、不要なカラムを紛れ込ませたい場合に利用します。
+	</p>
+
+	<h2 id="isrtrimcellvalue">isRTrimCellValue</h2>
+	<p>
+		データを右トリムするか否かを指定します。<span class="freecomment">@since 1.0.5F</span>
+	</p>
+	<p>
+		1.0.5F以降において、デフォルトではエクセルデータはそのまま登録されます。右トリムしたいときは、明示的にこの設定をすることで右トリムできます。
 	</p>
 
 	<h2 id="dateadjustmentmap">dateAdjustmentMap</h2>
