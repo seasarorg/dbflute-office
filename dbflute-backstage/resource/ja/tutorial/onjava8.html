@@ -525,11 +525,11 @@ memberList.forEach(<span class="subpoint">member -&gt; {</span>
     var.object
 }) <span class="comment">// セミコロンないんだけど後でね</span>
 --
-<span class="attribute">memberBhv</span>.selectList(<span class="subpoint">cb -&gt; {</span> <span class="comment">// そのまま cb と打って tab ボタン！</span>
-    <span class="subpoint">cb</span>.object <span class="comment">// ちなみに、こっちの変数も一緒に cb になってるはず</span>
+<span class="attribute">memberBhv</span>.selectList(<span class="subpoint">cb -&gt; {</span> <span class="comment">// そのまま cb と打って...</span>
+    <span class="subpoint">cb</span>.object <span class="comment">// こっちの変数も同時に cb になって...</span>
 })
 --
-<span class="attribute">memberBhv</span>.selectList(<span class="localvar">cb</span> -&gt; {
+<span class="attribute">memberBhv</span>.selectList(<span class="localvar">cb</span> -&gt; { <span class="comment">// tab (たぶ！)</span>
     cb.<span class="subpoint">object</span> <span class="comment">// (tabの後) すると object が選択状態に</span>
 })
 --
@@ -571,7 +571,7 @@ memberList.forEach(<span class="subpoint">member -&gt; {</span>
 })
 --
 <span class="attribute">memberBhv</span>.selectList(cb -> {
-    <span class="comment">// "li" と打って ctrl+space して likePrefix() を選択 (enterすれば一番右にカーソルが飛ぶ)</span>
+    <span class="comment">// "li" と打って ctrl+space して likePrefix() を選択 (enterすれば一番右に)</span>
     cb.query().setLikeSearch_LikeSearch(<span class="literal">"S"</span>, <span class="localvar">op</span> -&gt; <span class="localvar">op</span>.<span class="subpoint">likePrefix()</span>);
 })
 --
@@ -635,6 +635,22 @@ memberList.forEach(<span class="subpoint">member -&gt; {</span> <span class="com
 		</p>
 		<p>
 			<span class="freecomment">"右"って、cbLambdaの選択状態を解除して、cbLambdaの右側にカーソルを確定させているだけです。</span>
+		</p>
+	</div>
+	<div class="inucolumn">
+	<h3 id="escapeclipse">Eclipseのご乱心に注意</h3>
+		<p>
+			Lambdaの中の、補完がまだ 4.4.1 だととても不安定です。おかしいな!?と思ったら、いったん周りのコンパイルエラーを直しましょう。
+			特にセミコロンの有無とか括弧とか要注意です。実務における ConditionBean
+			の検索で、大きいものであれば、それだけで同じクラスにメソッド化してしまってもいいでしょう<span class="freecomment">(すると、"Lambdaの中" ではなくなるので安定します)</span>。
+		</p>
+		<p>
+			また、Eclipseの入力モード <span class="freecomment">(勝手にそう呼んでいますが、変数名やstatementが四角で囲われている状態)</span>
+			がどんどんネストしていって、enter押したときのカーソルの飛び先やセミコロンを入力したおきの扱いなどがわけわからないことになることがあります。
+		</p>
+		<p>
+			まずは、びっくりしないこと。そして、なんだか変な感じだなと思ったら、escボタンを押して入力モードを強制終了しちゃってもいいでしょう。
+			しかも、一回だけでなく、二、三回押すと確実にモードがおわりやすいので、escをパンパン！っと。<span class="freecomment">(いずせにせよ、反射神経を研ぎすませて...)</span>
 		</p>
 	</div>
 	<h3 id="intellij">IntelliJ IDEA なら</h3>
