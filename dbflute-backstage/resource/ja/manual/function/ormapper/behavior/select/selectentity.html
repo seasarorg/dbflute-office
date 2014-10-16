@@ -172,20 +172,20 @@ OptionalEntity&lt;Member&gt; <span class="localvar">entity</span> = <span class=
 <span class="comment">// 存在しないこともあるものは、Optionalのまま取っちゃって</span>
 Member <span class="localvar">member</span> = <span class="attribute">memberBhv</span>.selectEntity(cb <span class="keyword">-&gt;</span> <span class="abbreviation">...</span>).<span class="point">get()</span>;
 Product <span class="localvar">product</span> = <span class="attribute">productBhv</span>.selectEntity(cb <span class="keyword">-&gt;</span> <span class="abbreviation">...</span>).<span class="point">get()</span>;
-OptionalEntity&lt;MemberAddress&gt; <span class="localvar">optAddress</span> = <span class="attribute">memberAddressBhv</span>.selectEnt<span class="abbreviation">...</span>;
+OptionalEntity&lt;MemberAddress&gt; <span class="localvar">optAddress</span> = <span class="attribute">memberAddressBhv</span>.sel<span class="abbreviation">...</span>;
 
 <span class="comment">// いりみだれー</span>
 LocalDate <span class="localvar">birthdate</span> = <span class="localvar">member</span>.getBirthdate();
 String <span class="localvar">productName</span> = product.getProductName();
 <span class="keyword">if</span> (<span class="localvar">birthdate</span> != null && <span class="localvar">product</span>.isProductStatusCodeOnSale()) {
     <span class="localvar">optAddress</span>.<span class="point">ifPresent</span>(<span class="localvar">address</span> <span class="keyword">-&gt;</span> {
-        <span class="attribute">seaLogic</span>.land(<span class="localvar">member</span>.getMemberName(), <span class="localvar">productName</span>, <span class="localvar">address</span>);
+        <span class="attribute">seaLogic</span>.land(<span class="localvar">productName</span>, <span class="localvar">address</span>);
     }.<span class="point">orElse</span>(() <span class="keyword">-&gt;</span> {
         <span class="attribute">seaLogic</span>.iks(<span class="localvar">birthdate</span>, <span class="localvar">productName</span>);
     }
 } <span class="keyword">else</span> {
     <span class="localvar">optAddress</span>.<span class="point">ifPresent</span>(<span class="localvar">address</span> <span class="keyword">-&gt;</span> {
-        <span class="attribute">seaLogic</span>.amphi(<span class="localvar">member</span>.getMemberAccount(), <span class="localvar">productName</span>, <span class="localvar">address</span>);
+        <span class="attribute">seaLogic</span>.amphi(<span class="localvar">productName</span>, <span class="localvar">address</span>);
     }
     <span class="attribute">seaLogic</span>.miraco(<span class="localvar">member</span>.getFormalizedDatetime());
 }
@@ -209,12 +209,12 @@ OptionalEntity&lt;Member&gt; <span class="localvar">entity</span> = <span class=
 <span class="comment">// 業務的に必ず存在して、単に中のEntityを取り出すなら (なければ例外)</span>
 <span class="comment">// (他のメソッドにがそのままEntity渡す必要があるときなど)</span>
 Member <span class="localvar">member</span> = <span class="localvar">entity</span>.<span class="point">get()</span>;
-<span class="attribute">seaLogic</span>.land(<span class="localvar">member</span>); <span class="comment">// Entity型で受け取って、nullを受け付けないメソッド</span>
+<span class="attribute">seaLogic</span>.land(<span class="localvar">member</span>); <span class="comment">// Entityで受け取って、nullを受け付けないなら</span>
 
 <span class="comment">// 存在しないかもしれなくって、単に中のEntityを取り出すなら (なければnull)</span>
 <span class="comment">// (他のメソッドにnullありのEntity渡す必要があるとき)</span>
 Member <span class="localvar">member</span> = <span class="localvar">entity</span>.<span class="point">orElseNull()</span>;
-<span class="attribute">seaLogic</span>.land(<span class="localvar">member</span>); <span class="comment">// Entity型で受け取って、null分岐を中でやっているメソッド</span>
+<span class="attribute">seaLogic</span>.land(<span class="localvar">member</span>); <span class="comment">// Entityで受け取って、null分岐を中でやっているなら</span>
 </code></pre>
 		<h3 id="optionalname">OptionalEntityの変数名は？</h3>
 		<p>
@@ -280,6 +280,11 @@ Member member = memberBhv.<span class="point">selectEntityWithDeletedCheck</span
 <span class="abbreviation">...</span> = member.getMemberName();
 </code></pre>
 	</div>
+	<h3 id="relationoptional">リレーションもOptional</h3>
+	<p>
+		基点テーブルだけでなく、関連テーブルもOptionalとなります。
+	</p>
+	<div class="detailpage"><a href="../../conditionbean/setupselect/index.html#java8">Java8 ならリレーションも Optional</a></div>
 	<h3 id="onjava8">DBFlute on Java8</h3>
 	<p>
 		"DBFlute on Java8" ページ作りました。

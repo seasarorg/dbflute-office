@@ -113,7 +113,7 @@ List&lt;Member&gt; memberList = <span class="attribute">memberBhv</span>.selectL
 			<dt>なんども登場スタイル</dt><dd>そのあと何度も利用するようなケース</dd>
 			<dt>みんなで勢ぞろいスタイル</dt><dd>入りみだれて利用するようなケース</dd>
 			<dt>トラディショナルスタイル</dt><dd>いざとなったら or 迷って手が止まるくらいだったら</dd>
-			<dt>ちょっとだけ勢ぞろいスタイル</dt><dd>(後で登場します)</dd>
+			<dt>スタイル入りみだれスタイル</dt><dd>(後で登場します)</dd>
 		</dl>
 <pre><span class="codetitle">e.g. 関連テーブルにおける OptionalEntity の使い方 @Java</span><code>
 Member <span class="localvar">member</span> = <span class="attribute">memberBhv</span>.selectEntity(<span class="localvar">cb</span> <span class="keyword">-&gt;</span> {
@@ -215,7 +215,7 @@ OptionalEntity&lt;MemberAddress&gt; <span class="localvar">optAddress</span>
 <span class="localvar">optAddress</span>.<span class="point">ifPresent</span>(<span class="localvar">address</span> <span class="keyword">-&gt;</span> {
     <span class="abbreviation">...</span> = <span class="localvar">address</span>.getValidEndDate();
     <span class="localvar">address</span>.getRegion().<span class="point">alwaysPresent</span>(<span class="localvar">region</span> <span class="keyword">-&gt;</span> {
-        <span class="abbreviation">...</span> = region.getRegionName();
+        <span class="abbreviation">...</span> = <span class="localvar">region</span>.getRegionName();
     });
 }.<span class="point">orElse</span>(() <span class="keyword">-&gt;</span> {
     <span class="abbreviation">...</span>
@@ -275,12 +275,12 @@ OptionalEntity&lt;MemberWithdrwal&gt; <span class="localvar">optWithdrwal</span>
 <span class="comment">// 業務的に必ず存在して、単に中のEntityを取り出すなら (なければ例外)</span>
 <span class="comment">// (他のメソッドにがそのままEntity渡す必要があるときなど)</span>
 MemberStatus <span class="localvar">status</span> = <span class="localvar">member</span>.getMemberStatus().<span class="point">get()</span>;
-<span class="attribute">seaLogic</span>.land(<span class="localvar">status</span>); <span class="comment">// Entity型で受け取って、nullを受け付けないメソッド</span>
+<span class="attribute">seaLogic</span>.land(<span class="localvar">status</span>); <span class="comment">// Entityで受け取って、nullを受け付けないなら</span>
 
 <span class="comment">// 存在しないかもしれなくって、単に中のEntityを取り出すなら (なければnull)</span>
 <span class="comment">// (他のメソッドにnullありのEntity渡す必要があるとき)</span>
-MemberWithdrwal <span class="localvar">withdrwal</span> = <span class="localvar">member</span>.getMemberWithdrawal().<span class="point">orElseNull()</span>;
-<span class="attribute">seaLogic</span>.land(<span class="localvar">withdrwal</span>); <span class="comment">// Entity型で受け取って、null分岐を中でやっているメソッド</span>
+MemberWithdrwal <span class="localvar">wdl</span> = <span class="localvar">member</span>.getMemberWithdrawal().<span class="point">orElseNull()</span>;
+<span class="attribute">seaLogic</span>.land(<span class="localvar">wdl</span>); <span class="comment">// Entityで受け取って、null分岐を中でやっているなら</span>
 </code></pre>
 		<h3 id="relationoptname">さすがに関連テーブルのOptionalの変数名は...</h3>
 		<p>
@@ -331,7 +331,7 @@ MemberWithdrwal <span class="localvar">withdrwal</span> = <span class="localvar"
 			になりやすいので、Lambdaのコールバックを使うことで自然とスコープを限定されるので、安全性と可読性の向上が期待できます。
 			<span class="freecomment">(会員ステータスの詰め替え、退会情報系の詰め替えと自然とスコープで分かれる)</span>
 		</p>
-		<h3 id="smalltogetherstyle">ちょっとだけ勢ぞろいスタイル</h3>
+		<h3 id="smalltogetherstyle">スタイル入りみだれスタイル</h3>
 		<p>
 			もし、詰め替えの処理の中で、他の関連テーブルの情報が必要であっても、ちょっとだけなら関連テーブルの Optional を二回呼んでもOKかと思います。
 			<span class="freecomment">(よほどの "いりみだれ" でなければ)</span>
@@ -394,7 +394,7 @@ MemberWithdrwal <span class="localvar">withdrwal</span> = <span class="localvar"
 			でもいいかと思います。
 		</p>
 		<p>
-			関連テーブルの場合は、こういった感じで "一発処理でOKスタイル" と "みんなで勢ぞろいスタイル" との間、グレーゾーンあたりの <em class="keyword">ちょっとだけ勢ぞろいスタイル</em>
+			関連テーブルの場合は、こういった感じで "一発処理でOKスタイル" と "みんなで勢ぞろいスタイル" との間、グレーゾーンあたりの <em class="keyword">スタイル入りみだれスタイル</em>
 			が多いと考えられます。
 		</p>
 		<h3 id="overrule">ルールじゃなくて見やすさと安心</h3>
@@ -403,6 +403,11 @@ MemberWithdrwal <span class="localvar">withdrwal</span> = <span class="localvar"
 			という観点から "じゃあ、今回はこういう感じで書くかなー" って考えながらプログラミングしていくことが大切だということには何も変わりませんね。
 		</p>
 	</div>
+	<h3 id="onjava8">DBFlute on Java8</h3>
+	<p>
+		"DBFlute on Java8" ページ作りました。
+	</p>
+	<div class="detailpage"><a href="../../../../../tutorial/onjava8.html">DBFlute on Java8</a></div>
 
 	<h2 id="methodspec">メソッド仕様</h2>
 	<h3 id="severalcall">同じメソッドの複数回の呼び出し</h3>
