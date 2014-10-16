@@ -74,7 +74,7 @@ Member member = <span class="attribute">memberBhv</span>.selectEntity(cb);
 			また、わかりやすい例外ハンドリングのために、NoSuchElementException の代わりに EntityAlreadyDeletedException が発生します。
 		</p>
 		<p>
-			スタイルごとにうまく使い分けるといいでしょう。
+			スタイルごとにうまく使い分けるとよいでしょう。
 		</p>
 		<dl class="keymainlist">
 			<dt>一発処理でOKスタイル</dt><dd>その場で利用しておしまいなケース</dd>
@@ -229,12 +229,17 @@ Member <span class="localvar">member</span> = <span class="localvar">entity</spa
 			でいいのかもしれません。必要になったら、変数名を選択して ctrl+1->Enter で Rename すればいいかと。
 		</p>
 		<p>
-			そもそも Optional を使うときは、あまり変数に受け取られなくてもいいように実装する方がいいでしょう。
+			ちなみに、これは基点テーブルでの話です。関連テーブルでは少しニュアンスが違うでしょう。
+		</p>
+		<div class="relatedpage"><a href="../../conditionbean/setupselect/index.html#relationoptname">さすがに関連テーブルのOptionalの変数名は...</a></div>
+		<h3 id="onetimeokstyle">すぐに使って終わりなら一発処理でOKスタイル</h3>
+		<p>
+			そもそも Optional を使うときは、あまり変数に受け取られなくてもいいように実装する方がよいでしょう。
 			一発処理でおしまいなら、selectEntity()の戻り値でそのままコールバックスタイルに実装した方が世話ないです。
 			これを <em class="keyword">一発処理でOKスタイル</em> と呼びます。
 		</p>
 <pre><span class="codetitle">e.g. 一発処理でOKスタイルなら @Java</span><code>
-<span class="comment">// 絶対に存在することが前提で、一発処理でOKスタイル (なければ例外)</span>
+<span class="comment">// 業務的に必ず存在することが前提で、一発処理でOKスタイル (なければ例外)</span>
 memberBhv.selectEntity(cb).<span class="point">alwaysPresent</span>(member <span class="keyword">-&gt;</span> {
     <span class="abbreviation">...</span> = member.getMemberId();
     <span class="abbreviation">...</span> = member.getMemberName();
@@ -252,6 +257,10 @@ memberBhv.selectEntity(cb).<span class="point">ifPresent</span>(member <span cla
 			してしまえばいいですが、存在しないこともあるものは Optional
 			のまま受け取る必要がありそうです。みんなで勢ぞろいするときは optMember など区別できる名前にしないとですね。
 		</p>
+		<p>
+			これは関連テーブルでも同じようなことが言えます。
+		</p>
+		<div class="relatedpage"><a href="../../conditionbean/setupselect/index.html#onetimeokstyle">すぐに詰め替えるなら一発処理でOKスタイル</a></div>
 		<h3 id="withdeletedcheck">selectEntityWithDeletedCheck()もあるよ</h3>
 		<p>
 			ただ、絶対に存在することが前提の検索であれば、今まで通り selectEntityWithDeletedCheck(cb)
