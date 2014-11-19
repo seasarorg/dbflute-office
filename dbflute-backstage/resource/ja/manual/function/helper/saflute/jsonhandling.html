@@ -96,6 +96,137 @@
     <span class="keyword">return new</span> StreamResponse(<span class="literal">"dbflute.pdf"</span>).stream(ins);
 }
 </code></pre>
+
+	<h2 id="exceptionjson">JSON戻りの例外ハンドリング</h2>
+	<p>
+		JSON戻りのActionにて、例外 (主に業務例外) が発生したときに、JSONを戻す仕組みがあります。
+	</p>
+	<h3 id="assistantdirectorapicall">AssistantDirector で Provider 設定</h3>
+	<p>
+		AssistantDirectorで、アプリ独自の ApiResultProvider
+		を設定すると、例外発生時にその provider が処理されて、好きなようにJSONを戻すことができます。
+	</p>
+	<p>
+		JsonResponseが戻り値になっている Action の中で例外が発生したときに呼ばれます。
+	</p>
+<pre><span class="codetitle">e.g. AssistantDirectory で ApiResultProvider を設定 @Java</span><code>
+<span class="abbreviation">...</span>
+<span class="keyword">protected</span> OptionalActionDirection prepareOptionalActionDirection() {
+    <span class="abbreviation">...</span>
+    prepareApiCall(direction);
+}
+
+<span class="abbreviation">...</span>
+
+<span class="keyword">protected void</span> prepareApiCall(OptionalActionDirection direction) {
+    direction.directApiCall(createApiResultProvider());
+}
+
+<span class="keyword">protected</span> XxxApiResultProvider createApiResultProvider() { <span class="comment">// アプリ独自のクラス</span>
+    <span class="keyword">return new</span> <span class="point">XxxApiResultProvider()</span>; <span class="comment">// ApiResultProviderをimplements</span>
+}
+</code></pre>
+	<h3 id="apiresultprovider">ApiResultProvider の実装</h3>
+	<p>
+		ApiResultProvider では、それぞれの状況に応じて、ApiResult を implements したBeanを戻します。
+		そのBeanは、JSONに変換されてレスポンスになります。
+	</p>
+	<p>
+		その中で、メッセージなども取得できるようになっています。
+		アプリケーションのルールに従って、実装してみてください。
+	</p>
+<pre><span class="codetitle">e.g. ApiResultProvider の実装 @Java</span><code>
+// ===================================================================================
+//                                                                      Prepare Result
+//                                                                      ==============
+@Override
+public ApiResult prepareLoginRequiredFailureResult(ActionMessages errors, ActionExecuteMeta meta) {
+    final ApiResultWebBean bean = createApiResultWebBean(ApiResultMode.LOGIN_REQUIRED);
+    if (errors != null) {
+        bean.setMessage(getConcatedMessage(errors));
+    }
+    return bean;
+}
+
+@Override
+public ApiResult prepareLoginPerformRedirectResult(ActionMessages errors, ActionExecuteMeta meta) {
+    final ApiResultWebBean bean = createApiResultWebBean(ApiResultMode.SUCCESS);
+    bean.setMessage(getConcatedMessage(errors));
+    return bean;
+}
+
+@Override
+public ApiResult prepareValidationErrorResult(ActionMessages errors, ActionExecuteMeta meta) {
+    final ApiResultWebBean bean = createApiResultWebBean(ApiResultMode.FAIL);
+    bean.setMessage(getConcatedMessage(errors));
+    return bean;
+}
+
+@Override
+public ApiResult prepareApplicationExceptionResult(ActionMessages errors, ActionExecuteMeta meta,
+        RuntimeException cause) {
+    final ApiResultWebBean bean = createApiResultWebBean(ApiResultMode.FAIL);
+    bean.setMessage(getConcatedMessage(errors));
+    return bean;
+}
+
+@Override
+public ApiResult prepareSystemExceptionResult(HttpServletResponse response, ActionExecuteMeta executeMeta,
+        Throwable cause) {
+    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    final ApiResultWebBean bean = createApiResultWebBean(ApiResultMode.FAIL);
+    return bean; // Not Required
+}
+
+// ===================================================================================
+//                                                                             WebBean
+//                                                                             =======
+protected ApiResultWebBean createApiResultWebBean(ApiResultMode mode) {
+    return new ApiResultWebBean(mode);
+}
+
+// ===================================================================================
+//                                                                             Message
+//                                                                             =======
+protected List<String> getMessageList(ActionMessages errors) {
+    final MessageManager messageManager = getMessageManager();
+    final Locale userLocale = getRequestManager().getUserLocale();
+    return messageManager.getMessageList(userLocale, errors);
+}
+
+protected String getConcatedMessage(ActionMessages errors) {
+    List<String> messageList = getMessageList(errors);
+    if (CollectionUtil.isNotEmpty(messageList)) {
+        StringBuilder builder = new StringBuilder();
+        for (String message : messageList) {
+            builder.append(message);
+            builder.append("\n");
+        }
+        return builder.toString();
+    }
+    return "";
+}
+
+protected Map<String, List<String>> getPropertyMessageMap(ActionMessages errors) {
+    final MessageManager messageManager = getMessageManager();
+    final Locale userLocale = getRequestManager().getUserLocale();
+    return messageManager.getPropertyMessageMap(userLocale, errors);
+}
+
+protected MessageManager getMessageManager() {
+    return ContainerUtil.getComponent(MessageManager.class);
+}
+
+protected RequestManager getRequestManager() {
+    return ContainerUtil.getComponent(RequestManager.class);
+}
+</code></pre>
+	<h3 id="apiresultappexp">業務例外のハンドリングはActionCallback</h3>
+	<p>
+		どの例外が業務例外で、どういうメッセージを戻すかという設定は、ActionCallback
+		の中で行われています。TypicalBaseAction の godHandExceptionMonologue() から辿っていくとわかります。
+	</p>
+	<div class="relatedpage"><a href="./actioncallback.html">SAFlute の ActionCallback</a></div>
 <!-- __content-end__ --></div></div>
 
 <div id="sidebar">
