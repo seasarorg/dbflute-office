@@ -61,12 +61,15 @@ mvn -e clean install <span class="point">-P integration</span>
 mvn -e clean package <span class="point">-P integration</span>
 </code></pre>
 	<p>
-		すると、warファイルの中の xxx_env.properties などが指定された環境のものになっています。
+		すると、warファイルの中に含まれる xxx_env.properties などが、指定された環境のものになっています。
+		<span class="freecomment">(一方で、環境情報をwarに含めたくない場合は、propertiesの扱い方を工夫する必要があるでしょう)</span>
 	</p>
 	<p>
-		<span class="freecomment">※一方で、環境情報をwarに含めたくない場合は、propertiesの扱い方を工夫する必要があるでしょう</span>
+		環境ごとに切り替える設定ファイルの環境に適した修正が終わっていることが前提です。
 	</p>
-	
+	<div class="relatedpage"><a href="../projstructure.html#envproperties">環境切り替え用のproperties</a></div>
+	<div class="relatedpage"><a href="../projstructure.html#log4jproperties">ログの設定 (log4j.properties)</a></div>
+
 	<h2 id="newdeployenv">新しいデプロイ環境をつくる</h2>
 	<p>
 		新しいデプロイ環境 (profile) をつくる場合は、いくつかの設定ファイルを修正していく必要があります。
@@ -86,16 +89,11 @@ mvn -e clean package <span class="point">-P integration</span>
 	<p>
 		<span class="freecomment">※profileの設定場所を変更している場合は、そちらを修正</span>
 	</p>
-	<h3 id="addpropertieshtml">2. propertiesHtmlMap にて env を追加</h3>
-	<p>
-		documentDefinitionMap.dfprop の propertiesHtmlMap のそれぞれの environmentMap
-		にて、新しい環境の設定を追加します。<span class="freecomment">(PropertiesHTMLで比較ができるようにするため)</span>
-	</p>
-	<h3 id="addresources">3. src/sea/resources を追加</h3>
+	<h3 id="addresources">2. src/sea/resources を追加</h3>
 	<p>
 		common, webプロジェクトの src/sea/resources フォルダを作成します。
 	</p>
-	<h3 id="addproperties">4. resources にその他環境依存設定ファイルを追加</h3>
+	<h3 id="addproperties">3. resources に環境依存propertiesを追加</h3>
 	<p>
 		独自に作ったばかりの src/なんとか/resources フォルダに xxx_env.properties
 		を追加します。別の環境の xxx_env.properties をコピーして作るとよいです。
@@ -104,9 +102,29 @@ mvn -e clean package <span class="point">-P integration</span>
 	<p>
 		プロパティ値だけでなく、コメントの中も新しい環境に合わせましょう。<span class="freecomment">(環境名とか書いてあるかも)</span>
 	</p>
-	<h3 id="addoriginal">5. resources にその他環境依存設定ファイルを追加</h3>
+	<h3 id="addpropertieshtml">4. propertiesHtmlMap にて env を追加</h3>
 	<p>
-		もし、アプリで環境依存設定ファイルを作っていれば、それを作成します。
+		documentDefinitionMap.dfprop の propertiesHtmlMap のそれぞれの environmentMap
+		にて、新しい環境の設定を追加します。<span class="freecomment">(PropertiesHTMLで比較ができるようにするため)</span>
+	</p>
+	<div class="relatedpage"><a href="../../../generator/task/doc/propertieshtml.html">Docタスク - PropertiesHTML</a></div>
+<pre><span class="codetitle">e.g. propertiesHtmlMap の environmentMap に新しい環境を追加 @Command</span><code>
+        ; Sea_ConfigProperties = map:{
+            <span class="abbreviation">...</span>
+            ; environmentMap = map:{
+                ; integration = $$baseDir$$/integration/resources
+                ; production = $$baseDir$$/production/resources
+                <span class="point">; sea = $$baseDir$$/sea/resources</span>
+            }
+            <span class="abbreviation">...</span>
+        }
+</code></pre>
+	<p>
+		Docタスク (manageの22番) を叩いて、PropertiesHTML に新しい環境の情報が追加されていることを確認しましょう。
+	</p>
+	<h3 id="addoriginal">5. resources にその他環境依存のファイルを追加</h3>
+	<p>
+		もし、アプリで独自の環境依存の設定ファイルを作っていれば、それを resources に作成します。
 	</p>
 	<h3 id="addreplaceschema">6. ReplaceSchemaの環境設定を追加</h3>
 	<p>

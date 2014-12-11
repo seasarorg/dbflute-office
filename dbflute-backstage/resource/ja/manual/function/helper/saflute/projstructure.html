@@ -213,6 +213,18 @@ maihama-common
 		結合はできるだけ本番に近いプログラムで動いて欲しいものだからです。プロパティの値だけで切り替えたいところです。
 		ですが、どうしてもというときは、isDevelopmentHere()の仕組みを応用すれば、できなくはないので必要になったら修正を。
 	</p>
+	<h3 id="log4jproperties">ログの設定 (log4j.properties)</h3>
+	<p>
+		少なくともリリース時点では、結合環境は本番のログレベルは INFO (DEBUGは出さない)
+		にすると想定されるので、webプロジェクトの src/allpackage/resources 配下の log4j.properties の
+		log.logger.loglevel を INFO にします。
+	</p>
+	<p>
+		また、SAFlute Template でプロジェクトを作成した時点では、結合や本番ではコンソールにはアプリログを出力しません。
+		これは、catalina.outが肥大化してしまう可能性があるためと同時に、catalina.outは Tomcat
+		のログに徹したものにしたいというところから、アプリログは専用のログファイルに出力されます。
+		ただ、もし catalina.out に出力したい場合は、consoleを追加すれば出力できます。
+	</p>
 	<h3 id="newdeployenv">新しいデプロイ環境をつくるなら</h3>
 	<p>
 		新しい環境 (profile) をつくる場合は、いくつかの設定ファイルを修正していく必要があります。
