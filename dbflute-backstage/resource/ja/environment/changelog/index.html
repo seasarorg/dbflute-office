@@ -29,10 +29,11 @@
 
       <div class="release">
         <h2>DBFlute-1.1.0-sp1 <span class="freecomment">※Java8</span></h2>
-        <p class="releasedate">2015/01/25</p>
+        <p class="releasedate">2015/02/01</p>
         <div class="new">
           <h3>NEW</h3>
           <ul>
+            <li>DBFlute Engine: sisterCode for tableClassification</li>
             <li>DBFlute Engine: escape default value for Java</li>
             <li>DBFlute Engine: Spring Tomcat JDBC, transaction</li>
             <li>DBFlute Engine: remove CDI warning</li>
@@ -42,6 +43,8 @@
             <li>DBFlute Engine: natural unique info by DBMeta</li>
             <li>DBFlute Engine: upgrade H2 to 1.4.185</li>
             <li>DBFlute Engine: retry to secondary port for EMSynchronizer</li>
+            <li>DBFlute Runtime: can parse 2015/01/28 2:49</li>
+            <li>DBFlute Runtime: fix invoke query null allowed handling</li>
             <li>DBFlute Runtime: UpdateOption's uniqueOf(UniqueInfo)</li>
             <li>DBFlute Runtime: varyingQueryUpdate() option's specify()</li>
             <li>DBFlute Runtime: uniqueDeriven read-only and other props remove()</li>
@@ -82,6 +85,7 @@
         <div class="new">
           <h3>NEW</h3>
           <ul>
+            <li>(DBFLUTE-1179){Java/C#}: テーブル区分値でも姉妹コードを使えるように <span class="freecomment">*01/27パッチ</span></li>
             <li>(DBFLUTE-1178){Java/C#}: SchemaHTMLで隣のSchemaHTMLへのリンク、ERDの画像リンクなど <span class="freecomment">*01/21パッチ</span></li>
             <li>(DBFLUTE-1177){Java/C#}: 複数Eclipse起動に耐えられるようにEMSynchronizer対応 <span class="freecomment">*01/21パッチ</span></li>
             <li>(DBFLUTE-1176){Java/C#}: カラムのデフォルト値でダブルクォーテーションが入っていても大丈夫なように <span class="freecomment">*01/11パッチ</span></li>
