@@ -41,32 +41,35 @@
 <pre><span class="codetitle">e.g. fessプロジェクトのsrc/main/java @Directory</span><code>
 fess
  |-src/main/java          <span class="comment">// Fessプロジェクト共通クラス</span>
- |  |-org.codelibs.fess
- |     |-action           <span class="comment">// Actionのパッケージ</span>
- |     |  |-admin         <span class="comment">// 管理系のActionたち</span>
- |     |  |-base          <span class="comment">// Actionのスーパークラスなどの基盤 e.g. FessBaseAction</span>
+ |  |-org.codelibs.fess   <span class="comment">// ★パッケージ構成要検討</span>
+ |     |-<span class="abbreviation">...</span>
+ |     |-<span class="point">lasta</span>            <span class="comment">// FessのLasta対応パッケージ ★名前要検討</span>
+ |     |  |-core          <span class="comment">// SAFluteのcoreを拡張したクラスなど</span>
+ |     |  |  |-direction  <span class="comment">// SAFluteをFessプロジェクト風にするところ☆</span>
+ |     |  |     |-sponsor <span class="comment">// AssistantDirectorで設定する処理を切り出したクラスなど</span>
+ |     |  |     |  |-FessActionAdjustmentProvider    <span class="comment">// 微調整</span>
+ |     |  |     |  |-FessTimeResourceProvider        <span class="comment">// 時間リソース</span>
+ |     |  |     |  |-FessUserLocaleProcessProvider   <span class="comment">// ロケール</span>
+ |     |  |     |  |-FessUserTimeZoneProcessProvider <span class="comment">// タイムゾーン</span>
+ |     |  |     |-FessConfig.java <span class="comment">// fess_config 対応クラス(自動生成)</span>
+ |     |  |     |-FessEnv.java    <span class="comment">// fess_env 対応クラス(自動生成)</span>
+ |     |  |     |-<span class="point">FessFwAssistantDirector.java</span> <span class="comment">// Lastaの現場フィットを司る</span>
+ |     |  |       <span class="comment">// ☆これが最強に大事</span>
+ |     |  |       <span class="comment">// (各ドメインが継承して微調整オーバーライドする)</span>
+ |     |  |
+ |     |  |-<span class="abbreviation">...</span>
+ |     |  |-web           <span class="comment">// SAFluteのwebを拡張したクラスなど</span>
+ |     |     |-action     <span class="comment">// Actionに関する拡張クラスなど</span>
+ |     |     |-login      <span class="comment">// ログインに関する拡張クラスなど</span>
+ |     |     |-paging     <span class="comment">// ページングに関する拡張クラスなど</span>
+ |     |-<span class="abbreviation">...</span>
+ |     |-web      <span class="comment">// ActionやFormのパッケージ ★★actionとformをこっちに移行</span>
+ |     |  |-admin <span class="comment">// 管理系のActionたち</span>
+ |     |  |-base  <span class="comment">// Actionのスーパークラスなどの基盤 e.g. FessBaseAction</span>
  |     |  |-AppletAction
  |     |  |-ErrorAction
  |     |  |-IndexAction   <span class="comment">// トップページ (検索画面)</span>
  |     |  |-LoginAction
- |     |-<span class="point">lasta</span>             <span class="comment">// FessのLasta対応パッケージ</span>
- |        |-core           <span class="comment">// SAFluteのcoreを拡張したクラスなど</span>
- |        |  |-direction   <span class="comment">// SAFluteをFessプロジェクト風にするところ☆</span>
- |        |     |-sponsor  <span class="comment">// AssistantDirectorで設定する処理を切り出したクラスなど</span>
- |        |     |  |-FessActionAdjustmentProvider    <span class="comment">// 微調整</span>
- |        |     |  |-FessTimeResourceProvider        <span class="comment">// 時間リソース</span>
- |        |     |  |-FessUserLocaleProcessProvider   <span class="comment">// ロケール</span>
- |        |     |  |-FessUserTimeZoneProcessProvider <span class="comment">// タイムゾーン</span>
- |        |     |-FessConfig.java <span class="comment">// fess_config 対応クラス(自動生成)</span>
- |        |     |-FessEnv.java    <span class="comment">// fess_env 対応クラス(自動生成)</span>
- |        |     |-<span class="point">FessFwAssistantDirector.java</span> <span class="comment">// Lastaの現場フィットを司る</span>
- |        |       <span class="comment">// ☆これが最強に大事</span>
- |        |       <span class="comment">// (各ドメインが継承して微調整オーバーライドする)</span>
- |        |
- |        |-web           <span class="comment">// SAFluteのwebを拡張したクラスなど</span>
- |           |-action          <span class="comment">// SAFluteのwebを拡張したクラスなど</span>
- |           |-login           <span class="comment">// ログインに関する</span>
- |           |-paging          <span class="comment">// SAFluteのwebを拡張したクラスなど</span>
  |
  |-src/main/resources
  |-src/test/java
@@ -80,7 +83,7 @@ fess
  |  |-<span class="abbreviation">...</span>
  |-src/main/h2/resources/sql <span class="comment">// H2のときだけ変な!?情報が残っちゃうから</span>
  |  |-robot.ddl              <span class="comment">// fessの中でs2robotのDBを置き換え (手動同期)</span>
- |-src/main/resources
+ |-src/main/resources            <span class="comment">// ★フォルダ分けするか要検討</span>
  |  |-device                     <span class="comment">// ★★削除 (がらけー)</span>
  |  |-META-INF                   <span class="comment">// ★★削除</span>
  |  |-app.dicon                  <span class="comment">// ★整理: アプリ情報が埋め込まれている</span>
@@ -221,9 +224,38 @@ fess
  |-src/main/resources
  |  |-org.codelibs.fess.db.exbhv <span class="comment">// DBFluteの外だしSQL</span>
  |  |-dbflute.dicon <span class="comment">// DBFluteのBehaviorのコンポーネント定義</span>
- | TODO jflute
- |-src/test/java
- |-src/test/resources
+ |
+ |-dbflute_fess
+ |  |-dfprop
+ |  |  |-<span class="abbreviation">...</span>
+ |  |  |-basicInfoMap.dfprop <span class="comment">// DBFluteの基本となる設定 (自動生成パッケージなど)</span>
+ |  |  |-<span class="abbreviation">...</span>
+ |  |  |-databaseInfoMap.dfprop <span class="comment">// DBFluteエンジンの接続DB情報</span>
+ |  |  |-<span class="abbreviation">...</span>
+ |  |  |-documentDefinitionMap.dfprop <span class="comment">// ドキュメントの設定 (PropertiesHTMLも)</span>
+ |  |  |-<span class="abbreviation">...</span>
+ |  |  |-freeGenDefinitionMap.dfprop <span class="comment">// FreeGenの設定 (propertiesなど)</span>
+ |  |  |-<span class="abbreviation">...</span>
+ |  |  |-replaceSchemaDefinitionMap.dfprop <span class="comment">// ReplaceSchemaの設定</span>
+ |  |  |-<span class="abbreviation">...</span>
+ |  |-extlib
+ |  |-freegen              <span class="comment">// FreeGenのテンプレート置き場</span>
+ |  |  |-ControlFreeGen.vm <span class="comment">// FreeGen実行時のコントロールファイル</span>
+ |  |  |-JspPath.vm        <span class="comment">// JSPパスの定数のテンプレート</span>
+ |  |  |-SystemConfig.vm   <span class="comment">// Configインターフェースのテンプレート</span>
+ |  |  |-UserMessages.vm   <span class="comment">// ActionMessagesのテンプレート</span>
+ |  |-log
+ |  |-output
+ |  |-playsql <span class="comment">// ActionMessagesのテンプレート</span>
+ |  |  |-replace-schema.sql <span class="comment">// fessのDDL (drop文は不要)</span>
+ |  |  |-take-finally.sql   <span class="comment">// テストデータ登録後のDDL</span>
+ |  |-schema
+ |  |-_project.bat
+ |  |-_project.sh
+ |  |-_readme.txt
+ |  |-build.properties
+ |  |-manage.bat
+ |  |-manage.sh
  |-<span class="abbreviation">...</span>
 </code></pre>
 
