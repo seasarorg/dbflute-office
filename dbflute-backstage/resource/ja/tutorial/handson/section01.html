@@ -96,7 +96,10 @@ C:\projects
 		<em class="keyword">※社内でひな形が用意されている場合は、そちらを利用してください。</em>
 	</p>
 	<p>
-		EGit (GitクライアントのEclipseプラグイン) を使う場合は、以下のような手順になります。
+		<span class="freecomment">(ひな形が用意されているかどうかわからない場合は、近くの人に聞いてみてください)</span>
+	</p>
+	<p>
+		もし、EGit (GitクライアントのEclipseプラグイン) を使う場合は、以下のような手順になります。
 	</p>
 	<ol>
 		<li>Preferences の Team - Git - Configuration にて autocrlf が "もし" true になら false に</li>
@@ -105,7 +108,7 @@ C:\projects
 		<li><em class="keyword">Import as general project</em> を選択して Next, そして次も Finish でおしまい</li>
 	</ol>
 	<p>
-		<span class="freecomment">(<em class="keyword">dbflute-hands-on</em> を選択して右クリック、ってのが大事...あとその後、<em class="keyword">general project</em> ってのがポイント)</span>
+		<span class="freecomment">(<em class="keyword">dbflute-hands-on</em> を選択して右クリック、ってのが大事...あとその後、<em class="keyword">general project</em> ってのがポイント。一方で、もし社内のひな形で <em class="keyword">.project</em> が含まれている場合は、general ではなく <em class="keyword">Import existing project</em> を選択)</span>
 	</p>
 	<div class="inucolumn">
 		<h3 id="gitmaster">もし、社内でひな形が用意されてる場合は...</h3>
@@ -154,6 +157,7 @@ PROJECT_ROOT
 	<p>
 		今後、ハンズオンを中断する場合は、localdb/close-mysql.bat|sh
 		を実行し、MySQLをシャットダウンし、そして、またハンズオンを再開するときは、boot-mysql.bat|sh を実行してください。
+		<span class="freecomment">(Windowsであれば、Eclipse上からbatファイルをダブルクリックで実行できます: ctrl+shift+Rで実行でもOKです)</span>
 	</p>
 	<p>
 		ちなみに Mac の人は、ダウンロードした後に mysql_install_db
@@ -169,11 +173,16 @@ PROJECT_ROOT
 		<dd>
 			DBFluteライフを支援するプラグイン
 		</dd>
+		<dd></dd>
 		<dd>
+			<em class="keyword">Java8</em> なら、DBFlute-EMecha.zip を解凍し、Eclipse の dropinsディレクトリ配下に配置:
 			<a href="https://github.com/dbflute-emecha/dbflute-emecha-eclipse/releases">https://github.com/dbflute-emecha/dbflute-emecha-eclipse/releases</a>
 		</dd>
 		<dd>
-			DBFlute-EMecha.zip を解凍し、Eclipse の dropinsディレクトリ配下に配置。 
+			<em class="keyword">Java6,7</em> なら、更新サイトからインストール: <em class="keyword">http://eclipse.seasar.org/updates/3.3</em>
+		</dd>
+		<dd>
+			
 		</dd>
 		<dd>
 			<div class="relatedpage"><a href="../../manual/function/helper/emecha/index.html">EMechaプラグイン</a></div>
@@ -185,7 +194,7 @@ PROJECT_ROOT
 	</dl>
 
 	<h2 id="project">プロジェクトのセットアップ</h2>
-	<h3 id="eclipse">Eclipseプロジェクトの作成</h3>
+	<h3 id="maveneclipse">Eclipseプロジェクトの作成</h3>
 	<p>
 		tutorial/material/eclipse/prototype-pom.xml をプロジェクト直下に pom.xml
 		という名前でコピーしましょう。ちなみに、pom.xml やその他幾つかのリソースは SVN-Ignore 設定となっています。
@@ -196,6 +205,10 @@ PROJECT_ROOT
 		を再起動してしてください。ただし、M2_REPO が既に登録されている環境ではリフレッシュするだけでOKです。すると、そのプロジェクトが
 		Maven 管理された Java プロジェクトになり、既に存在している UnitContainerTestCase がコンパイルされます。
 		(ただし、この時点ではコンパイルエラーになっているはずです)
+	</p>
+	<p>
+		<span class="freecomment">(ちなみに、この時点では、maven-eclipse.bat|sh の "call dbflute_maihamadb/manage.bat refresh"
+		において、そんなコマンドはないとエラーが発生しますが、Mavenのコマンドさえ成功していればOKです)</span>
 	</p>
 	<h3 id="encoding">エンコーディングの調整 <span class="freecomment">#workspace #project</span></h3>
 	<p>
@@ -509,7 +522,7 @@ PROJECT_ROOT
 <pre><span class="codetitle">e.g. CreateSchema用のDDLの配置場所 @Directory</span><code>
 PROJECT_ROOT
  |-<span class="abbreviation">...</span>
- |-dbflute_exampledb
+ |-dbflute_maihamadb
  |  |-dfprop
  |  |-<span class="abbreviation">...</span>
  |  |-playsql
@@ -538,7 +551,7 @@ PROJECT_ROOT
 		DBFluteタスクのログファイルである、DBFluteクライアント/log/dbflute.log でも確認することができます。
 	</p>
 	<p>
-		再度、MySQLにログインし、exampledb データベースが作られていることを確認してください。
+		再度、MySQLにログインし、maihamadb データベースが作られていることを確認してください。
 	</p>
 	<h3 id="jdbc">JDBCタスクの実行</h3>
 	<p>
