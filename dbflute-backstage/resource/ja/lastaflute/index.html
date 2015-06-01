@@ -4,7 +4,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
-	<meta name="keywords" content="DBFlute,チュートリアル,Tutorial,Deveploer,Architect" />
+	<meta name="keywords" content="DBFlute,LastaFlute" />
 	<style type="text/css" title="currentStyle">@import "../../css/sub.css";</style>
 	<title>LastaFlute | DBFlute</title>
 </head>
@@ -29,12 +29,100 @@
 
 	<h2 id="about">LastaFluteとは？</h2>
 	<p>
-		TODO jflute 書き途中
+		Typesafe Web Framework for LeAn STArtup with DBFlute and Java8
 	</p>
-	<div class="relatedpage"><a href="./tutorial/action.html">Action Tutorial | LastaFlute</a></div>
-	<div class="relatedpage"><a href="./migration/satola.html">LastafluteとSAFluteとの違い</a></div>
-	<div class="relatedpage"><a href="./migration/mifromsa.html">SAFluteからLastaFluteへの移行</a></div>
-	<div class="relatedpage"><a href="./lastadi/index.html">Lasta Di | LastaFlute</a></div>
+	<p>
+		<em class="keyword">リーンスタートアップ & インクリメンタル開発</em> のための、Java8前提のWebフレームワークです。
+	</p>
+	<h3 id="trialanderror"><em class="mark">スピード</em>プログラミング</h3>
+	<p>
+		スタートアップは、<em class="keyword">Trial & Error</em> の繰り返しのため、身軽な開発環境が求められる。
+	</p>
+	<dl class="keymainlist">
+		<dt><em class="mark">ホットデプロイ</em></dt><dd>再起動せずに、Actionクラスを修正してすぐに確認できる</dd>
+		<dt><em class="mark">起動が速い</em></dt><dd>再起動が必要になっても、ハイスピードの再起動</dd>
+	</dl>
+	<h3 id="transmutable"><em class="mark">変化できる</em>プログラミング</h3>
+	<p>
+		スタートアップは、<em class="keyword">要求の変化</em> の繰り返しのため、安全な仕組みが求められる。
+	</p>
+	<div class"detailpage"><a href=""></a></div>
+	<dl class="keymainlist">
+		<dt><em class="mark">徹底したタイプセーフ</em></dt><dd>タイプセーフなAction実装、そして、ConditionBean</dd>
+		<dt><em class="mark">攻めのDB変更</em></dt><dd>DBFluteフルパワー、そして、FreeGen</dd>
+		<dt><em class="mark">化け物のようなログ</em></dt><dd>困ったときに見たくなるようなログ</dd>
+	</dl>
+	<p>
+		......................................................変化の激しい中において、<em class="keyword">安全はスピード</em> になる。
+	</p>
+	<h3 id="naturcare"><em class="mark">自然とそうなる</em>プログラミング</h3>
+	<p>
+		スタートアップは、<em class="keyword">リソースも変化</em> の繰り返しのため、自然の力が求められる。
+	</p>
+	<dl class="keymainlist">	
+		<dt><em class="mark">規約ベース</em></dt><dd>URL = クラス名 + メソッド名: URLからクラスが探しやすい</dd>
+		<dt><em class="mark">少ない選択肢</em></dt><dd>不要な選択肢を省き、できる限り実装のブレを少なく</dd>
+		<dt><em class="mark">デフォルトセット</em></dt><dd>一通り揃っている開発環境、コンフィグの仕組みからメールまで</dd>
+	</dl>
+	<h3 id="cast">LastaFluteのキャスト</h3>
+	<p class="imgbox">
+		<a href="../data/model/lastaflute-Dependencies-view.png" title="LastaFluteのキャスト"><img src="../data/model/lastaflute-Dependencies-view.png" alt="LastaFluteのキャスト" width="550" height="380" /></a>
+	</p>
+
+	<h2 id="howtoimpl">LastaFluteの実装方法</h2>
+	<p>
+		Actionクラスがなかなか楽しくなっております。
+	</p>
+	<div class="detailpage"><a href="./tutorial/action.html">Action Tutorial | LastaFlute</a></div>
+<pre><span class="codetitle">e.g. Action for URL '/product/list/3/' @Java</span><code>
+@Execute
+<span class="keyword">public</span> HtmlResponse index(<span class="keyword">int</span> <span class="localvar">pageNumber</span>, ProductSearchForm <span class="localvar">form</span>) {
+    validate(<span class="localvar">form</span>, () -&gt; {
+        <span class="keyword">return</span> asHtml(<span class="attribute">path_Product_ProductListJsp</span>);
+    });
+    PagingResultBean&lt;Product&gt; <span class="localvar">page</span> = productBhv.selectPage(cb -> {
+        cb.setupSelect_ProductStatus();
+        cb.query().setProductName_LikeSearch(form.productName, op -&gt; op.likeContain());
+        cb.query().addOrderBy_ProductName_Asc();
+        cb.paging(getPagingPageSize(), pageNumber);
+    });
+    List&lt;ProductSearchRowBean&gt; <span class="localvar">beans</span> = <span class="localvar">page</span>.mappingList(<span class="localvar">product</span> -&gt; {
+        <span class="keyword">return</span> mappingToBean(<span class="localvar">product</span>);
+    });
+    <span class="keyword">return</span> asHtml(<span class="attribute">path_Product_ProductListJsp</span>).renderWith(<span class="localvar">data</span> -&gt; {
+        <span class="localvar">data</span>.register(<span class="literal">"beans"</span>, <span class="localvar">beans</span>);
+        registerPagingNavi(<span class="localvar">data</span>, <span class="localvar">page</span>, <span class="localvar">form</span>);
+    });
+}
+</code></pre>
+
+	<h2 id="saflute">SAFluteを御存知の方へ</h2>
+	<p>
+		違いを簡単にまとめています。
+	</p>
+	<div class="detailpage"><a href="./migration/satola.html">LastafluteとSAFluteとの違い</a></div>
+	<p>
+		もし、移行する強者 (つわもの) であればこちら。
+	</p>
+	<div class="detailpage"><a href="./migration/mifromsa.html">SAFluteからLastaFluteへの移行</a></div>
+
+	<h2 id="repository">LastaFluteのリポジトリ</h2>
+	<p>
+		The source codes are in Github.
+	</p>
+	<div class="detailpage"><a href="https://github.com/lastaflute">Github - LastaFlute</a></div>
+
+	<h2 id="Thanks">Thanks, Frameworks</h2>
+	<p>
+		LastaFlute forks the following frameworks:
+	</p>
+	<dl class="keymainlist">
+		<dt>Seasar</dt><dd>Lasta Di</dd>
+		<dt>AOP Alliance</dt><dd>Lasta Di</dd>
+		<dt>SAStruts</dt><dd>LastaFlute</dd>
+		<dt>Struts</dt><dd>LastaFlute</dd>
+		<dt>Commons</dt><dd>LastaFlute</dd>
+	</dl>
 <!-- __content-end__ --></div></div>
 
 <div id="sidebar">
