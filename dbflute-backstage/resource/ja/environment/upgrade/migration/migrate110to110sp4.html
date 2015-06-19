@@ -88,6 +88,22 @@
     #}
     # - - - - - - - - - -/
 </code></pre>
+	<h3 id="lambdaentity">互換モード、LambdaのselectEntity()の戻り値</h3>
+	<p>
+		1.0.x から 1.1.x に互換モードで移行した人だけが対象です。
+	</p>
+	<p>
+		isAvailableSelectEntityPlainReturn を true にすることで、selectEntity()の戻り値が Optional
+		ではなくそのままのEntityが戻るようになりますが、同時に isMakeCallbackConditionBeanSetup を true
+		にして、Lambda引数のselectEntity()も生成しているとき、そちらだけは Optional になるようになっています。
+		<span class="frm">(sp3までは、両方とも Plain な Entity だった)</span>
+	</p>
+	<p>
+		これにより、古い方のselectEntity()だけは完全に今まで通りで、新しいLambda引数のselectEntity()はOptionalで完全に新しいやり方で実装していくことができます。
+	</p>
+	<p>
+		もし、Lambda引数のselectEntity()も Plain な Entity にしたいときは、isAvailableLambdaSelectEntityForcedlyOptional を false にします。
+	</p>
 
 	<h2 id="impl">実装上の注意点</h2>
 	<p>
