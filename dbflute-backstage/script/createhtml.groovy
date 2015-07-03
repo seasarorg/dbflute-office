@@ -93,6 +93,9 @@ class SitemapManager {
     def getTutorialList() {
         getCategoryList('tutorial')
     }
+    def getLastaFluteList() {
+        getCategoryList('lastaflute')
+    }
 }
 
 def sitemapManager = new SitemapManager()
