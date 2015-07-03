@@ -6,7 +6,7 @@
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="keywords" content="DBFlute,LastaFlute,Java,Lean Startup,Incremental Development" />
 	<style type="text/css" title="currentStyle">@import "../../../css/sub.css";</style>
-	<title>LastaFlute実装チュートリアル | LastaFlute</title>
+	<title>LastaFluteの実装チュートリアル | LastaFlute</title>
 </head>
 <body>
 <div id="container" class="ct-manual">
@@ -24,7 +24,7 @@
 </div>
 
 <div id="content"><!-- __content-start__ -->
-	<h1>LastaFlute実装チュートリアル</h1>
+	<h1>LastaFluteの実装チュートリアル</h1>
 	<div class="relatedpage"><a href="../index.html">LastaFlute</a></div>
 	<p>
 		LastaFluteで実装するディベロッパーは、このページをブックマーク！
@@ -34,6 +34,14 @@
 	</p>
 	<div class="relatedpage"><a href="../howto/startup/index.html">LastaFluteでスタートアップ</a></div>
 	${indexlist}
+
+	<h2 id="style">ディベロッパーの実装スタイル</h2>
+	<h3 id="threecrazy">三人の勇者、もしくは狂人</h3>
+	<dl class="shortvaluemainlist">
+		<dt><em class="mark">ホットデプロイ (Lasta Di)</em></dt><dd><em class="keyword"><a href="../lastadi/index.html">Lasta Di</a></em></dd>
+		<dt><em class="mark">規約ベースAction</em></dt><dd><em class="keyword"><a href="../howto/action/index.html">LastaFlute Action</a></em></dd>
+		<dt><em class="mark">Java8 DBFlute</em></dt><dd><em class="keyword"><a href="../../tutorial/onjava8.html">DBFlute on Java8</a></em></dd>
+	</dl>
 
 	<h2 id="prepare">まず、準備</h2>
 	<dl class="shortkeymainlist">
@@ -82,7 +90,7 @@
 	<dl class="textlist">
 		<dt>1. <em class="mark">ホットデプロイ</em>でリズミカル実装</dt>
 		<dd>
-			Action や Form, Logic など、appパッケージ配下は (開発時は) 再起動せずに修正が反映されます。
+			Action や Form, Logic など、<em class="keyword">appパッケージ配下</em> は (開発時は) 再起動せずに修正が反映されます。
 		</dd>
 		<dd>
 			アプリは起動しっぱなしで、"直してリロード直してリロード" を楽しみましょう。
@@ -127,14 +135,14 @@
 		いちどざっくり眺めて、また忘れた頃にまた見返すとよいでしょう。
 	</p>
 	<dl class="keymainlist">
-		<dt>ホットデプロイ</dt><dd>appパッケージの下は再起動不要、一方で、<em class="smallmark">自動生成したら再起動</em></dd>
-		<dt><a href="../howto/action/index.html#urlmapping">規約マッピング</a></dt><dd><em class="mark">Action</em> class + <em class="mark">Execute</em> method</dd>
+		<dt><a href="../lastadi/index.html">ホットデプロイ (Lasta Di)</a></dt><dd>appパッケージの下は再起動不要、一方で、<em class="smallmark">自動生成したら再起動</em></dd>
+		<dt><a href="../howto/action/index.html">規約ベースAction</a></dt><dd><em class="mark">Action</em> class + <em class="mark">Execute</em> method</dd>
+		<dt>FreeGenでタイプセーフ</dt><dd><a href="../howto/architecture/objsafeprop.html">タイプセーフProperties</a>, <a href="../howto/architecture/typesafemail.html">タイプセーフMailFlute</a>, ...</dd>
 		<dt>JettyBoot</dt><dd>アプリは main() メソッドで起動 <span class="frm">(TomcatBootでもOK)</span></dd>
 		<dt><a href="../howto/architecture/friendlylogging.html">フレンドリーログに着目</a></dt><dd>とにかくログをしっかり読めば、大抵のことのはわかるはず</dd>
 		<dt>JavaDocに着目</dt><dd>いたるところにリッチJavaDoc...例えば、Actionで <em class="smallmark">this.docu...</em></dd>
-		<dt>FreeGenでタイプセーフ</dt><dd><a href="../howto/architecture/objsafeprop.html">タイプセーフProperties</a>, タイプセーフMailFlute</dd>
-		<dt>ActionHook</dt><dd>横断的な共通処理は、ActionHook で実装 <span class="frm">(Interceptor はあまり使わない)</span></dd>
 		<dt>リクエストトランザクション</dt><dd>Actionメソッドはすでにトランザクション</dd>
+		<dt>ActionHook</dt><dd>横断的な共通処理は、ActionHook で実装 <span class="frm">(Interceptor はあまり使わない)</span></dd>
 		<dt>循環テストデータ</dt><dd><a href="../../manual/function/generator/task/replaceschema/index.html">ReplaceSchema</a> と <a href="../../manual/function/generator/task/doc/loaddatareverse.html">LoadDataReverse</a> の合わせ技</dd>
 		<dt><a href="../tutorial/developer.html#tenclause">DBFluteの十か条</a></dt><dd>DBFluteフルパワー！...なので、九たす十で合計十九か条でした...</dd>
 	</dl>
