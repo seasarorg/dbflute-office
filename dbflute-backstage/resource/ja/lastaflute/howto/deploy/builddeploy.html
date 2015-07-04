@@ -4,15 +4,15 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
-	<meta name="keywords" content="DBFlute,SAStruts,SAFlute,Maihama,Dockside" />
-	<style type="text/css" title="currentStyle">@import "../../../../../../css/sub.css";</style>
-	<title>SAFluteでビルドデプロイするやり方 | DBFlute</title>
+	<meta name="keywords" content="DBFlute,LastaFlute,Java,Lean Startup,Incremental Development" />
+	<style type="text/css" title="currentStyle">@import "../../../../css/sub.css";</style>
+	<title>LastaFluteでビルドデプロイするやり方 | DBFlute</title>
 </head>
 <body>
 <div id="container" class="ct-manual">
 <div id="mainbar"><div id="header">
 	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
-	<img src="../../../../../image/logo-content.gif" alt="logo"/>
+	<img src="../../../../image/logo-content.gif" alt="logo"/>
 	<ul>
 		<li class="hd-introduction"><a href="#">Introduction</a></li>
 		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
@@ -24,11 +24,12 @@
 </div>
 
 <div id="content"><!-- __content-start__ -->
-	<h1>SAFluteでビルドデプロイするやり方</h1>
+	<h1>LastaFluteでビルドデプロイするやり方</h1>
 	<p>
-		SAFluteにおけるビルドデプロイのやり方です。
+		LastaFluteにおけるビルドデプロイのやり方です。
+		Maven の profile を使って切り替えることを前提としています。
 	</p>
-	<div class="relatedpage"><a href="../index.html">SAFlute</a></div>
+	<div class="relatedpage"><a href="../../index.html">LastaFlute</a></div>
 	${indexlist}
 
 	<h2 id="mavenwar">Mavenでwarファイル作成</h2>
@@ -36,12 +37,11 @@
 	<p>
 		継承や依存などの Maven の構成を把握していることを前提として...
 	</p>
-	<div class="relatedpage"><a href="../projstructure.html#maven">SAFluteのプロジェクト構成 - Mavenの構成</a></div>
+	<div class="relatedpage"><a href="../projstructure.html#maven">LastaFluteのプロジェクト構成 - Mavenの構成</a></div>
 	<p>
 		依存の順序通りに maven を実行していきます。
 	</p>
 	<ol>
-		<li>saflute で mvn -e clean install</li>
 		<li>xxx-base で mvn -e clean install</li>
 		<li>xxx-common で mvn -e clean install <span class="frm">(profileの切り替えが必要なら -P オプション)</span></li>
 		<li>xxx-dockside で mvn -e clean package <span class="frm">(profileの切り替えが必要なら -P オプション)</span></li>
@@ -50,7 +50,7 @@
 	<p>
 		環境切り替え設定などの構成を把握していることを前提として...
 	</p>
-	<div class="relatedpage"><a href="../projstructure.html#envswitch">SAFluteのプロジェクト構成 - 環境切り替えの構成</a></div>
+	<div class="relatedpage"><a href="./envswitch.html">LastaFluteの環境切り替え</a></div>
 	<p>
 		環境ごとに設定を切り替え場合は、commonとwebプロジェクトにて、profileを指定します。
 	</p>
@@ -67,8 +67,8 @@ mvn -e clean package <span class="point">-P integration</span>
 	<p>
 		環境ごとに切り替える設定ファイルの環境に適した修正が終わっていることが前提です。
 	</p>
-	<div class="relatedpage"><a href="../projstructure.html#envproperties">環境切り替え用のproperties</a></div>
-	<div class="relatedpage"><a href="../projstructure.html#log4jproperties">ログの設定 (log4j.properties)</a></div>
+	<div class="relatedpage"><a href="./envswitch.html#envproperties">環境切り替え用のproperties</a></div>
+	<div class="relatedpage"><a href="./envswitch.html#logbackxml">ログの設定 (logback.xml)</a></div>
 
 	<h2 id="newdeployenv">新しいデプロイ環境をつくる</h2>
 	<p>
@@ -102,22 +102,18 @@ mvn -e clean package <span class="point">-P integration</span>
 	<p>
 		プロパティ値だけでなく、コメントの中も新しい環境に合わせましょう。<span class="frm">(環境名とか書いてあるかも)</span>
 	</p>
-	<h3 id="addpropertieshtml">4. propertiesHtmlMap にて env を追加</h3>
+	<h3 id="addpropertieshtml">4. lastafluteMap.dfprop にて env を追加</h3>
 	<p>
-		documentDefinitionMap.dfprop の propertiesHtmlMap のそれぞれの environmentMap
-		にて、新しい環境の設定を追加します。<span class="frm">(PropertiesHTMLで比較ができるようにするため)</span>
+		lastafluteMap.dfprop の environmentList に、新しい環境の設定を追加します。<span class="frm">(PropertiesHTMLで比較ができるようにするため)</span>
 	</p>
 	<div class="relatedpage"><a href="../../../generator/task/doc/propertieshtml.html">Docタスク - PropertiesHTML</a></div>
-<pre><span class="codetitle">e.g. propertiesHtmlMap の environmentMap に新しい環境を追加 @Command</span><code>
-        ; Sea_ConfigProperties = map:{
-            <span class="abbreviation">...</span>
-            ; environmentMap = map:{
-                ; integration = $$baseDir$$/integration/resources
-                ; production = $$baseDir$$/production/resources
-                <span class="point">; sea = $$baseDir$$/sea/resources</span>
-            }
-            <span class="abbreviation">...</span>
-        }
+<pre><span class="codetitle">e.g. lastafluteMap の environmentList に新しい環境を追加 @Command</span><code>
+    <span class="abbreviation">...</span>
+
+    <span class="comment"># keywords for environment properties, same as directory name</span>
+    ; environmentList = <span class="keyword">list:</span>{ integration ; production <span class="point">; sea</span> }
+
+    <span class="abbreviation">...</span>
 </code></pre>
 	<p>
 		Docタスク (manageの22番) を叩いて、PropertiesHTML に新しい環境の情報が追加されていることを確認しましょう。
@@ -136,13 +132,13 @@ mvn -e clean package <span class="point">-P integration</span>
 	<div class="relatedpage"><a href="../projstructure.html#envreps">ReplaceSchemaの環境切り替え</a></div>
 	<ol>
 		<li>DBFluteクライアント/dfprop/sea フォルダを作成</li>
-		<li>そこに、databaseInfoMap+.dfprop と replaceSchemaDefinitionMap+.dfprop を作成</li>
+		<li>そこに、databaseInfoMap+.dfprop と replaceSchemaMap+.dfprop を作成</li>
 		<li>databaseInfoMap+.dfprop の設定</li>
-		<li>replaceSchemaDefinitionMap+.dfprop の設定</li>
-		<li>DBFluteクライアント/_sea_replace-schema.sh を作成 (環境変数をseaに)</li>
+		<li>replaceSchemaMap+.dfprop の設定</li>
+		<li>DBFluteクライアント/__sea_manage.sh を作成 (環境変数をseaに)</li>
 	</ol>
 	<p>
-		_sea_replace-schema.sh を叩けば、sea環境用の設定で ReplaceSchema できるようになります。
+		__sea_manage.sh を叩けば、sea環境用の設定で ReplaceSchema できるようになります。
 	</p>
 
 	<h2 id="newwebproj">新しいWebプロジェクトつくる</h2>
