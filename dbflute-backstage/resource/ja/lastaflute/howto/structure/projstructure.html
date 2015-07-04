@@ -36,11 +36,11 @@
 		架空のプロジェクトである、マルチプロジェクト構成のMaihamaプロジェクトの Dockside ドメイン (Webアプリ)
 		を想定して説明します。これらは、LastaFlute の Example 実装として公開されています。
 	</p>
-	<div class="relatedpage"><a href="https://www.codebreak.com/git/jflute/maihama/">外部サイト - Maihamaリポジトリのページ</a></div>
+	<div class="relatedpage"><a href="https://github.com/dbflute-session/lastaflute-example-maihama">lastaflute-example-maihama | Github</a></div>
 	<h3 id="projstructure">Maihamaプロジェクトのプロジェクト構成</h3>
 <pre><span class="codetitle">e.g. Maihamaプロジェクトのプロジェクト構成 @Directory</span><code>
 
-maihama-base           <span class="comment">// ベースプロジェクト (親pomやドキュメントなど)</span>
+<span class="spotlight"><span class="point">maihama-base</span></span>           <span class="comment">// ベースプロジェクト (親pomやドキュメントなど)</span>
  |-etc                 <span class="comment">// 環境ファイル置き場</span>
  |  |-license          <span class="comment">// ライセンスファイル置き場</span>
  |  |-tools            <span class="comment">// ツール関連ファイル置き場</span>
@@ -54,7 +54,7 @@ maihama-base           <span class="comment">// ベースプロジェクト (親
  |-<span class="abbreviation">...</span>
  |-pom.xml             <span class="comment">// プロジェクト全体の共通pom</span>
 
-maihama-common         <span class="comment">// commonプロジェクト (DBFluteも含む)</span>
+<span class="spotlight"><span class="point">maihama-common</span></span>         <span class="comment">// commonプロジェクト (DBFluteも含む)</span>
  |-src/main/java       <span class="comment">// Maihamaプロジェクト共通クラス</span>
  |-src/main/resources  <span class="comment">// lasta_di.properties, dbflute.xml など</span>
  |-<span class="abbreviation">...</span>
@@ -81,7 +81,7 @@ maihama-common         <span class="comment">// commonプロジェクト (DBFlut
  |-<span class="abbreviation">...</span>
  |-pom.xml             <span class="comment">// commonプロジェクトのpom (baseのpomを継承)</span>
 
-maihama-dockside       <span class="comment">// ドメインプロジェクト (Webアプリ)</span>
+<span class="spotlight"><span class="point">maihama-dockside</span></span>       <span class="comment">// ドメインプロジェクト (Webアプリ)</span>
  |-src/main/java       <span class="comment">// Docksideドメインのクラス</span>
  |-src/main/resources  <span class="comment">// app.xml, lastaflute_director.xml など</span>
  |-<span class="abbreviation">...</span>
