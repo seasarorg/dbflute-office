@@ -46,7 +46,8 @@
 	<h2 id="prepare">まず準備</h2>
 	<dl class="shortkeymainlist">
 		<dt>LastaFluteって何？</dt><dd>まずは、LastaFluteってなにもの？を知りましょう</dd>
-		<dt>開発環境の構築</dt><dd>Java8環境、Eclipseなら ERMaster-b や EMecha などのプラグイン</dd>
+		<dt>データベースの準備</dt><dd>MySQLのインストール、my.cnfの設定</dd>
+		<dt>開発環境の構築</dt><dd>Java8環境、EclipseならEMechaなどのプラグイン</dd>
 		<dt>Exampleをclone</dt><dd>参考実装である、Exampleをいつでも見られるように clone しておく</dd>
 	</dl>
 	<h3 id="whatlasta">LastaFluteって何？</h3>
@@ -54,6 +55,27 @@
 		トップページにいろいろ書いてあります。
 	</p>
 	<div class="detailpage"><a href="../index.html">LastaFluteトップページ</a></div>
+	<h3 id="database">データベースの準備</h3>
+	<p>
+		デフォルトでは MySQL を利用しますので、3306ポートの MySQL をインストールしましょう。
+	</p>
+	<p>
+		そして、my.cnf の [mysqld] の欄にて、以下の設定を入れることがオススメします。
+		もちろん、プロジェクトのカスタマイズ設定があれば調整して構いません。特にこだわりがなければ、これをそのままコピーして貼りつけましょう。
+		<span class="frm">(my.cnf or my.ini の場所にご注意を、よく調べてください)</span>
+	</p>
+<pre><span class="codetitle">e.g. MySQL の my.cnf のオススメ設定 @Java</span><code>
+<span class="comment"># /* * * * * * * * * * * * * * * * * * * * * * * * Custom Settings</span>
+<span class="localvar">character_set_server</span>=<span class="literal">utf8mb4</span>
+<span class="localvar">lower_case_table_names</span>=<span class="literal">1</span>
+
+<span class="comment"># to avoid easy deadlock of repeatable-read</span>
+<span class="localvar">transaction-isolation</span>=<span class="literal">READ-COMMITTED</span>
+
+<span class="comment"># TRADITIONAL contains STRICT_ALL_TABLES, NO_ZERO_DATE and so on...</span>
+<span class="localvar">sql_mode</span>=<span class="literal">"TRADITIONAL"</span>
+<span class="comment"># * * * * * * * * * */</span>
+</code></pre>
 	<h3 id="setupenv">開発環境の構築</h3>
 	<p>
 		Java8環境でコンパイル、開発ができる環境を準備しましょう。(e.g. Eclipse, IntelliJ IDEA)
@@ -62,18 +84,20 @@
 		もし、Eclipseなら...
 	</p>
 	<p>
-		<em class="keyword">ERMaster-b</em> と <em class="keyword">EMecha</em>
-		を入れましょう。
+		<em class="keyword">EMecha</em> と <em class="keyword">ERMaster-b</em> を入れましょう。
 	</p>
-	<dl class="keymainlist">
+	<dl class="shortkeymainlist">
+		<dt>DBFlute,Lasta支援</dt><dd><em class="keyword"><a href="../../manual/function/helper/emecha/install.html">EMecha のインストール</a></em> <span class="frm">※手順に沿って</span></dd>
 		<dt>ERDエディター</dt><dd><em class="keyword"><a href="../../manual/topic/friends/eclipse/ermaster/index.html">ERMaster-b の紹介</a></em> <span class="frm">※リンク先のページからダウンロード</span></dd>
-		<dt>DBFlute, Lasta支援</dt><dd><em class="keyword"><a href="../../manual/function/helper/emecha/index.html">EMecha のトップページ</a></em> <span class="frm">※リンク先のページからインストール</span></dd>
 	</dl>
 	<p>
 		そして、Eclipse の workspace の Preferences にて、<em class="keyword">DBFlute補完テンプレート</em>
-		を設定しましょう。<em class="smallmark">化け物のような補完支援</em>で楽しくスピーディーに実装できます。
+		を設定しましょう。すると、<em class="smallmark">化け物のような補完支援</em>で楽しくスピーディーに実装できます。
 	</p>
-	<div class="detailpage"><a href="../../tutorial/onjava8.html#jflutableeclipse">DBFlute補完テンプレートを入れたEclipse</a></div>
+	<dl class="shortkeymainlist">
+		<dt>補完テンプレート</dt><dd><a href="http://dbflute.seasar.org/download/misc/setting-example/dbflute-eclipse-editor-templates.zip">dbflute-eclipse-editor-templates.zip</a> <span class="frm">(既存設定を残しつつそのままImport)</span></dd>
+	</dl>
+	<div class="relatedpage"><a href="../../tutorial/onjava8.html#jflutableeclipse">DBFlute補完テンプレートを入れたEclipse</a></div>
 	<h3 id="cloneexample">Exampleをclone</h3>
 	<p>
 		自分が開発する環境に近い Example を。<span class="frm">(README の Quick Trial を参考に)</span>
@@ -85,12 +109,12 @@
 
 	<h2 id="acquaintanceship"><em class="keyword">ディベロッパーの心得</em></h2>
 	<p>
-		LastaFluteのディベロッパーに、大切な <em class="mark">五つ</em> の心得！
+		Lastaディベロッパーに、<em class="mark">五つ</em>、大切な心得！<span class="frm">(リズミカル、スッキリ、サクサク、シナガラ、キナガラ)</span>
 	</p>
 	<dl class="textlist">
 		<dt>1. <em class="mark">ホットデプロイ</em>でリズミカル実装</dt>
 		<dd>
-			Action や Form, Logic など、<em class="keyword">appパッケージ配下</em> は (開発時は) 再起動せずに修正が反映されます。
+			Action, Form, Logic など、<em class="keyword">appパッケージ配下</em> は (開発時は) 再起動せずに修正が反映されます。
 		</dd>
 		<dd>
 			アプリは起動しっぱなしで、"直してリロード直してリロード" を楽しみましょう。
@@ -139,8 +163,8 @@
 		<dt><a href="../howto/action/index.html">規約ベースAction</a></dt><dd><em class="mark">Action</em> class + <em class="mark">Execute</em> method</dd>
 		<dt>FreeGenでタイプセーフ</dt><dd><a href="../howto/architecture/objsafeprop.html">タイプセーフProperties</a>, <a href="../howto/architecture/typesafemail.html">タイプセーフMailFlute</a>, ...</dd>
 		<dt>JettyBoot</dt><dd>アプリは main() メソッドで起動 <span class="frm">(TomcatBootでもOK)</span></dd>
-		<dt><a href="../howto/architecture/friendlylogging.html">フレンドリーログに着目</a></dt><dd>とにかくログをしっかり読めば、大抵のことのはわかるはず</dd>
-		<dt>JavaDocに着目</dt><dd>いたるところにリッチJavaDoc...例えば、Actionで <em class="smallmark">this.docu...</em></dd>
+		<dt><a href="../howto/architecture/friendlylogging.html">フレンドリーログに注目</a></dt><dd>とにかくログをしっかり読めば、大抵のことのはわかるはず</dd>
+		<dt>凝り性JavaDocに注目</dt><dd>いたるところにリッチJavaDoc...例えば、Actionで <em class="smallmark">this.docu...</em></dd>
 		<dt>リクエストトランザクション</dt><dd>Actionメソッドはすでにトランザクション</dd>
 		<dt>ActionHook</dt><dd>横断的な共通処理は、ActionHook で実装 <span class="frm">(Interceptor はあまり使わない)</span></dd>
 		<dt>循環テストデータ</dt><dd><a href="../../manual/function/generator/task/replaceschema/index.html">ReplaceSchema</a> と <a href="../../manual/function/generator/task/doc/loaddatareverse.html">LoadDataReverse</a> の合わせ技</dd>

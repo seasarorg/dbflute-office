@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,MailFlute,メール送信,メールテンプレート" />
+	<style type="text/css" title="currentStyle">@import "../../../../../css/sub.css";</style>
+	<title>MailFlute | DBFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-install"><a href="#">Install</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>MailFlute</h1>
+	${indexlist}
+
+	<h2 id="about">MailFluteとは？</h2>
+	<p>
+		MailFlute は、メールテンプレート機能を備えたシンプルなメール送信ライブラリです。
+	</p>
+	<p>
+		DBFlute の FreeGen と組み合わせて利用することで、タイプセーフでメールパラメーターを指定できる、堅いツールになります。
+		DBFluteライクなメール送信ライブラリと言えるでしょう。
+	</p>
+	<dl class="keymainlist">
+		<dt>1. メールテンプレートを書く</dt><dd>パラメータコメント形式でテンプレートを作成、拡張子は.dfmail</dd>
+		<dt>2. FreGenを叩く</dt><dd>FreeGenがメールテンプレートを読み込んで、クラスを自動生成</dd>
+		<dt>3. タイプセーフ実装</dt><dd>自動生成されたクラスを使って、タイプセーフにメール送信の実装</dd>
+	</dl>
+
+	<h3 id="lastaeg">LastaFluteでの利用例</h3>
+	<p>
+		LastaFluteとの組み合わせが、MailFlute利用の典型例となります。
+	</p>
+	<div class="relatedpage"><a href="../../../../lastaflute/howto/architecture/typesafemail/index.html">LastaFlute Typesafe Mail</a></div>
+	<p>
+		まず、src/main/resources/mail配下に、dfmailのメールテンプレートを書きます。
+		外だしSQLに非常によく似たパラメータコメント形式 (pmfile形式) で書きます。
+	</p>
+<pre><span class="codetitle">e.g. 新しい会員の登録を想定したメールテンプレート @welcome_member.dfmail</span><code>
+<span class="comment">/*
+ [New Member's Registration]
+ The member will be formalized after click.
+*/</span>
+<span class="attribute">subject:</span> Welcome to your sign up, <span class="comment">/*pmb.memberName*/</span>
+<span class="attribute">&gt;&gt;&gt;</span>
+Hello, <span class="comment">/*pmb.memberName*/</span>
+
+How are you?
+<span class="comment">/*IF pmb.birthdate != null*/</span>
+Happy birthdate! Today is <span class="comment">/*pmb.birthdate*/</span>.
+<span class="comment">/*END*/</span>
+
+Thanks
+</code></pre>
+	<p>
+		そして、FreeGenを叩き...
+	</p>
+<pre><span class="codetitle">e.g. Manageで 12 (freegen) を叩く @Command</span><code>
+<span class="abbreviation">...</span>$ sh manage.sh <span class="literal">12</span>
+</code></pre>
+	<p>
+		mylasta.mail配下に自動生成されたクラスで実装します。
+		クラス名は、テンプレートファイルをキャメルケースにしたものになります。<span class="frm">(welcome_member.dfmail なら WelcomeMemberPostcard)</span>
+	</p>
+<pre><span class="codetitle">e.g. 自動生成されたクラスで実装 @Java</span><code>
+<span class="point">WelcomeMemberPostcard</span>.droppedInto(<span class="localvar">postbox</span>, <span class="localvar">postcard</span> -&gt; {
+    <span class="localvar">postcard</span>.setFrom(<span class="literal">"from@example.com"</span>, <span class="attribute">LABELS_OFFICE_MAIL</span>);
+    <span class="localvar">postcard</span>.addTo(<span class="literal">"to@example.com"</span>);
+    <span class="localvar">postcard</span>.<span class="subpoint">setMemberName</span>(<span class="literal">"sea"</span>);
+    <span class="localvar">postcard</span>.<span class="subpoint">setBirthdate</span>(birthdate);
+    <span class="localvar">postcard</span>.addReplyTo(<span class="literal">"replyto@example.com"</span>);
+});
+</code></pre>
+
+	<h2 id="mailtemplate">メールテンプレート</h2>
+	<p>
+		拡張子は .dfmail で、パラメーターコメント形式で書きます。
+	</p>
+	<h3 id="bodymeta">Body Meta</h3>
+	<p>
+		コメントや subject など、メールBodyのメタ情報 (Body Meta) を <em class="mark">&gt;&gt;&gt;</em> 区切りで定義します。
+	</p>
+	<dl class="shortkeymainlist">
+		<dt>*HeaderComment</dt><dd>ヘッダー部に書かれたメールに関する開発用コメント、タイトルと説明がある</dd>
+		<dt>*Title</dt><dd>メールを一行で要約する開発用コメント、[...]形式で書く</dd>
+		<dt>*Description</dt><dd>メールを自由に説明する開発用コメント、Titleの下に書く</dd>
+		<dt>*subject:</dt><dd>メールの件名、文言の中で動的パラメーターが利用できる</dd>
+		<dt>option:</dt><dd>メールのオプション、HTMLメールも飛ばすなら option: +html</dd>
+		<dt>-- !![type] abc!!</dt><dd>自動判別できないプロパティを明示的宣言をして自動生成</dd>
+	</dl>
+<pre><span class="codetitle">e.g. Body Meta の属性が勢ぞろい @welcome_member.dfmail</span><code>
+<span class="comment">/*
+ [New Member's Registration]
+ The member will be formalized after click.
+*/</span>
+<span class="attribute">subject:</span> Welcome to your sign up, <span class="comment">/*pmb.memberName*/</span>
+<span class="attribute">option:</span> +html
+<span class="attribute">-- !!</span>List&lt;Integer&gt;<span class="attribute"> abcList!!</span>
+<span class="point">&gt;&gt;&gt;</span>
+Hello, <span class="comment">/*pmb.memberName*/</span>
+
+<span class="abbreviation">...</span>
+</code></pre>
+	<h3 id="headercomment">ヘッダーコメント <span class="frm">(タイトル、説明)</span></h3>
+	<p>
+		Title や Description は必須です。メールテンプレートには必ずタイトルと説明を入れます。
+		形式も決まっています。必ず <em class="mark">/* [タイトル] 説明 */</em> という形式でないと、FreeGenも実行時もエラーで落ちます。
+	</p>
+<pre><span class="codetitle">e.g. ヘッダーコメントの形式 @dfmail</span><code>
+<span class="point">/*
+ [タイトル]
+ 説明
+*/</span>
+<span class="attribute">subject:</span> <span class="abbreviation">...</span>
+<span class="abbreviation">...</span>
+</code></pre>
+	<p>
+		タイトルと説明は、あくまで開発用コメントで、実装に送信されるメールの件名(subject)とは別です。
+	</p>
+	<h3 id="subject">subject: <span class="frm">(メールの件名)</span></h3>
+	<p>
+		さて、こちらは実際にメールされて受信者が目にするメールの件名です。
+	</p>
+	<p>
+		TODO jflute
+	</p>
+	<h3 id="option">option: <span class="frm">(メールのオプション)</span></h3>
+	<p>
+		TODO jflute
+	</p>
+	<h3 id="pmcomment">パラメーターコメント</h3>
+	<p>
+		TODO jflute
+	</p>
+
+	<h2 id="postcard">Postcard, PostOffice</h2>
+	<p>
+		TODO jflute
+	</p>
+
+	<h2 id="personnel">PostalPersonnel</h2>
+	<p>
+		TODO jflute
+	</p>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">inu</a></li>
+		<li><a href="#">neko</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>
