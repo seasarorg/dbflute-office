@@ -160,8 +160,9 @@ PROJECT_ROOT
 		<span class="frm">(Windowsであれば、Eclipse上からbatファイルをダブルクリックで実行できます: ctrl+shift+Rで実行でもOKです)</span>
 	</p>
 	<p>
-		ちなみに Mac の人は、ダウンロードした後に mysql_install_db
-		を実行する必要があるかもしれません。<span class="frm">(起動に失敗したら、その可能性があります。エラーメッセージでググってみたりしてみましょう)</span>
+		ちなみに Mac の人は、ダウンロードした後に ./script/mysql_install_db
+		を実行する必要があるかもしれません。
+		<span class="frm">(起動に失敗したら、その可能性があります。エラーメッセージでググってみたりしてみましょう。jfluteの環境では、mysqlディレクトリにて ./script/mysql_install_db と叩けばいけました)</span>
 	</p>
 	<h3 id="plugin">プラグインのセットアップ</h3>
 	<p>
@@ -448,6 +449,11 @@ PROJECT_ROOT
 		DBFlute Maven Plugin を使って、インストールします。
 	</p>
 	<p>
+		pom.xml に Plugin の設定はすでにされているはずですが、もし実行してみてプラグインが存在しないというようなエラーが発生した場合は、"Mavenによるセットアップ"
+		ドキュメントを参考にpom.xmlを修正してみてください。
+	</p>
+	<div class="relatedpage"><a href="../../environment/setup/maven.html">Mavenによるセットアップ</a></div>
+	<p>
 		まずは、コマンドラインで dbflute:download ゴールを叩きます。<span class="frm">(プロジェクト直下にて)</span>
 	</p>
 <pre><span class="codetitle">e.g. dbflute:download ゴールを叩く！ @Command</span><code>
@@ -483,7 +489,7 @@ PROJECT_ROOT
 	<div class="relatedpage"><a href="../../manual/function/generator/task/replaceschema/index.html">ReplaceSchema</a></div>
 	<h4>DBユーザ自動作成のための設定</h4>
 	<p>
-		DBFluteクライアント/dfprop配下の replaceSchemaDefinitionMap.dfprop
+		DBFluteクライアント/dfprop配下の replaceSchemaMap.dfprop (旧replaceSchemaDefinitionMap.dfprop)
 		の additionalUserMap プロパティを以下のように設定してください<span class="frm">(コメントアウトされた雛形があるので、そのコメントアウトを外して修正)</span>。
 		これは、システムユーザによるアプリユーザ、スキーマの作成を自動化するための準備です。
 	</p>
@@ -549,6 +555,7 @@ PROJECT_ROOT
 	<p>
 		コンソールのログを見て、正常終了していることを確認してください。
 		DBFluteタスクのログファイルである、DBFluteクライアント/log/dbflute.log でも確認することができます。
+		<span class="frm">(ハンズオンをどこかの Git で管理する場合は、logファイルを .gitignore に登録しておきましょう)</span>
 	</p>
 	<p>
 		もし、Mac OS X の Java8 環境にて UnsupportedClassVersionError が発生した場合は、JAVA_HOME
@@ -589,7 +596,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 	<div class="relatedpage"><a href="../../manual/function/generator/task/generate/index.html">Generateタスク</a></div>
 	<p>
 		そして、Generateタスク (manage.bat|sh で23番) を実行してください。src/main/java 配下にテーブル対応のクラスが自動生成されているはずです。
-		ResourceSynchronizer が有効であれば自動でリフレッシュされます。コンパイルが正常に通っていることを確認してください。
+		Eclipse の EmSynchronizer が有効であれば自動でリフレッシュされます。コンパイルが正常に通っていることを確認してください。
 	</p>
 	<p>
 		<span class="frm">(...コンパイル確認中)</span>
@@ -598,9 +605,9 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 		自動生成されたクラスがコンパイルエラーになったでしょうか？
 	</p>
 	<p>
-		DBFluteモジュールとDBFluteランタイムのバージョンを確認してみてください。
+		もし、コンパイルエラーであれば、DBFluteエンジンとDBFluteランタイムのバージョンを確認してみてください。
 		自動生成されたクラスとDBFluteランタイムのjarファイルのバージョンは一致していなければなりません。
-		食い違っていれば、DBFluteランタイムのバージョンを修正してみましょう。
+		食い違っていれば、DBFluteランタイムのバージョンを修正して合わせましょう。
 	</p>
 	<p>
 		これで本当にコンパイルエラーなくなれば、セクション１はおしまいです！
@@ -612,34 +619,11 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 	<div class="relatedpage"><a href="#hierarchical">this - Package Presentation を Hierarchical に</a></div>
 
 	<div class="inucolumn">
-		<h2 id="java8">Java8 なら 1.1 系を使いましょう！</h2>
-		<h3 id="v11x">さっそくアップグレードしてみましょう</h3>
-		<p>
-			Java8を使う場合は、ぜひ DBFlute の 1.1.x 系でやってみましょう。
-		</p>
-		<p>
-			(2014/11/5) 時点では、DBFlute-1.1-pilotB-SNAPSHOT が出ています。
-			突然ですが、アップグレードしてみましょう。
-		</p>
-		<div class="relatedpage"><a href="http://d.hatena.ne.jp/jflute/20141003/pilot1">外部サイト - jfluteの日記 - DBFlute-1.1パイロットわんSNAPSHOT</a></div>
-		<ol>
-			<li>EMecha の Upgrade にて、Latest Snapshot ボタン押して Download 押して Finish!</li>
-			<li>pom.xml の DBFlute と UTFlute のバージョンを 1.1 系のものにして maven-eclipse.bat(sh)</li>
-			<li>manage.bat(sh) で、renewal しましょう！</li>
-		</ol>
-		<h3 id="onjava8">まずは、Java8 のページ読んでおきましょう</h3>
-		<p>
-			Java8のページあります！
-		</p>
-		<div class="detailpage"><a href="http://dbflute.seasar.org/ja/tutorial/onjava8.html">DBFlute on Java8</a></div>
-	</div>
-
-	<div class="inucolumn">
 		<h3 id="devtu">ディベロッパーのためのチュートリアル</h3>
 		<p>
 			さあ、ディベロッパーのためのチュートリアルをブックマークしましょう！
 		</p>
-		<div class="detailpage"><a href="../../../tutorial/developer.html">ディベロッパーのためのチュートリアル</a></div>
+		<div class="detailpage"><a href="../../tutorial/developer.html">ディベロッパーのためのチュートリアル</a></div>
 		<p>
 			今後、何かとこのページを見ることになるかと思います。
 			DBFluteのさまざまなページを辿ることができるエントリページになっています。
@@ -649,6 +633,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 		<p>
 			ちなみに、Java8のページ (DBFlute on Java8) もこちらから辿れるようになっています。
 		</p>
+		<div class="detailpage"><a href="../../tutorial/onjava8.html">DBFlute on Java8</a></div>
 	</div>
 	
 	<h2 id="nextsection">次のセクション</h2>
