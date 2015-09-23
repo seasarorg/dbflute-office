@@ -252,13 +252,17 @@ def create = { file, breadcrumbs ->
         return
     }
 
-    def map = [keywords: '', title: 'DBFlute', content: '', contextRoot: '.', containerClass: 'ct-default'];
+    def map = [keywords: '', title: 'DBFlute', content: '', contextRoot: '.', subCss: '/css/sub.css', containerClass: 'ct-default'];
     def text = file.getText()
 
     map.keywords = getMatched(text, /(?s).*<meta\s+name="keywords"\s+content="(.*?)"\s*\/?>.*/)
     println map.keywords
     map.title = getMatched(text, /(?s).*<title>(.*)<\/title>.*/)
     map.content = getMatched(text, /(?s).*<div id="content"><!-- __content-start__ -->\r?\n?(.*)\s*<!-- __content-end__ -->\s*<\/div>.*/)
+
+	if (file.getPath().contains('lastaflute')) {
+	    map.subCss = '/css/lasub.css'
+	}
 
 	if (!map.content) {
 		return antBuilder.copy(file: file, tofile: outputFile)
