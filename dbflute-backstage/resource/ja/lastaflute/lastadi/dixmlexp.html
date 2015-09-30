@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,LastaFlute,リーンスタートアップ" />
+	<style type="text/css" title="currentStyle">@import "../../../css/sub.css";</style>
+	<title>Di xml の Expression | DBFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-install"><a href="#">Install</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>Di xml の Expression</h1>
+	<div class="relatedpage"><a href="./index.html">Lasta Di</a></div>
+	${indexlist}
+
+	<h2 id="overview">Nashorn JavaScript</h2>
+	<p>
+		Di xml 上のプロパティはコンポーネントの expression のパーサーとして、Javaに組み込まれている、JavaScriptエンジン Nashorn を使っています。
+	</p>
+	<p>
+		これにより、依存ライブラリなしで Di xml を利用することができます。
+	</p>
+	<p>
+		一方で、OGNL や Groovy などに比べて若干表現力は落ちる可能性があります。
+		ですが、Di xml での expression は、ちょっとした生成ロジックの補佐に徹して、あまり複雑になり過ぎないようにする方がよいと考えています。
+		ユーザーの方々のフィードバックや利用状況を考慮しながら、バランスよく対応していきたいと思います。
+	</p>
+<pre><span class="codetitle">e.g. Di xml vaious pattern  @Dixml</span><code>
+&lt;components&gt;
+    &lt;include path="lastaflute.xml"/&gt;
+
+    &lt;component name="expSea" class="org.docksidestage.mylasta.trial.TrialExpSea"&gt;
+        &lt;property name="simpleString"&gt;<span class="literal">"dockside"</span>&lt;/property&gt;
+        &lt;property name="simpleInteger"&gt;<span class="literal">3</span>&lt;/property&gt;
+        &lt;postConstruct name="addStringList"&gt;
+            &lt;arg&gt;<span class="literal">["a","b"]</span>&lt;/arg&gt;
+        &lt;/postConstruct&gt;
+        &lt;postConstruct name="addStringMap"&gt;
+            &lt;arg&gt;<span class="literal">{"sea.over": "land.oneman"}</span>&lt;/arg&gt;
+        &lt;/postConstruct&gt;
+        &lt;postConstruct name="addIntArray"&gt;
+            &lt;arg&gt;<span class="literal">(int[])[1,2]</span>&lt;/arg&gt
+        &lt;/postConstruct&gt;
+        &lt;postConstruct name="addStringArray"&gt;
+            &lt;arg&gt;<span class="literal">(String[])["sea" ,  "land" ]</span>&lt;/arg&gt;
+        &lt;/postConstruct&gt;
+        &lt;postConstruct name="addType"&gt;
+            &lt;arg&gt;<span class="literal">@org.dbflute.Entity@class</span>&lt;/arg&gt;
+        &lt;/postConstruct&gt;
+        &lt;postConstruct name="addStaticFinal"&gt;
+            &lt;arg&gt;<span class="literal">org.dbflute.util.DfTypeUtil.HYPHENED_DATE_PATTERN</span>&lt;/arg&gt;
+        &lt;/postConstruct&gt;
+        &lt;postConstruct name="addConfigProp"&gt;
+            &lt;arg&gt;<span class="literal">lastaflute_assist.provider.config().getJdbcUrl()</span>&lt;/arg&gt;
+        &lt;/postConstruct&gt;
+        &lt;postConstruct name="addCipher"&gt;
+            &lt;arg&gt;<span class="literal">lastaflute_core.primaryCipher</span>&lt;/arg&gt;
+        &lt;/postConstruct&gt;
+    &lt;/component&gt;
+
+    &lt;component name="expPark"&gt;
+        <span class="literal">provider.config().isDevelopmentHere()</span>
+            ? <span class="literal">"new org.docksidestage.mylasta.trial.TrialExpSea()"</span>
+            : <span class="literal">"new org.docksidestage.mylasta.trial.TrialExpLand()"</span>
+    &lt;/component&gt;
+&lt;/components&gt;
+</code></pre>
+
+	<h2 id="simpleliteral">Simple Literal</h2>
+<pre><span class="codetitle">e.g. Di xml simple literal  @Dixml</span><code>
+&lt;property name="simpleString"&gt;<span class="point">"dockside"</span>&lt;/property&gt;
+&lt;property name="simpleInteger"&gt;<span class="point">3</span>&lt;/property&gt;
+&lt;postConstruct name="addStringList"&gt;
+    &lt;arg&gt;<span class="point">["a","b"]</span>&lt;/arg&gt;
+&lt;/postConstruct&gt;
+&lt;postConstruct name="addStringMap"&gt;
+    &lt;arg&gt;<span class="point">{"sea.over": "land.oneman"}</span>&lt;/arg&gt;
+&lt;/postConstruct&gt;
+</code></pre>
+
+	<h2 id="reflection">Reflection Literal</h2>
+<pre><span class="codetitle">e.g. Di xml reflection literal  @Dixml</span><code>
+
+&lt;postConstruct name="addType"&gt;
+    &lt;arg&gt;<span class="point">@org.dbflute.Entity@class</span>&lt;/arg&gt;
+&lt;/postConstruct&gt;
+&lt;postConstruct name="addStaticFinal"&gt;
+    &lt;arg&gt;<span class="literal">org.dbflute.util.DfTypeUtil.</span><span class="point">HYPHENED_DATE_PATTERN</span>&lt;/arg&gt;
+&lt;/postConstruct&gt;
+&lt;postConstruct name="addConfigProp"&gt;
+    &lt;arg&gt;<span class="literal">lastaflute_assist.provider.</span><span class="point">config().getJdbcUrl()</span>&lt;/arg&gt;
+&lt;/postConstruct&gt;
+</code></pre>
+
+	<h2 id="component">Component Reference</h2>
+	<p>
+		TODO jflute
+	</p>
+
+	<h2 id="condition">Condition Operand</h2>
+	<p>
+		TODO jflute
+	</p>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">inu</a></li>
+		<li><a href="#">neko</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>
