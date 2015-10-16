@@ -32,15 +32,13 @@
 		ハンズオン環境で利用しているDIコンテナが、Seasar から Lasta Di に変わりました。<span class="frm">(Java8以降)</span>
 	</p>
 	<div class="relatedpage"><a href="../../lastaflute/lastadi/index.html">Lasta Di</a></div>
-	<p>
-		
-	</p>
 	<ol>
 		<li>pom.xmlを修正、Seasar関連のものを削除して、Lasta Diを追加</li>
 		<li>maven-eclipse.bat|sh を叩く</li>
 		<li>UnitContainerTestCase の import 文を編成 (seasar 部分を lastadi に)</li>
 		<li>src/test/resources のファイルをすべて削除、.gitkeep (空のテキストファイル) だけ配置</li>
 		<li>src/main/resources に、<em class="smallmark">app.xml, jdbc.xml, lasta_di.properties, logback.xml</em> を追加</li>
+		<li>basicInfoMap.dfprop 似て、targetContainer を <em class="smallmark">lasta_di</em> にして、再自動生成</li>
 	</ol>
 	<p>
 		pom.xmlは、以下をコピーして、該当箇所に設定しましょう。
