@@ -444,10 +444,11 @@
 </code></pre>
 	<dl class="textlist">
 		<dt>ロジックのメソッド</dt>
-		<dd>void callResultSetProcedure(SpReturnResultSetPmb pmb)</dd>
+		<dd>void callResultSetProcedure(LocalDate birthdate)</dd>
 		<dd>
 			<ul class="supplementlist">
 				<li>指定された ParameterBean で SP_RETURN_RESULT_SET を call</li>
+				<li>会員名称と会員ステータス名称を一行のログで出力すること</li>
 			</ul>
 		</dd>
 		<dt>対応テストメソッド</dt>
@@ -456,7 +457,6 @@
 			<ul class="supplementlist">
 				<li>birthdate に1968年1月1日を設定</li>
 				<li>生年月日が1968年以降であることをアサート</li>
-				<li>会員名称と会員ステータス名称を一行のログで出力すること</li>
 			</ul>
 		</dd>
 	</dl>
