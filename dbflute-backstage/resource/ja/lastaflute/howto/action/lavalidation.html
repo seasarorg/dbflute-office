@@ -65,10 +65,16 @@
 	</p>
 	<dl class="shortkeymainlist">
 		<dt>String</dt><dd>NotBlank と同じ、nullと空文字と空白はダメ</dd>
-		<dt>Integer など</dt><dd>NotNull と同じ</dd>
-		<dt>LocalDate など</dt><dd>NotNull と同じ</dd>
+		<dt>Integer など</dt><dd>NotNull と同じ <span class="frm">(必ず Wrapper 型 である Integer や Long を使いましょう)</span></dd>
+		<dt>LocalDate など</dt><dd>NotNull と同じ <span class="frm">(必ず Java8 から導入された LocalDate などを使いましょう)</span></dd>
+		<dt>Boolean</dt><dd>NotNull と同じ <span class="frm">(必ず Wrapper 型である Boolean を使いましょう)</span></dd>
 		<dt>List や Map など</dt><dd>NotEmpty と同じ、null や空リストはダメ、<em class="keyword">一件以上の要素が必要</em></dd>
+		<dt>Primitive型</dt><dd><em class="bigmark">効かない</em> <span class="frm">(0がsetされたのか、setされなくて0なのか区別が付かない)</span></dd>
 	</dl>
+	<p>
+		全体的に、<em class="keyword">プロパティの型にはWrapper型を使う</em> というポリシーでよいでしょう。
+	</p>
+	<div class="relatedpage"><a href="#dontuseprimitive">this - 気をつけて！int や boolean の @Required</a></div>
 	<h3 id="clienterror">システム項目は groups=ClientError.class</h3>
 	<p>
 		例えば、hiddenフィールドに保持しておいたIDやバージョン番号など、ユーザー入力ではないシステム項目は、
@@ -166,8 +172,10 @@
 @Execute
 <span class="keyword">public</span> HtmlResponse index(<span class="keyword">int</span> <span class="localvar">productId</span>, SeaLandForm <span class="localvar">form</span>) {
     <span class="subpoint">validate</span>(<span class="localvar">form</span>, <span class="localvar">messages</span> -&gt; {
-        <span class="keyword">if</span> (<span class="localvar">form</span>.<span class="attribute">sea</span> &gt; <span class="localvar">form</span>.<span class="attribute">land</span>) {
-            <span class="localvar">messages</span>.<span class="point">addErrorsSeaLand</span>(<span class="literal">"sea"</span>);
+        <span class="keyword">if</span> (isNotEmpty(<span class="localvar">form</span>.<span class="attribute">sea</span>) && isNotEmpty(<span class="localvar">form</span>.<span class="attribute">land</span>)) {
+            <span class="keyword">if</span> (<span class="localvar">form</span>.<span class="attribute">sea</span>.length() &gt; <span class="localvar">form</span>.<span class="attribute">land</span>.length()) {
+                <span class="localvar">messages</span>.<span class="point">addErrorsSeaLand</span>(<span class="literal">"sea"</span>);
+            }
         }
     }, () -&gt; {
         <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandJsp</span>);
@@ -194,20 +202,28 @@
     <span class="abbreviation">...</span>
 }
 
-<span class="keyword">public void</span> <span class="subpoint">moreValidate</span>(SeaLandForm <span class="localvar">form</span>, HarborMessages <span class="localvar">messages</span>) {
-    <span class="keyword">if</span> (isNotEmpty(<span class="localvar">form</span>.<span class="attribute">sea</span>) && isNotEmpty(<span class="localvar">form</span>.<span class="attribute">land</span>)) { <span class="comment">// don't forget!</span>
-        <span class="keyword">if</span> (<span class="localvar">form</span>.<span class="attribute">sea</span>.length() &gt; <span class="localvar">form</span>.<span class="attribute">land</span>.length()) { <span class="comment">// should be longer</span>
+<span class="keyword">private void</span> <span class="subpoint">moreValidate</span>(SeaLandForm <span class="localvar">form</span>, HarborMessages <span class="localvar">messages</span>) {
+    <span class="keyword">if</span> (isNotEmpty(<span class="localvar">form</span>.<span class="attribute">sea</span>) && isNotEmpty(<span class="localvar">form</span>.<span class="attribute">land</span>)) {
+        <span class="keyword">if</span> (<span class="localvar">form</span>.<span class="attribute">sea</span>.length() &gt; <span class="localvar">form</span>.<span class="attribute">land</span>.length()) {
             <span class="localvar">messages</span>.addErrorsSeaLand(<span class="literal">"sea"</span>);
         }
     }
 }
 </code></pre>
+	<h3 id="alwayscalled">アノテーションでエラーがあっても呼ばれる</h3>
 	<p>
-		アノテーションの方でバリデーションエラーが発生しても、必ず呼び出されます。
+		アノテーションの方でバリデーションエラーが発生しても、第二引数の moreValidation の Lambda は必ず呼び出されます。
+		なので、必須項目でも必須チェックに引っかかって null になっているかもしれないので、<em class="keyword">実際に値が入っていたら</em>、という分岐を入れましょう。
 	</p>
-	<p>
-		必須項目でも、必須チェックに引っかかって null かもしれないので、<em class="keyword">実際に値が入っていたら</em>、という分岐を入れましょう。
-	</p>
+<pre><span class="codetitle">e.g. null check for more validation @Java</span><code>
+<span class="keyword">private void</span> moreValidate(SeaLandForm <span class="localvar">form</span>, HarborMessages <span class="localvar">messages</span>) {
+    <span class="keyword">if</span> (<span class="point">isNotEmpty</span>(<span class="localvar">form</span>.<span class="attribute">sea</span>) && <span class="point">isNotEmpty</span>(<span class="localvar">form</span>.<span class="attribute">land</span>)) {
+        <span class="keyword">if</span> (<span class="localvar">form</span>.<span class="attribute">sea</span>.length() &gt; <span class="localvar">form</span>.<span class="attribute">land</span>.length()) {
+            <span class="localvar">messages</span>.addErrorsSeaLand(<span class="literal">"sea"</span>);
+        }
+    }
+}
+</code></pre>
 
 	<h2 id="adjustmessage">エラーメッセージを調整</h2>
 	<p>
@@ -253,10 +269,38 @@
 		凝り過ぎてもつらいので、例えば <em class="keyword">Required だけチェックする</em>
 		というような割り切りがオススメです。フロント側のディベロッパーと相談してみましょう。
 	</p>
-	<h3 id="dontforgetjson">@Valid や List の @Required に注意</h3>
+	<h3 id="exceptproduction">本番ではチェックしない、とか、警告だけとか</h3>
 	<p>
-		Form や Body のときと同様に、ネストした Bean には @Valid
-		を定義し忘れないようにしましょう。
+		TODO jflute
+	</p>
+
+	<h2 id="bigcheck">三大チェックポイント</h2>
+	<h3 id="dontuseprimitive">気をつけて！int や boolean の @Required</h3>
+	<p>
+		Primitive型を使うと、setされたのかされてないのかが区別付かないため、@Required
+		が効きません。
+	</p>
+<pre><span class="codetitle">e.g. don't use primitive, use wrapper type @Java</span><code>
+<span class="keyword">public class</span> SeaLandBean {
+
+    @Required
+    <span class="comment">//public int piari; *Bad</span>
+    <span class="keyword">public</span> <span class="point">Integer</span> <span class="attribute">piari</span>; <span class="comment">// Good</span>
+
+    @Required
+    <span class="comment">//public boolean bonvo; *Bad</span>
+    <span class="keyword">public</span> <span class="point">Boolean</span> <span class="attribute">bonvo</span>; <span class="comment">// Good</span>
+}
+</code></pre>
+	<p>
+		特に、Boolean などはついつい boolean を使いたくなるので注意です。
+	</p>
+	<p>
+		全体的に、<em class="keyword">プロパティの型にはWrapper型を使う</em> というポリシーでよいでしょう。
+	</p>
+	<h3 id="dontforgetvalid">忘れないで！ネストBean には @Valid</h3>
+	<p>
+		ネストした Bean には @Valid を定義し忘れないようにしましょう。
 	</p>
 <pre><span class="codetitle">e.g. don't forget @Valid annotation for nested bean @Java</span><code>
 <span class="keyword">public class</span> SeaLandBean {
@@ -279,9 +323,10 @@
     }
 }
 </code></pre>
+	<h3 id="rememberlistrequired">思い出して！List の @Required は一件以上</h3>
 	<p>
-		また、<em class="keyword">List に対する @Required は一件以上</em>
-		というチェックになるので、もし、その List が空リストでもOKなのであれば、代わりに <em class="mark">@NotNull</em> を付けましょう。 
+		List に @Required を付けると、空リストでバリデーションエラーになります。
+		もし、"空リストでもOK だが null はあり得ない" とかであれば、<em class="mark">@NotNull</em> を付けましょう。 
 	</p>
 <pre><span class="codetitle">e.g. List @Valid annotation for nested bean @Java</span><code>
 <span class="keyword">public class</span> SeaLandBean {
@@ -305,10 +350,6 @@
     }
 }
 </code></pre>
-	<h3 id="exceptproduction">本番ではチェックしない、とか、警告だけとか</h3>
-	<p>
-		TODO jflute
-	</p>
 
 	<h2 id="professional">プロフェッショナルバリデーション</h2>
 	<p>
