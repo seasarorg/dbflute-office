@@ -6,7 +6,7 @@
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="keywords" content="DBFlute,LastaFlute,Java,Lean Startup,Incremental Development" />
 	<style type="text/css" title="currentStyle">@import "../../../../css/sub.css";</style>
-	<title>LastaFlute の Validation | LastaFlute</title>
+	<title>見通しのValidation | LastaFlute</title>
 </head>
 <body>
 <div id="container" class="ct-manual">
@@ -24,7 +24,7 @@
 </div>
 
 <div id="content"><!-- __content-start__ -->
-	<h1>LastaFlute の Validation</h1>
+	<h1>見通しのValidation</h1>
 	<div class="relatedpage"><a href="../../index.html">LastaFlute</a></div>
 	${indexlist}
 
@@ -72,7 +72,7 @@
 		<dt>Primitive型</dt><dd><em class="bigmark">効かない</em> <span class="frm">(0がsetされたのか、setされなくて0なのか区別が付かない)</span></dd>
 	</dl>
 	<p>
-		全体的に、<em class="keyword">プロパティの型にはWrapper型を使う</em> というポリシーでよいでしょう。
+		全体的に <em class="keyword">プロパティの型にはWrapper型を使う</em> というポリシーでよいでしょう。
 	</p>
 	<div class="relatedpage"><a href="#dontuseprimitive">this - 気をつけて！int や boolean の @Required</a></div>
 	<h3 id="clienterror">システム項目は groups=ClientError.class</h3>
@@ -156,9 +156,10 @@
 		JsonResponseの場合は、<em class="mark">validateApi()</em> の方を使います。
 		こちらは第三引数がなく、バリデーションエラーは ApiFailureHook#handleValidationError() で、統一的なResponse処理がされます。
 	</p>
+	<div class="relatedpage"><a href=".//lajson.html#apifailurehook">忘れられないApiFailureHook</a></div>
 	<h3 id="switchtoapi">そもそも全部 JsonResponse なら</h3>
 	<p>
-		もし、JSON APIサーバーで全部 JsonResponse というときは、BaseAction が implements しているインターフェースを LaValidatableApi
+		もし、そのアプリがJSON APIサーバーで全部 JsonResponse というときは、BaseAction が implements しているインターフェースを LaValidatableApi
 		に変更すると、validate() 自体が JsonResponse 用のメソッドになります。<span class="frm">(これは一番最初に決めましょう)</span>
 	</p>
 
@@ -230,7 +231,7 @@
 		TODO jflute [App]_message.properties, FreeGne
 	</p>
 
-	<h2 id="jsonvalidation">番外. JSON Bean のバリデーション</h2>
+	<h2 id="jsonbeanvalidation">番外. JSON Bean のバリデーション</h2>
 	<h3 id="alsobeanlastadoc">LastaDocに載るのでフロント側に伝えやすい</h3>
 	<p>
 		asJson() の引数に指定する JSON Bean にも、アノテーションを付けることができます。 
@@ -267,7 +268,7 @@
 	</p>
 	<p>
 		凝り過ぎてもつらいので、例えば <em class="keyword">Required だけチェックする</em>
-		というような割り切りがオススメです。フロント側のディベロッパーと相談してみましょう。
+		というような割り切りがオススメです。フロントサイドのディベロッパーと相談してみましょう。
 	</p>
 	<h3 id="exceptproduction">本番ではチェックしない、とか、警告だけとか</h3>
 	<p>
@@ -296,7 +297,7 @@
 		特に、Boolean などはついつい boolean を使いたくなるので注意です。
 	</p>
 	<p>
-		全体的に、<em class="keyword">プロパティの型にはWrapper型を使う</em> というポリシーでよいでしょう。
+		全体的に <em class="keyword">プロパティの型にはWrapper型を使う</em> というポリシーでよいでしょう。
 	</p>
 	<h3 id="dontforgetvalid">忘れないで！ネストBean には @Valid</h3>
 	<p>
