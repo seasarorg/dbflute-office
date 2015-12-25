@@ -34,11 +34,8 @@
 
 	<h2 id="overview">いきなりまとめ</h2>
 	<p>
-		本気でDDDをやるフェーズまで達していない段階での、実装デザインの提案です。
-	</p>
-	<p>
-		もちろん、プロジェクトで独自にアーキテクチャを構築して徹底させる場合はこの限りである必要はありませんが、
-		特になければ LastaFlute からのデフォルトです。
+		本気でDDDをやるフェーズまで達していない段階、かつ、プロジェクトで独自にアーキテクチャを定義していない場合の、LastaFlute
+		からのデフォルト実装デザインの提案です。
 	</p>
 	<dl class="textlist">
 		<dt><em class="mark">Action</em> <span class="frm">(すでにトランザクションかかっている)</span></dt>
@@ -280,10 +277,10 @@
 			もっと、"それ以前" 的な話ですが...
 			時々見かけるコードにこういうのがあります。
 		</p>
-<pre><span class="codetitle">e.g. No way, logic should not extend action @Java</span><code>
+<pre><span class="codetitle">e.g. No way, logic should not depend on web @Java</span><code>
 <span class="keyword">public class</span> SeaInParkLogic {
 
-    <span class="keyword">public void</span> land(<span class="point">SeaForm</span> form) { <span class="comment">// ★絶対やっちゃダメ</span>
+    <span class="keyword">public void</span> land(<span class="point">SeaForm</span> form) { <span class="comment">// ★絶対ダメ</span>
     }
 }
 </code></pre>
@@ -354,7 +351,7 @@ app
 			よく新人プログラマーの実装で見かけることがあるかと思います。
 		</p>
 <pre><span class="codetitle">e.g. No way, logic should not extend action @Java</span><code>
-<span class="keyword">public class</span> SeaInParkLogic <span class="keyword">extends</span> DocksideBaseAction { <span class="comment">// ★絶対やっちゃダメ</span>
+<span class="keyword">public class</span> SeaInParkLogic <span class="keyword">extends</span> DocksideBaseAction { <span class="comment">// ★絶対ダメ</span>
     <span class="abbreviation">...</span>
 }
 </code></pre>
@@ -401,7 +398,7 @@ app
 			よく巨大な Logic を見かけませんか？
 		</p>
 <pre><span class="codetitle">e.g. No way, logic should not extend action @Java</span><code>
-<span class="keyword">public class</span> SeaLogic {
+<span class="keyword">public class</span> SeaLogic { <span class="comment">// ★名前がアバウト</span>
 
     <span class="comment">// ここにメソッド100個くらい...ってちょっとおおげさだけど、ちょーたくさん</span>
 }
@@ -438,7 +435,7 @@ app
 <pre><span class="codetitle">e.g. object + business + logic @Java</span><code>
 <span class="keyword">public class</span> SeaInParkLogic { <span class="comment">// SeaにInParkするLogic</span>
 
-    <span class="comment">// さすがに In する以外のメソッドが追加されることは...あまりないはず</span>
+    <span class="comment">// したら、さすがに In する以外のメソッドが追加されることは...あまりないはず</span>
 }
 </code></pre>
 		<p>
@@ -465,7 +462,7 @@ app
 <pre><span class="codetitle">e.g. No way, many business methods in  @Java</span><code>
 <span class="keyword">public abstract class</span> MaihamaBaseAction <span class="keyword">extends</span> <span class="abbreviation">...</span> {
 
-    <span class="comment">// どかどか業務メソッドが追加されていく。。。</span>
+    <span class="comment">// ★どかどか業務メソッドが追加されていく。。。</span>
 }
 </code></pre>
 		<p>
