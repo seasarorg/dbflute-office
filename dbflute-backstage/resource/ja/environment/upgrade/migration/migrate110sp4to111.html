@@ -43,7 +43,17 @@
 	<h2 id="impl">実装上の注意点</h2>
 	<h3 id="inherits">CallbackContextが全体的にinheritsに</h3>
 	<p>
-		CallbackContext ですが、
+		相当マニアックでレアな注意点です。
+	</p>
+	<p>
+		CallbackContext ですが、SqlFireHook や SqlStringFilter など、setメソッドにおいて、すでに設定されたものは上書きしていました。
+		それが、既存の Hook や Filter も引き継いだ上で set されるようになります。
+	</p>
+	<p>
+		CallbackContext が、フレームワークなどからも使われるようになり、アプリで使うと気付いたらフレームワークの設定が上書きで消されていた、というようなことを防ぐためです。
+	</p>
+	<p>
+		CallbackContext は、DBFluteとしてはデフォルトの設定は何もないため、ほとんどいないと想定されますが、万が一アプリで既存のを上書き前提でsetしている場合は注意してください。
 	</p>
 <!-- __content-end__ --></div></div>
 
