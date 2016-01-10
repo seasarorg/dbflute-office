@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,LastaFlute" />
+	<style type="text/css" title="currentStyle">@import "../../../../css/sub.css";</style>
+	<title>ストレートなジョブ (Job) | DBFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-install"><a href="#">Install</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>ストレートなジョブ (Job)</h1>
+	<p>
+		LastaFluteの特徴の一つです。
+	</p>
+	<div class="relatedpage"><a href="../../index.html">LastaFluteトップページ</a></div>
+	<div class="relatedpage"><a href="../../tutorial/laimpl.html">LastaFluteの実装チュートリアル</a></div>
+	${indexlist}
+
+	<h2 id="overview">Java上でスケジューリング</h2>
+	<p>
+		<em class="keyword">cron 書いたら、その時間に Job が動く</em>
+	</p>
+	<p>
+		スケジューリングする仕組みが別に用意されている場合は全く問題ありませんが、
+		Java上で気軽にスケジューリングしてバッチを実装するための仕組みも捨てがたいです。
+		そんなに大げさなことをしないのであれば、インフラ用意せずにJava上だけで "cron書いたら、その時間に Job 動く"
+		くらいでサクッと実装したいものです。
+	</p>
+
+	<h2 id="prepare">まずは、Jobの環境準備</h2>
+	<p>
+		pom.xml に lasta-job を定義します。
+	</p>
+<pre><span class="codetitle">e.g. Lasta Job dependency @pom.xml</span><code>
+&lt;lasta.job.version&gt;<span class="literal">0.2.0</span>&lt;/lasta.job.version&gt;
+
+<span class="abbreviation">...</span>
+
+&lt;dependency&gt;
+    &lt;groupId&gt;<span class="literal">org.lastaflute.job</span>&lt;/groupId&gt;
+    &lt;artifactId&gt;<span class="literal">lasta-job</span>&lt;/artifactId&gt;
+    &lt;version&gt;<span class="literal">${lasta.job.version}</span>&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+	<p>
+		[App]CurtainBeforeHook で LastaJobStarter を start() します。
+	</p>
+<pre><span class="codetitle">e.g. start Job when curtain before @Java</span><code>
+<span class="keyword">public class</span> MaihamaCurtainBeforeHook <span class="keyword">implements</span> CurtainBeforeHook {
+
+    <span class="keyword">public void</span> hook(FwAssistantDirector assistantDirector) {
+        processDBFluteSystem();
+        <span class="keyword">new</span> LastaJobStarter().<span class="point">start()</span>;
+    }
+
+    <span class="abbreviation">...</span>
+}
+</code></pre>
+
+	<h2 id="scheduling">Jobのスケジューリング</h2>
+	<p>
+		app.job.AllJobScheduler クラスを作成して、Jobクラスを cron 登録します。
+	</p>
+<pre><span class="codetitle">e.g. AllJobScheduler package @Directory</span><code>
+org.docksidestage
+ |-app <span class="comment">// application package</span>
+ |  |-<span class="subpoint">job</span>
+ |  |  |-<span class="point">AllJobScheduler</span>
+ |  |  |-<span class="subpoint">SeaJob</span>
+ |  |  |-<span class="subpoint">LandJob</span>
+ |  |  |-<span class="abbreviation">...</span>
+ |  |-web <span class="comment">// web package</span>
+ |     |-AbcAction
+ |     |-AbcForm
+ |-bizfw
+ |-dbflute
+ |-mylasta
+</code></pre>
+	<p>
+		AllJobScheduler は、LaJobSchedulerインターフェースを implements します。
+	</p>
+<pre><span class="codetitle">e.g. AllJobScheduler implementation @Java</span><code>
+<span class="comment">/**
+ * @author jflute
+ */</span>
+<span class="keyword">public class</span> AllJobScheduler <span class="keyword">implements</span> LaJobScheduler {
+
+    <span class="keyword">protected static final</span> String <span class="attribute">APP_TYPE</span> = <span class="literal">"JOB"</span>;
+
+    @Resource
+    <span class="keyword">private</span> TimeManager <span class="attribute">timeManager</span>;
+    @Resource
+    <span class="keyword">private</span> DocksideConfig <span class="attribute">docksideConfig</span>;
+    @Resource
+    <span class="keyword">private</span> AccessContextLogic <span class="attribute">accessContextLogic</span>;
+
+    @Override
+    <span class="keyword">public void</span> schedule(LaCron <span class="localvar">cron</span>) {
+        <span class="localvar">cron</span>.<span class="point">register</span>(<span class="literal">"* * * * *"</span>, () -&gt; <span class="subpoint">SeaJob</span>.<span class="keyword">class</span>);
+        <span class="localvar">cron</span>.<span class="point">register</span>(<span class="literal">"* * * * *"</span>, () -&gt; <span class="subpoint">LandJob</span>.<span class="keyword">class</span>);
+        <span class="abbreviation">...</span>
+    }
+
+    @Override
+    <span class="keyword">public</span> LaJobRunner createRunner() {
+        <span class="keyword">return new</span> LaJobRunner().useAccessContext(<span class="localvar">resource</span> -&gt; {
+            <span class="keyword">return</span> accessContextLogic.create(<span class="localvar">resource</span>, () -&gt; OptionalThing.empty(), () -&gt; OptionalThing.empty(), () -&gt; <span class="attribute">APP_TYPE</span>);
+        });
+    }
+}
+</code></pre>
+
+	<h2 id="howtojob">Jobの実装の仕方</h2>
+	<p>
+		app.job の下に Job クラスを作成します。
+	</p>
+<pre><span class="codetitle">e.g. AllJobScheduler package @Directory</span><code>
+org.docksidestage
+ |-app <span class="comment">// application package</span>
+ |  |-<span class="subpoint">job</span>
+ |  |  |-AllJobScheduler
+ |  |  |-<span class="point">SeaJob</span>
+ |  |  |-<span class="abbreviation">...</span>
+ |  |-web <span class="comment">// web package</span>
+ |     |-AbcAction
+ |     |-AbcForm
+ |-bizfw
+ |-dbflute
+ |-mylasta
+</code></pre>
+	<p>
+		Job は、LaJobインターフェースを implements します。
+	</p>
+<pre><span class="codetitle">e.g. Job implementation @Java</span><code>
+<span class="comment">/**
+ * @author jflute
+ */</span>
+<span class="keyword">public class</span> SeaJob <span class="keyword">implements</span> LaJob {
+
+    @Resource
+    <span class="keyword">private</span> TransactionStage <span class="attribute">stage</span>;
+    @Resource
+    <span class="keyword">private</span> MemberBhv <span class="attribute">memberBhv</span>;
+
+    @Override
+    <span class="keyword">public void</span> run(LaJobRuntime runtime) {
+        <span class="abbreviation">...</span> = <span class="attribute">memberBhv</span>.select<span class="abbreviation">...</span>;  <span class="comment">// you can select</span>
+
+        <span class="attribute">stage</span>.required(tx -&gt; { <span class="comment">// you can use transaction</span>
+            memberBhv</span>.update<span class="abbreviation">...</span>;  <span class="comment">// you can update</span>
+            <span class="abbreviation">...</span>
+        });
+    }
+}
+</code></pre>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">inu</a></li>
+		<li><a href="#">neko</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>
