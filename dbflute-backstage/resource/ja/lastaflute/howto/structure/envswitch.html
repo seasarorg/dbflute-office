@@ -36,7 +36,7 @@
 		ファイル単位で切り替えるため、一つのファイルで環境ごとのものと環境で変わらないものが混在していると重複の原因になります。
 		なので、なんでもかんでも切り替えるのではなく、環境切り替え用のpropertiesを用意しています。
 	</p>
-	<div class="relatedpage"><a href="../architecture/objsafeprop.html#antidiconfig">これはやめたい！DI設定ファイルの環境ごと切り替え</a></div>
+	<div class="relatedpage"><a href="../architecture/objsafeprop.html#antidiswitch">これはやめたい！DI設定ファイルの環境ごと切り替え</a></div>
 	<p>
 		デフォルトでは、commonと各アプリにそれぞれ xxx_env.properties が用意されています。
 		こちらに、DBの接続情報や、メールサーバーの情報などを入れて切り替えるとよいでしょう。
@@ -52,7 +52,7 @@ maihama-common
 	<p>
 		こちらの properties は、プログラム上でタイプセーフに get することができます。
 	</p>
-	<div class="relatedpage"><a href="./objsafeprop.html#typesafeprop">LastaFluteのタイプセーフProperties</a></div>
+	<div class="relatedpage"><a href="../architecture/objsafeprop.html#typesafeprop">LastaFluteのタイプセーフProperties</a></div>
 
 	<h2 id="envifstatement">プログラム上で環境切り替え分岐</h2>
 	<p>
@@ -105,6 +105,7 @@ maihama-common
 	<p>
 		なので、組み込みwarで実行するときは、javaコマンドの引数で指定します。
 	</p>
+	<div class="relatedpage"><a href="./builddeploy.html#executablewar">LastaFluteのデプロイ環境 - 実行可能warでアプリ起動</a></div>
 <pre><span class="codetitle">e.g. 本番環境(production)としてアプリを実行 @Command</span><code>
 java <span class="point">-Dlasta.env=production</span> -jar maihama-dockside.war
 </code></pre>

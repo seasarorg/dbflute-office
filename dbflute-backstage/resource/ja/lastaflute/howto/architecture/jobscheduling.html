@@ -59,18 +59,15 @@
 &lt;/dependency&gt;
 </code></pre>
 	<p>
-		[App]CurtainBeforeHook で LastaJobStarter を start() します。
+		app.xml で lasta_job.xml を include します。
 	</p>
-<pre><span class="codetitle">e.g. start Job when curtain before @Java</span><code>
-<span class="keyword">public class</span> MaihamaCurtainBeforeHook <span class="keyword">implements</span> CurtainBeforeHook {
-
-    <span class="keyword">public void</span> hook(FwAssistantDirector assistantDirector) {
-        processDBFluteSystem();
-        <span class="keyword">new</span> LastaJobStarter().<span class="point">start()</span>;
-    }
-
-    <span class="abbreviation">...</span>
-}
+<pre><span class="codetitle">e.g. include Lasta Job @app.xml</span><code>
+&lt;components>
+	&lt;include path="convention.xml"/&gt;
+	&lt;include path="dbflute.xml"/&gt;
+	&lt;include path="lastaflute.xml"/&gt;
+	<span class="point">&lt;include path="lasta_job.xml"/&gt;</span>
+&lt;/components>
 </code></pre>
 
 	<h2 id="scheduling">Jobのスケジューリング</h2>
@@ -112,8 +109,8 @@ org.docksidestage
 
     @Override
     <span class="keyword">public void</span> schedule(LaCron <span class="localvar">cron</span>) {
-        <span class="localvar">cron</span>.<span class="point">register</span>(<span class="literal">"* * * * *"</span>, () -&gt; <span class="subpoint">SeaJob</span>.<span class="keyword">class</span>);
-        <span class="localvar">cron</span>.<span class="point">register</span>(<span class="literal">"* * * * *"</span>, () -&gt; <span class="subpoint">LandJob</span>.<span class="keyword">class</span>);
+        <span class="localvar">cron</span>.<span class="point">register</span>(<span class="literal">"* * * * *"</span>, <span class="subpoint">SeaJob</span>.<span class="keyword">class</span>);
+        <span class="localvar">cron</span>.<span class="point">register</span>(<span class="literal">"* * * * *"</span>, <span class="subpoint">LandJob</span>.<span class="keyword">class</span>);
         <span class="abbreviation">...</span>
     }
 
@@ -169,6 +166,32 @@ org.docksidestage
     }
 }
 </code></pre>
+
+	<h2 id="jobmanager">JobManagerでマネジメント</h2>
+	<p>
+		DIコンポーネントとして、<em class="mark">JobManager</em> が利用できます。
+	</p>
+	<dl class="keymainlist">
+		<dt>findJobByKey()</dt><dd>JobKeyでJobを検索</dd>
+		<dt>findJobByUniqueOf()</dt><dd>アプリ指定のユニークコードでJobを検索</dd>
+		<dt>getJobList()</dt><dd>すべてのJobを取得</dd>
+		<dt>registerJob()</dt><dd>Jobを新たに登録 <span class="frm">(システムが動いてる途中で登録できる)</span></dd>
+		<dt>clearClosedJob()</dt><dd>closeされたJobをJobListからクリア <span class="frm">(Jobをcloseした後に行う)</span></dd>
+		<dt>destroySchedule()</dt><dd>登録されたスケジュールを完全に破棄 <span class="frm">(完全に初期化、普通やらない)</span></dd>
+	</dl>
+	<p>
+		find した <em class="mark">LaScheduledJob</em> で、個々の Job に対して操作することもできます。
+	</p>
+	<dl class="shortkeymainlist">
+		<dt>getJobKey()</dt><dd>JobKeyを取得</dd>
+		<dt>getJobUnique()</dt><dd>アプリ指定のユニークコードを取得 <span class="frm">(あれば)</span></dd>
+		<dt>getCronExp()</dt><dd>cron設定を取得</dd>
+		<dt>isExecutingNow()</dt><dd>このJobがいま動いているかどうか？</dd>
+		<dt>launchNow()</dt><dd>このJobをいま動かす <span class="frm">(スケジュールと関係なしに)</span></dd>
+		<dt>stopNow()</dt><dd>このJobが動いていたら停止(停止要求を出す) <span class="frm">(要求に応じるかは実装次第)</span></dd>
+		<dt>closeNow()</dt><dd>このJobをcloseする、もう動かない <span class="frm">(いま動いているものは最後まで動く)</span></dd>
+		<dt>isClosed()</dt><dd>このJobがcloseされたかどうか？</dd>
+	</dl>
 <!-- __content-end__ --></div></div>
 
 <div id="sidebar">
