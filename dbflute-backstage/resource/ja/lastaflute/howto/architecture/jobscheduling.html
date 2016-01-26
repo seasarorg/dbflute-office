@@ -109,15 +109,15 @@ org.docksidestage
 
     @Override
     <span class="keyword">public void</span> schedule(LaCron <span class="localvar">cron</span>) {
-        <span class="localvar">cron</span>.<span class="point">register</span>(<span class="literal">"* * * * *"</span>, <span class="subpoint">SeaJob</span>.<span class="keyword">class</span>, waitIfConcurrent());
-        <span class="localvar">cron</span>.<span class="point">register</span>(<span class="literal">"* * * * *"</span>, <span class="subpoint">LandJob</span>.<span class="keyword">class</span>, quitIfConcurrent());
+        <span class="localvar">cron</span>.<span class="point">register</span>(<span class="literal">"* * * * *"</span>, <span class="subpoint">SeaJob</span>.<span class="keyword">class</span>, waitIfConcurrent(), op -&gt; {});
+        <span class="localvar">cron</span>.<span class="point">register</span>(<span class="literal">"* * * * *"</span>, <span class="subpoint">LandJob</span>.<span class="keyword">class</span>, quitIfConcurrent(), op -&gt; {});
         <span class="abbreviation">...</span>
     }
 
     @Override
     <span class="keyword">public</span> LaJobRunner createRunner() {
         <span class="keyword">return new</span> LaJobRunner().useAccessContext(<span class="localvar">resource</span> -&gt; {
-            <span class="keyword">return</span> accessContextLogic.create(<span class="localvar">resource</span>, () -&gt; OptionalThing.empty(), () -&gt; OptionalThing.empty(), () -&gt; <span class="attribute">APP_TYPE</span>);
+            <span class="keyword">return</span> <span class="attribute">accessContextLogic</span>.create(<span class="localvar">resource</span>, () -&gt; OptionalThing.empty(), () -&gt; OptionalThing.empty(), () -&gt; <span class="attribute">APP_TYPE</span>);
         });
     }
 }
@@ -191,6 +191,7 @@ org.docksidestage
 		<dt>stopNow()</dt><dd>このJobが動いていたら停止(停止要求を出す) <span class="frm">(要求に応じるかは実装次第)</span></dd>
 		<dt>reschedule()</dt><dd>このJobのcronをリスケする <span class="frm">(いま動いているものは最後まで動く)</span></dd>
 		<dt>unschedule()</dt><dd>このJobを外す、もう動かない <span class="frm">(いま動いているものは最後まで動く)</span></dd>
+		<dt>becomeNonCron()</dt><dd>このJobをcronなし状態にする、勝手には動かない <span class="frm">(launchNow()だけで動かせる)</span></dd>
 		<dt>isUnscheduled()</dt><dd>このJobがunscheduleされたかどうか？</dd>
 	</dl>
 <!-- __content-end__ --></div></div>
