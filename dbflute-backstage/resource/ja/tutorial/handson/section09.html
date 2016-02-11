@@ -283,7 +283,7 @@
 			<ul class="supplementlist">
 				<li>"さらに外だし" と同じ仕様(ページングは不要)</li>
 				<li>カーソル検索として作成すること</li>
-				<li>明らかにおかしいカラム名のカラムは取得してはいけない <span class="frm">(後は何を取ってもOKですが、これだけはっ)</span></li>
+				<li>明らかにおかしいカラム名のカラムはデータ取得してはいけない <span class="frm">(後は何を取ってもOKですが、これだけはっ)</span></li>
 			</ul>
 		</dd>
 		<dt>ロジックのメソッド</dt>
@@ -445,7 +445,7 @@
 </code></pre>
 	<dl class="textlist">
 		<dt>ロジックのメソッド</dt>
-		<dd>void callResultSetProcedure(LocalDate birthdateFrom)</dd>
+		<dd>SpReturnResultSetPmb callResultSetProcedure(LocalDate birthdateFrom)</dd>
 		<dd>
 			<ul class="supplementlist">
 				<li>指定された ParameterBean で SP_RETURN_RESULT_SET を call</li>

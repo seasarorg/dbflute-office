@@ -94,9 +94,9 @@ C:\projects
 	<p>
 		<span class="frm">※Eclipseのworkspaceで利用するJavaは、JREではなくJDK。Preferences の Installed JREs で調整できます。</span>
 	</p>
-	<h3 id="checkout">プロジェクトのチェックアウト</h3>
-	<dl class="valuemainlist">
-		<dt>GITリポジトリURL</dt><dd>https://jflute@git.codebreak.com/jflute/hands-on.git</dd>
+	<h3 id="clone">プロジェクトのclone</h3>
+	<dl class="longvaluemainlist">
+		<dt>GITリポジトリ</dt><dd>https://github.com/dbflute-session/dbflute-hands-on.git</dd>
 		<dt>プロジェクト</dt><dd>dbflute-hands-on</dd>
 	</dl>
 	<p>
@@ -111,7 +111,7 @@ C:\projects
 	<ol>
 		<li>Preferences の Team - Git - Configuration にて autocrlf が "もし" true になら false に</li>
 		<li><em class="keyword">Gitリポジトリエクスプローラー</em>にてリポジトリのクローン (ユーザー・パスワードなし)</li>
-		<li><em class="keyword">Working Directory</em> の <em class="keyword">dbflute-hands-on</em> を選択して右クリック <em class="keyword">Import Projects...</em></li>
+		<li><em class="keyword">Working Directory</em> を選択して右クリック <em class="keyword">Import Projects...</em></li>
 		<li><em class="keyword">Import as general project</em> を選択して Next, そして次も Finish でおしまい</li>
 	</ol>
 	<p>
@@ -142,7 +142,6 @@ C:\projects
 	</p>
 	<p>
 		MySQLのオフィシャルサイトからローカル環境に対応する MySQL のインストーラー無し版(ZIPアーカイブ版など)をダウンロードし、localdb/mysql に配置します。
-		そして、localdb/boot-mysql.bat|sh を実行し、MySQL を起動してください。
 	</p>
 	<div class="detailpage"><a href="http://dev.mysql.com/downloads/mysql/">Official Site - MySQL Download</a></div>
 <pre><span class="codetitle">e.g. MySQLの配置場所 @Directory</span><code>
@@ -158,6 +157,23 @@ PROJECT_ROOT
  |-tutorial
 </code></pre>
 	<p>
+		ちなみに Mac の人は、<em class="keyword">起動する前に</em> MySQL を初期化してあげる必要があります。
+	</p>
+	<dl class="shortkeymainlist">
+		<dt>MySQL-5.6</dt><dd>./script/mysql_install_db を叩く</dd>
+		<dt>MySQL-5.7</dt><dd>mysqld で初期化コマンド叩く</dd>
+	</dl>
+	<p>
+		MySQL-5.7 での初期化コマンドは、mysqlディレクトリにて以下を叩きます。
+		<span class="frm">(rootのパスワードが空っぽで作成されます)</span>
+	</p>
+<pre><span class="codetitle">e.g. Macのときの MySQL-5.7 での初期化コマンド @Command</span><code>
+./bin/mysqld --no-defaults --datadir=./data --basedir=./ --initialize-insecure
+</code></pre>
+	<p>
+		そして、localdb/boot-mysql.bat|sh を実行し、MySQL を起動してください。
+	</p>
+	<p>
 		さらに、login-mysql-root.bat|sh を実行し、MySQLのコマンドコンソールにて "show databases;" と打って enter
 		して、作成されているデータベースは特にないこと(デフォルトのデータベースだけが存在)を確認してください。 
 	</p>
@@ -165,11 +181,6 @@ PROJECT_ROOT
 		今後、ハンズオンを中断する場合は、localdb/close-mysql.bat|sh
 		を実行し、MySQLをシャットダウンし、そして、またハンズオンを再開するときは、boot-mysql.bat|sh を実行してください。
 		<span class="frm">(Windowsであれば、Eclipse上からbatファイルをダブルクリックで実行できます: ctrl+shift+Rで実行でもOKです)</span>
-	</p>
-	<p>
-		ちなみに Mac の人は、ダウンロードした後に ./script/mysql_install_db (MySQL-5.6まで!?)、
-		もしくは、mysqld --initialize (MySQL-5.7から!?) を実行する必要があるかもしれません。
-		<span class="frm">(起動に失敗したら、その可能性があります。エラーメッセージでググってみたりしてみましょう。jfluteの環境では、mysqlディレクトリにて ./script/mysql_install_db と叩けばいけました)</span>
 	</p>
 	<h3 id="plugin">プラグインのセットアップ</h3>
 	<p>
