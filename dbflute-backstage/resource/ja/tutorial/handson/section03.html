@@ -49,20 +49,21 @@
 	</p>
 	<div class="relatedpage"><a href="./news.html#20150311">ハンズオンニュース - org.docksidestageに変更</a></div>
 
-	<h2 id="morebasic">ConditionBeanの基本をさらに</h2>
+	<h2 id="stretch">ConditionBeanのストレッチ</h2>
 	<p>
-		それでは、ConditionBeanの筋トレです。
+		それでは、ConditionBeanのストレッチです。
 		ConditionBeanの使い方、機能のページを参考にしながら実装しましょう。
 	</p>
 	<div class="relatedpage"><a href="../../manual/function/ormapper/conditionbean/index.html">ConditionBean</a></div>
 	<p>
 		テストが成り立っていることをアサートすることも大事です。
 		また、明示的に指定されていなくても、ログ出力でテストが成り立っていることを目でも確認できるように必要に応じて臨機で入れていくと良いでしょう。
-		<span class="frm">(講師によるフォローあり)</span>
 	</p>
 	<p>
 		Good Luck!
 	</p>
+
+	<h2 id="cbsilver">Silverストレッチ</h2>
 	<dl class="textlist">
 		<!-- PrefixSearch, LessThan, SetupSelect -->
 		<dt>[1] 会員名称がSで始まる1968年1月1日以前に生まれた会員を検索</dt>
@@ -100,6 +101,10 @@
 				<li>アサートするために別途検索処理を入れても誰も文句は言わない</li>
 			</ul>
 		</dd>
+	</dl>
+
+	<h2 id="cbgold">Goldストレッチ</h2>
+	<dl class="textlist">
 		<dd>
 			<span class="frm">
 				※Actでの検索は本番でも実行されることを想定して、テスト都合でパフォーマンス劣化させないように
@@ -143,6 +148,8 @@
 				<li>会員ステータスも一緒に取得</li>
 				<li>ただし、会員ステータス名称だけ取得できればいい (説明や表示順カラムは不要)</li>
 				<li>2005年10月の1日から3日までに正式会員になった会員を検索</li>
+				<li>"2005/10/01" と "2005/10/03" という文字列がリクエストされたと想定 <span class="frm">(Arrangeで宣言)</span></li>
+				<li>それら日付を、ArrangeやActの中では一切動かさずに実現すること <span class="frm">(日付型に変換するのはOK)</span></li>
 				<li>会員名称と正式会員日時と会員ステータス名称をログに出力</li>
 				<li>会員ステータスがコードと名称だけが取得されていることをアサート</li>
 				<li>会員の正式会員日時が指定された条件の範囲内であることをアサート</li>
@@ -158,6 +165,10 @@
 				もともと一件しかなかった検索結果が「二件」になるはずです。
 			</span>
 		</dd>
+	</dl>
+
+	<h2 id="cbplatinum">Platinumストレッチ</h2>
+	<dl class="textlist">
 		<!-- ColumnQuery, ColumnCalculation -->
 		<dt>[7] 正式会員になってから一週間以内の購入を検索</dt>
 		<dd>
@@ -182,6 +193,8 @@
 		<dt>[8] 1974年までに生まれた、もしくは不明の会員を検索</dt>
 		<dd>
 			<ul class="supplementlist">
+				<li>"1974/01/01" という文字列がリクエストされたと想定 <span class="frm">(Arrangeで宣言)</span></li>
+				<li>それら日付を、ArrangeやActの中では一切動かさずに実現すること <span class="frm">(日付型に変換するのはOK)</span></li>
 				<li>会員ステータス名称、リマインダ質問と回答、退会理由入力テキストも取得(ログ出力)</li>
 				<li>若い順だが生年月日が null のデータを最初に並べる</li>
 				<li>生年月日が指定された条件に合致することをアサート</li>
@@ -197,6 +210,8 @@
 				<li>会員アカウントの等値条件に空文字を設定</li>
 				<li>生年月日がない、という条件を設定</li>
 				<li>2005年6月に正式会員になった会員は先にして、会員IDの降順で並べる</li>
+				<li>"2005/06/01" という文字列がリクエストされたと想定 <span class="frm">(Arrangeで宣言)</span></li>
+				<li>それら日付を、ArrangeやActの中では一切動かさずに実現すること <span class="frm">(日付型に変換するのはOK)</span></li>
 				<li>会員名称や会員アカウントの条件がないことをログで確認すること</li>
 				<li>検索された会員の生年月日が存在しないことをアサート</li>
 				<li>2005年6月に正式会員になった会員が先に並んでいることをアサート</li>
@@ -207,8 +222,9 @@
 			<div class="relatedpage"><a href="http://d.hatena.ne.jp/jflute/20140813/strict11">外部サイト - jfluteの日記 - DBFlute-1.1になったらStrict</a></div>
 		</dd>
 	</dl>
+
 	<div class="inucolumn">
-		<h3 id="handydate">HandyDateが使えます</h3>
+		<h2 id="handydate">HandyDateが使えます</h2>
 		<p>
 			java.util.Calendarは、色々と落とし穴があります。
 			ハンズオンでは、ぜひ、HandyDateというクラスを使ってみてください。日付に関する色々な便利メソッドがあります。

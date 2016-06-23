@@ -278,7 +278,7 @@ src/main/java
 	<h3 id="htmlfreegen">FreeGenを叩いてパス自動生成</h3>
 	<p>
 		manageタスク (DBFluteクライアントの manage.bat|sh) の 12 (freegen) を叩いて、FreeGen を実行すると、そのHTMLテンプレートに対応するパス定義が自動生成されます。
-		ここでは <em class="mark">HarborHtmlPath</em> に <em class="mark">path_Sea_SeaLandJsp</em> というパス定義が追加されるでしょう。
+		ここでは <em class="mark">HarborHtmlPath</em> に <em class="mark">path_Sea_SeaLandHtml</em> というパス定義が追加されるでしょう。
 	</p>
 	<div class="relatedpage"><a href="../dbflute/lafreegen.html">なんでも自動生成 (FreeGen)</a></div>
 <pre><span class="codetitle">e.g. execute FreeGen @Command</span><code>
@@ -394,7 +394,7 @@ src/main/java
 <pre><span class="codetitle">e.g. return HtmlResponse as HTML template @Java</span><code>
 @Execute
 <span class="keyword">public</span> <span class="subpoint">HtmlResponse</span> index(<span class="keyword">int</span> <span class="localvar">productId</span>, SeaLandForm <span class="localvar">form</span>) {
-    <span class="keyword">return</span> <span class="point">asHtml</span>(<span class="attribute">path_Sea_SeaLandJsp</span>); 
+    <span class="keyword">return</span> <span class="point">asHtml</span>(<span class="attribute">path_Sea_SeaLandHtml</span>); 
 }
 </code></pre>
 	<p>
@@ -417,9 +417,9 @@ src/main/java
 @Execute
 <span class="keyword">public</span> HtmlResponse index(<span class="keyword">int</span> <span class="localvar">productId</span>, SeaLandForm <span class="localvar">form</span>) {
     <span class="point">validate</span>(<span class="localvar">form</span>, <span class="localvar">messages</span> -&gt; {}, () -&gt; {
-        <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandJsp</span>);
+        <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandHtml</span>);
     });
-    <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandJsp</span>); 
+    <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandHtml</span>); 
 }
 </code></pre>
 	<p>
@@ -454,7 +454,7 @@ src/main/java
 @Execute
 <span class="keyword">public</span> HtmlResponse index(<span class="keyword">int</span> <span class="localvar">productId</span>, SeaLandForm <span class="localvar">form</span>) {
     validate(<span class="localvar">form</span>, <span class="localvar">messages</span> -&gt; {}, () -&gt; {
-        <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandJsp</span>);
+        <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandHtml</span>);
     });
     Integer <span class="localvar">userId</span> = <span class="subpoint">getUserBean()</span>.get().getUserId();
     ListResultBean&lt;Purchase&gt; <span class="localvar">purchaseList</span> = <span class="attribute">purchaseBhv</span>.<span class="point">selectList</span>(<span class="localvar">cb</span> -&gt; {
@@ -472,7 +472,7 @@ src/main/java
         });
         <span class="localvar">cb</span>.query().addOrderBy_PurchaseDatetime_Desc();
     });
-    <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandJsp</span>); 
+    <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandHtml</span>); 
 }
 </code></pre>
 	<p>
@@ -551,7 +551,7 @@ src/main/java
 @Execute
 <span class="keyword">public</span> HtmlResponse index(<span class="keyword">int</span> <span class="localvar">productId</span>, SeaLandForm <span class="localvar">form</span>) {
     validate(<span class="localvar">form</span>, <span class="localvar">messages</span> -&gt; {}, () -&gt; {
-        <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandJsp</span>);
+        <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandHtml</span>);
     });
     Integer <span class="localvar">userId</span> = <span class="subpoint">getUserBean()</span>.get().getUserId();
     ListResultBean&lt;Purchase&gt; <span class="localvar">purchaseList</span> = <span class="attribute">purchaseBhv</span>.selectList(cb -&gt; {
@@ -571,7 +571,7 @@ src/main/java
         <span class="localvar">bean</span>.purchasePrice = <span class="localvar">purchase</span>.getPurchasePrice();
         <span class="keyword">return</span> <span class="localvar">bean</span>;
     });
-    <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandJsp</span>); 
+    <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandHtml</span>); 
 }
 </code></pre>
 	<p>
@@ -590,12 +590,12 @@ src/main/java
 @Execute
 <span class="keyword">public</span> HtmlResponse index(<span class="keyword">int</span> <span class="localvar">productId</span>, SeaLandForm <span class="localvar">form</span>) {
     validate(<span class="localvar">form</span>, <span class="localvar">messages</span> -&gt; {}, () -&gt; {
-        <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandJsp</span>);
+        <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandHtml</span>);
     });
     Integer <span class="localvar">userId</span> = <span class="subpoint">getUserBean()</span>.get().getUserId();
     ListResultBean&lt;Purchase&gt; <span class="localvar">purchaseList</span> = <span class="abbreviation">...</span>
     List&lt;SeaLandRowBean&gt; <span class="localvar">beans</span> = <span class="abbreviation">...</span>
-    <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandJsp</span>).<span class="point">renderWith</span>(<span class="localvar">data</span> -&gt; {
+    <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandHtml</span>).<span class="point">renderWith</span>(<span class="localvar">data</span> -&gt; {
         <span class="localvar">data</span>.<span class="subpoint">register</span>(<span class="literal">"beans"</span>, <span class="localvar">beans</span>);
     });
 }
@@ -620,7 +620,7 @@ src/main/java
     @Execute
     <span class="keyword">public</span> HtmlResponse index(<span class="keyword">int</span> <span class="localvar">productId</span>, SeaLandForm <span class="localvar">form</span>) {
         validate(<span class="localvar">form</span>, <span class="localvar">messages</span> -&gt; {}, () -&gt; {
-            <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandJsp</span>);
+            <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandHtml</span>);
         });
         Integer <span class="localvar">userId</span> = <span class="subpoint">getUserBean()</span>.get().getUserId();
         ListResultBean&lt;Purchase&gt; <span class="localvar">purchaseList</span> = <span class="attribute">purchaseBhv</span>.selectList(<span class="localvar">cb</span> -&gt; {
@@ -652,7 +652,7 @@ src/main/java
             <span class="localvar">bean</span>.purchasePrice = <span class="localvar">purchase</span>.getPurchasePrice();
             <span class="keyword">return</span> <span class="localvar">bean</span>;
         });
-        <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandJsp</span>).renderWith(<span class="localvar">data</span> -&gt; {
+        <span class="keyword">return</span> asHtml(<span class="attribute">path_Sea_SeaLandHtml</span>).renderWith(<span class="localvar">data</span> -&gt; {
             <span class="localvar">data</span>.<span class="subpoint">register</span>(<span class="literal">"beans"</span>, <span class="localvar">beans</span>);
         });
     }
