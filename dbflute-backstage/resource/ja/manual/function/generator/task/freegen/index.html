@@ -1,0 +1,85 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,タスク,Task,FreeGen" />
+	<style type="text/css" title="currentStyle">@import "../../../../../../css/sub.css";</style>
+	<title>FreeGenタスク | DBFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-install"><a href="#">Install</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>FreeGenタスク</h1>
+	${indexlist}
+
+	<h2 id="about">FreeGenタスクとは？</h2>
+	<p>
+		なんでも自動生成DBFluteタスクです。
+	</p>
+	<p>
+		例えば、Solrの schema.xml
+		を読み込んで対応するクラスを自動生成したり、JSONの定義を読み込んで対応するクラスを自動生成したり、様々な用途で利用されます。
+	</p>
+	<p>
+		DBFluteのメインの自動生成とは切り離された機能です。
+		DBFluteの自動生成エンジンを間借りして好きなものを読み込んで好きなものを自動生成するためのものと考えてよいでしょう。
+	</p>
+	<h3 id="timing">主な実行タイミング</h3>
+	<ul>
+		<li>自動生成したいとき</li>
+	</ul>
+	<h3 id="map">FreeGenの概念マップ</h3>
+	<p class="imgbox">図 : FreeGenの概念マップ
+		<a href="../../../../../../data/model/freegen/freegen-map.png" title="FreeGenの概念マップ"><img src="../../../../../../data/model/freegen/freegen-map.png" alt="FreeGenの概念マップ" width="550" height="360" /></a>
+	</p>
+
+	<h2 id="command">実行コマンド</h2>
+	<p>
+		DBFluteクライアント配下の <em class="keyword">manage.(bat|sh)</em> の 12 (freegen) を選択して実行します。
+	</p>
+	<div class="relatedpage"><a href="../index.html#command">タスク実行コマンド</a></div>
+
+	<h2 id="environment">環境構築</h2>
+	<p>
+		freeGenMap.dfprop と ControlFreeGen.vm を作成します。
+	</p>
+	<div class="relatedpage"><a href="../../../../reference/dfprop/freegen/index.html">freeGenMap.dfprop</a></div>
+
+	<h2 id="overview">処理概要</h2>
+	<p>
+		FreeGenタスクを実行すると、freeGenMap.dfprop が読み込まれて、そして、ControlFreeGen.vm が実行されます。
+		あとはその通りです。
+	</p>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">Under Construction</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>
