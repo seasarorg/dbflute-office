@@ -148,8 +148,8 @@
 		その部分のソースコードをよく読み、自分のプロジェクトではどうするかしっかり考えて直しましょう。
 	</p>
 	<p>
-		直したときは、#change_it_first コメントを削除しましょう。
-		すぐに決められないものとかあった場合、あとで何を直して何を保留したのかがわからなくなってしまうので。
+		直したときは、#change_it_first コメントを #changed とかに修正しておくとよいでしょう。
+		あとで何を直して何を保留したのかがわからなくなってしまうので。
 	</p>
 	<p>
 		ここでは、代表的なものを紹介します。
@@ -197,7 +197,7 @@
 		<dt>databaseInfoMap.dfprop</dt><dd>JDBC接続情報</dd>
 		<dt>maihama_env.properties</dt><dd>JDBC接続情報</dd>
 		<dt>pom.xml</dt><dd>dependenciesのJDBCドライバ</dd>
-		<dt>.erm (ERMaster-bなら)</dt><dd>ERMaster-bの対象データベース</dd>
+		<dt>.erm (ERMaster-bなら)</dt><dd>ERFluteの対象データベース</dd>
 	</dl>
 	<h3 id="firstdbdesign">最初のDB設計</h3>
 	<p>
@@ -227,7 +227,7 @@
 		すぐに修正しなくてもいいけど、いつかはちゃんとアプリにフィットさせないといけない場所に記載されています。
 	</p>
 	<p>
-		こちらも、#change_it_first のときと同様に、直したら削除しましょう。
+		こちらも、#change_it_first のときと同様に、直したら #changed とかに修正しておくとよいでしょう。
 		直したけど、まだ後で調整が必要(かも)というときは、(Eclipseなら _to => ctrl+space で補完して)todoコメントを入れましょう。
 	</p>
 	<h3 id="bonvoyage">Bon voyage</h3>
