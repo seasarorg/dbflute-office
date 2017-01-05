@@ -68,7 +68,7 @@
 		<em class="bigmark">statement</em> は、アプリ側が独自に設定するポリシーです。"もし...だったら、これは...である"
 		というような形式で指定します。
 	</p>
-<pre><span class="codetitle">カラム名が _FLG で終わっていたら、データ型は INTEGER であること @schemaPolicyMap.dfprop</span><code>
+<pre><span class="codetitle">e.g. カラム名が _FLG で終わっていたら、データ型は INTEGER であること @schemaPolicyMap.dfprop</span><code>
 <span class="keyword">map:</span>{
     <span class="abbreviation">...</span>
     ; <span class="attribute">columnMap</span> = <span class="keyword">map:</span>{
@@ -168,6 +168,82 @@
 	<p>
 		それぞれの AdditionalSchema に独自のポリシーを設定することはできないため、
 		AdditionalSchema のテーブルのポリシーチェックは、別途そのスキーマ専用のDBFluteクライアントを用意すると良いでしょう。
+	</p>
+	<h3 id="wholemap">wholeMap <span class="frm">(@since 1.1.2)</span></h3>
+	<p>
+		スキーマ全体に対するポリシー。themeList だけが利用できます。(statementListは不可)
+	</p>
+<pre><span class="codetitle">e.g. テーブルの別名がユニーク、カラム名が同じならカラムの別名も同じ @schemaPolicyMap.dfprop</span><code>
+<span class="keyword">map:</span>{
+    <span class="abbreviation">...</span>
+    ; <span class="attribute">wholeMap</span> = <span class="keyword">map:</span>{
+        ; <span class="attribute">themeList</span> = <span class="keyword">list:</span>{ uniqueTableAlias ; sameColumnAliasIfSameColumnName }
+    }
+    <span class="abbreviation">...</span>
+}
+</code></pre>
+	<h4>themeList</h4>
+	<p>
+		利用できる theme は以下の通りです。
+	</p>
+	<dl class="lolongkeymainlist">
+		<dt>uniqueTableAlias</dt><dd>テーブルの別名がユニークである</dd>
+		<dt>sameColumnAliasIfSameColumnName</dt><dd>カラム名が同じならカラムの別名も同じ</dd>
+		<dt>sameColumnDbTypeIfSameColumnName</dt><dd>カラム名が同じならカラムのデータ型も同じ</dd>
+		<dt>sameColumnSizeIfSameColumnName</dt><dd>カラム名が同じならカラムのサイズも同じ</dd>
+		<dt>sameColumnNameIfSameColumnAlias</dt><dd>カラムの別名が同じならカラム名も同じ</dd>
+	</dl>
+	<p>
+		そもそも別名が定義されていないテーブルやカラムは比較対象になりません。
+		別名の必須チェックなどは、別途 tableMap や columnMap の statement にて表現すると良いでしょう。
+	</p>
+	<h4>statementList</h4>
+	<p>
+		wholeMap で statementList は利用できません。
+	</p>
+	<h3 id="tablemap">tableMap</h3>
+	<p>
+		テーブルに対するポリシー。
+	</p>
+<pre><span class="codetitle">e.g. テーブルの別名がユニーク、カラム名が同じならカラムの別名も同じ @schemaPolicyMap.dfprop</span><code>
+<span class="keyword">map:</span>{
+    <span class="abbreviation">...</span>
+    ; <span class="attribute">tableMap</span> = <span class="keyword">map:</span>{
+        ; <span class="attribute">themeList</span> = <span class="keyword">list:</span>{ hasPK ; upperCaseBasis ; identityIfPureIDPK }
+    }
+    <span class="abbreviation">...</span>
+}
+</code></pre>
+	<h4>themeList</h4>
+	<p>
+		利用できる theme は以下の通りです。
+	</p>
+	<dl class="keymainlist">
+		<dt>hasPK</dt><dd>全てのテーブルがPKを持っている</dd>
+	"resource/css/sub-content.css"	<dt>upperCaseBasis</dt><dd>テーブル名は大文字 <span class="frm">(SQL上の名前で判定)</span></dd>
+		<dt>lowerCaseBasis</dt><dd>テーブル名は大文字 <span class="frm">(SQL上の名前で判定)</span></dd>
+		<dt>identityIfPureIDPK</dt><dd>FKではない _ID のPKカラムにはIdentityが付与される</dd>
+		<dt>hasCommonColumn</dt><dd>共通カラムを持っている</dd>
+		<dt>hasAlias</dt><dd>別名が存在する <span class="frm">(DBコメントの一部を別名として認識する設定が前提)</span></dd>
+		<dt>hasComment</dt><dd>テーブルのコメントが存在する (別名部分を除く)</dd>
+	</dl>
+	<p>
+		upperCaseBasis, lowerCaseBasis の大文字小文字判定では、DBFluteが管理するSQL上のテーブル名 (ConditionBeanのSQLで利用)
+		の大文字小文字ルールを利用します。例えば、upperCaseBasis をポリシーにしたとき、DBMSのメタデータが小文字であっても、littleAdjustmentMap.dfprop
+		にて isTableSqlNameUpperCase が true に設定されていればセーフです。
+	</p>
+	<p>
+		identityIfPureIDPK は、Sequence では効果ありません。
+	</p>
+	<p>
+		hasCommonColumn は、共通カラムのすべてのカラムを持っていればOKです。
+	</p>
+	<p>
+		hasAlias は、documentMap.dfprop の aliasDelimiterInDbComment が設定されていることが前提です。
+		<span class="frm">(DBFluteには、DBコメントの中の一部文字列を別名として扱う機能があります)</span>
+	</p>
+	<p>
+		hasComment は、別名設定がされていれば、DBコメントから別名の除いた部分だけで比較されます。
 	</p>
 <!-- __content-end__ --></div></div>
 
