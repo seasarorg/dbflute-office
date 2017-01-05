@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,DBFluteプロパティ,DBFluteProperty,schemaPolicyMap.dfprop" />
+	<style type="text/css" title="currentStyle">@import "../../../../../css/sub.css";</style>
+	<title>typeMappingMap | DBFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-install"><a href="#">Install</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>schemaPolicyMap</h1>
+	${indexlist}
+
+	<h2 id="about">schemaPolicyMapとは？</h2>
+	<p>
+		SchemaPolicyCheck のためのポリシーを設定する dfprop です<span class="frm">(@since 1.1.1)</span>。この dfprop
+		ファイルに設定が追加されると、Docタスクにて SchemaPolicyCheck が実行されます。
+	</p>
+	<div class="relatedpage"><a href="../../../function/generator/task/doc/index.html">Docタスク</a></div>
+
+	<h2 id="property">プロパティ</h2>
+	<p>
+		<em class="keyword">map型プロパティ</em> で、JDBC型とプログラム型の関連を key-value 形式で定義します。
+	</p>
+<pre><span class="codetitle">schemaPolicyMapの仕様 @schemaPolicyMap.dfprop</span><code>
+<span class="keyword">map:</span>{
+    ; <span class="attribute">tableExceptList</span> = <span class="keyword">list:</span>{ [table-hints for exccept] }
+    ; <span class="attribute">tableTargetList</span> = <span class="keyword">list:</span>{ [table-hints for target] }
+    ; <span class="attribute">columnExceptMap</span> = <span class="keyword">map:</span>{
+        ; [table-hint] = <span class="keyword">list:</span>{ [column-hints for exccept] }
+    }
+    ; <span class="attribute">isMainSchemaOnly</span> = [true or false]
+
+    ; <span class="attribute">wholeMap</span> = <span class="keyword">map:</span>{
+        ; <span class="attribute">themeList</span> = <span class="keyword">list:</span>{ [themes] }
+    }
+    ; <span class="attribute">tableMap</span> = <span class="keyword">map:</span>{
+        ; <span class="attribute">themeList</span> = <span class="keyword">list:</span>{ [themes] }
+        ; <span class="attribute">statementList</span> = <span class="keyword">list:</span>{ [statements] }
+    }
+    ; <span class="attribute">columnMap</span> = <span class="keyword">map:</span>{
+        ; <span class="attribute">themeList</span> = <span class="keyword">list:</span>{ [themes] }
+        ; <span class="attribute">statementList</span> = <span class="keyword">list:</span>{ [statements] }
+    }
+}
+</code></pre>
+	<p>
+		<em class="bigmark">theme</em> は、DBFlute側が提供するお決まりのパターンポリシーです。例えば、tableMap にて upperCaseBasis
+		とすれば、テーブル名は大文字であることがチェックされます。
+	</p>
+	<p>
+		<em class="bigmark">statement</em> は、アプリ側が独自に設定するポリシーです。"もし...だったら、これは...である"
+		というような形式で指定します。
+	</p>
+<pre><span class="codetitle">カラム名が _FLG で終わっていたら、データ型は INTEGER であること @schemaPolicyMap.dfprop</span><code>
+<span class="keyword">map:</span>{
+    <span class="abbreviation">...</span>
+    ; <span class="attribute">columnMap</span> = <span class="keyword">map:</span>{
+        ; <span class="attribute">themeList</span> = <span class="keyword">list:</span>{ <span class="abbreviation">...</span> }
+        ; <span class="attribute">statementList</span> = <span class="keyword">list:</span>{
+            ; <span class="point">if columnName is suffix:_FLG then dbType is INTEGER</span>
+        }
+    }
+}
+</code></pre>
+	<p>
+		以下、(*)の付いたプロパティは必須です。
+	</p>
+	<h3 id="tableexceptlist">tableExceptList</h3>
+	<p>
+		チェックの除外テーブルのリスト。
+	</p>
+	<dl class="textlist">
+		<dt>値候補</dt><dd>テーブル名のlist型プロパティ</dd>
+		<dt>デフォルト</dt><dd>なし (除外するものなし)</dd>
+		<dt>補足</dt>
+		<dd>
+			<ul class="supplementlist">
+				<li>tableTargetList の指定がされている場合は無効 (target優先)</li>
+				<li>前方一致: "prefix:前方一致させる文字列" という形式で指定</li>
+				<li>後方一致: "suffix:後方一致させる文字列" という形式で指定</li>
+				<li>部分一致: "contain:部分一致させる文字列" という形式で指定</li>
+				<li>正規表現: "pattern:マッチさせる正規表現文字列" という形式で指定 <span class="frm">@since 1.1.2</span></li>
+				<li>正規表現を除き、大文字小文字の区別なし (ただし実体と合わせることを推奨)</li>
+				<li>複数指定時は、and 条件として扱われる (e.g. Aでもない、Bでもない)</li>
+			</ul>
+		</dd>
+	</dl>
+	<p>
+		基本的な使い方は、databaseInfoMap.dfprop の tableExceptList と似ています。
+	</p>
+	<div class="relatedpage"><a href="../databaseinfo/index.html#tableexceptlist">databaseInfoMap.dfprop - tableExceptList</a></div>
+	<h3 id="tabletargetlist">tableTargetList</h3>
+	<p>
+		チェックの対象テーブルのリスト。(特に指定がなければ全テーブルが対象)
+	</p>
+	<dl class="textlist">
+		<dt>値候補</dt><dd>テーブル名のlist型プロパティ</dd>
+		<dt>デフォルト</dt><dd>なし (全テーブルが対象)</dd>
+		<dt>補足</dt>
+		<dd>
+			<ul class="supplementlist">
+				<li>指定方法は、基本的に <a href="#tableexceptlist">tableExceptList</a> と同じ</li>
+				<li>複数指定時は、and 条件として扱われる (A もしくは B)</li>
+			</ul>
+		</dd>
+	</dl>
+	<p>
+		基本的な使い方は、databaseInfoMap.dfprop の tableTargetList と似ています。
+	</p>
+	<div class="relatedpage"><a href="../databaseinfo/index.html#tabletargetlist">databaseInfoMap.dfprop - tableExceptList</a></div>
+	<h3 id="columnexcecptmap">columnExcecptMap <span class="frm">(@since 1.1.2)</span></h3>
+	<p>
+		チェックの除外カラムのリスト。(テーブル名とカラム名で指定なのでmap)
+	</p>
+	<dl class="textlist">
+		<dt>値候補</dt><dd>テーブル名とカラム名のmap型プロパティ</dd>
+		<dt>デフォルト</dt><dd>なし (全てのカラムが対象)</dd>
+		<dt>補足</dt>
+		<dd>
+			<ul class="supplementlist">
+				<li>テーブル名の指定では、<a href="#tableexceptlist">tableExceptList</a> のように prefix: などが使える</li>
+				<li>カラム名リストの指定方法は、基本的に <a href="#tableexceptlist">tableExceptList</a> と同じ</li>
+			</ul>
+		</dd>
+	</dl>
+	<p>
+		基本的な使い方は、databaseInfoMap.dfprop の columnExcecptMap と似ていますが、若干違う部分があります。
+		例えば、テーブル名での prefix: などの利用可否が違います<span class="frm">(@now 1.1.2)</span>。
+	</p>
+	<div class="relatedpage"><a href="../databaseinfo/index.html#columnexceptmap">databaseInfoMap.dfprop - columnExceptMap</a></div>
+	<h3 id="ismainschemaonly">isMainSchemaOnly</h3>
+	<p>
+		チェックの対象が、メインスキーマだけかどうか？ (AdditionalSchemaを除外するかどうか？)
+	</p>
+	<dl class="textlist">
+		<dt>値候補</dt><dd>テーブル名とカラム名のmap型プロパティ</dd>
+		<dt>デフォルト</dt><dd>なし (全てのカラムが対象)</dd>
+		<dt>補足</dt>
+		<dd>
+			<ul class="supplementlist">
+				<li>テーブル名の指定では、<a href="#tableexceptlist">tableExceptList</a> のように prefix: などが使える</li>
+				<li>カラム名リストの指定方法は、基本的に <a href="#tableexceptlist">tableExceptList</a> と同じ</li>
+			</ul>
+		</dd>
+	</dl>
+	<p>
+		AdditionalSchema のテーブルも一緒にチェックされます。
+		もし、スキーマごとにポリシーが違うとチェックがやりづらいので、メインスキーマだけに絞ることができます。
+	</p>
+	<div class="relatedpage"><a href="../../../function/genbafit/projectfit/additionalschema/index.html">現場フィット - AdditionalSchema</a></div>
+	<p>
+		それぞれの AdditionalSchema に独自のポリシーを設定することはできないため、
+		AdditionalSchema のテーブルのポリシーチェックは、別途そのスキーマ専用のDBFluteクライアントを用意すると良いでしょう。
+	</p>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">inu</a></li>
+		<li><a href="#">neko</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>
