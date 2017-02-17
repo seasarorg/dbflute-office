@@ -57,17 +57,65 @@
 			<span class="frm">(ERMaster-bから引き継いでいる挙動です。なので 1:n Relationship)</span>
 		</dd>
 	</dl>
+	<h3 id="tableoutlinesearch">テーブルのOutline検索 <span class="frm">*Point</span></h3>
+	<p>
+		ダイアグラム上で ctrl + O (おー) すると、図上に Outline
+		が表示され、テーブル名のキーワード入れてテーブルを選択 (Enter) すると、そのテーブルに飛びます。
+	</p>
+	<p class="imgbox">図 : Outlineによるテーブル検索
+		<a href="../../../../../data/snapshot/helper/erflute/erflute-function-outline-table-search-snapshot.png" title="Outlineによるテーブル検索"><img src="../../../../../data/snapshot/helper/erflute/erflute-function-outline-table-search-snapshot.png" alt="Outlineによるテーブル検索" width="550" height="400" /></a>
+	</p>
+
+	<h2 id="exportddlimg">DDLや画像のエクスポート</h2>
+	<h3 id="ddlexport">DDLのエクスポート</h3>
+	<p>
+		ダイアグラム上の右クリックメニューで、Export - DDL すると、DDL出力のためのダイアログが表示されます。
+		DDLのオプションを指定してOKすると、DDLが出力されます。
+	</p>
+	<p class="imgbox">図 : DDLのエクスポートメニュー
+		<a href="../../../../../data/snapshot/helper/erflute/erflute-function-ddl-popup-snapshot.png" title="DDLのエクスポートメニュー"><img src="../../../../../data/snapshot/helper/erflute/erflute-function-ddl-popup-snapshot.png" alt="DDLのエクスポートメニュー" width="550" height="360" /></a>
+	</p>
+	<p>
+		DDLの出力先パスは、workspace内のパスになっています。<span class="frm">(e.g. /maihama-base/modeling/...)</span>
+	</p>
+	<h3 id="imgexport">画像のエクスポート</h3>
+	<p>
+		ダイアグラム上の右クリックメニューで、Export - Image すると、出力先を指定するダイアログが表示されます。
+		そして、出力先を選ぶと画像が出力されます。
+	</p>
 
 	<h2 id="vdiagram">仮想ダイアグラム</h2>
+	<h3 id="whatisvdiagram">そもそも仮想ダイアグラムとは？</h3>
 	<p>
-		TODO jflute now making... とりあえず箇条書きで
+		そもそも仮想ダイアグラム (Virtual Diagram) とは、一部のテーブルだけで構成できるダイアグラムです。
+		実体を管理せず、テーブルを仮想的に参照して独自の視点を持った別のモデリングビューを表現できるものです。
+		例えば、ダイアグラム上でテーブルを削除しても、ダイアグラムから消えるだけで実体は削除されません。
 	</p>
+	<p>
+		例えば、会員系ダイアグラム、商品系ダイアグラムというように業務カテゴリごとに分けます。
+	</p>
+	<h3 id="maindiagram">対してメインダイアグラム</h3>
+	<p>
+		対して、デフォルトのダイアグラムを、メインダイアグラム (Main Diagram)
+		と呼びます。こちらは実体を直接管理しているので、例えばダイアグラム上でテーブルの削除をすると、そのまま実体の削除になります
+	</p>
+	<h3 id="howtovdiagram">仮想ダイアグラムの使い方</h3>
 	<dl class="keymainlist">
 		<dt>仮想ダイアグラムの作成</dt><dd>ダイアグラム上で右クリックして、new VirtualDiagram()</dd>
 		<dt>テーブルの呼び寄せ</dt><dd>Outline上のテーブルを選択してドラッグ&ドロップ</dd>
+		<dt>テーブルの除外</dt><dd>ダイアグラム上でテーブルを選択して削除ボタン <span class="frm">(実体が消えるわけじゃない)</span></dd>
+		<dt>テーブルの作成</dt><dd>メインダイアグラムと同じようにできる</dd>
+		<dt>FK制約の作成</dt><dd>メインダイアグラムと同じようにできる</dd>
+		<dt>あれこれ</dt><dd>だいたいメインダイアグラムと同じようにできる</dd>
 	</dl>
+	<h3 id="badvdiagram">仮想ダイアグラムのバッドノウハウ</h3>
+	<dl class="keymainlist">
+		<dt>仮想ダイアグラムの削除</dt><dd>できないので、XML技で該当の vdiagram タグを削除</dd>
+		<dt>描画が変になったら再描画</dt><dd>FK線がすっ飛んだら、Outlineの仮想ダイアグラムをダブルクリック</dd>
+	</dl>
+	<div class="relatedpage"><a href="#xmlway">this - XML技</a></div>
 
-	<h2 id="xmlway">XML技バッドノウハウ</h2>
+	<h2 id="xmlway">XML技</h2>
 	<p>
 		ERMaster-bからフォークしても、すぐにどんどん改善されるわけではないので、
 		おかしなことなど何かあったら、ermファイルをテキストエディタで開いて、中の XML を直接修正して直すと良いでしょう。
