@@ -34,10 +34,21 @@
 	<div class="relatedpage"><a href="./index.html">ERFluteトップページ</a></div>
 	${indexlist}
 
+	<h2 id="overview">ERFluteの概観</h2>
+	<dl class="keymainlist">
+		<dt>パレットメニュー</dt><dd>左の Select, Table, 1:n Replationship などのメニュー</dd>
+		<dt>ダイアグラム</dt><dd>テーブルが表示されているERDの表示領域</dd>
+		<dt>Outlineビュー</dt><dd>右のOutlineビュー、テーブルなどがアウトラインで表示される</dd>
+		<dt>ダイアグラムモニター</dt><dd>Outlineビューの下、ダイアグラムの概観が見れる</dd>
+	</dl>
+	<p class="imgbox">図 : ERFluteの概観
+		<a href="../../../../../data/snapshot/helper/erflute/erflute-introduction-overview-snapshot.png" title="ERFluteの概観"><img src="../../../../../data/snapshot/helper/erflute/erflute-introduction-overview-snapshot.png" alt="ERFluteの概観" width="550" height="360" /></a>
+	</p>
+
 	<h2 id="basic">基本操作</h2>
 	<h3 id="tableoperation">テーブルの操作</h3>
 	<dl class="shortkeymainlist">
-		<dt>テーブルの作成</dt><dd>メニューの Table を選択してダイアグラム上へポトり</dd>
+		<dt>テーブルの作成</dt><dd>パレットメニューの Table を選択してダイアグラム上へポトり</dd>
 		<dt>テーブルの編集</dt><dd>ダイアグラム上の Table をダブルクリック or 選択して Enter or Space</dd>
 	</dl>
 	<h3 id="columnoperation">カラムの操作</h3>
@@ -57,7 +68,16 @@
 			<span class="frm">(ERMaster-bから引き継いでいる挙動です。なので 1:n Relationship)</span>
 		</dd>
 	</dl>
-	<h3 id="tableoutlinesearch">テーブルのOutline検索 <span class="frm">*Point</span></h3>
+	<h3 id="noteoperation">ノートの操作</h3>
+	<p>
+		TODO jflute now making...
+	</p>
+	<h3 id="tablegroupoperation">テーブルグループの操作</h3>
+	<p>
+		TODO jflute now making...
+	</p>
+
+	<h2 id="tableoutlinesearch">テーブルのOutline検索 <span class="frm">*Point</span></h2>
 	<p>
 		ダイアグラム上で ctrl + O (おー) すると、図上に Outline
 		が表示され、テーブル名のキーワード入れてテーブルを選択 (Enter) すると、そのテーブルに飛びます。
@@ -101,13 +121,17 @@
 	</p>
 	<h3 id="howtovdiagram">仮想ダイアグラムの使い方</h3>
 	<dl class="keymainlist">
-		<dt>仮想ダイアグラムの作成</dt><dd>ダイアグラム上で右クリックして、new VirtualDiagram()</dd>
-		<dt>テーブルの呼び寄せ</dt><dd>Outline上のテーブルを選択してドラッグ&ドロップ</dd>
-		<dt>テーブルの除外</dt><dd>ダイアグラム上でテーブルを選択して削除ボタン <span class="frm">(実体が消えるわけじゃない)</span></dd>
+		<dt>仮想ダイアグラムの作成</dt><dd>ダイアグラム上で右クリックして、new VirtualDiagram() (*1)</dd>
+		<dt>仮想ダイアグラムを開く</dt><dd>Outline上の仮想ダイアグラムをダブルクリック</dd>
+		<dt>テーブルの呼び寄せ</dt><dd>Outline上でテーブル選択してドラッグ&ドロップ</dd>
+		<dt>テーブルの除外</dt><dd>ダイアグラム上でテーブル選択して削除ボタン <span class="frm">(実体が消えるわけじゃない)</span></dd>
 		<dt>テーブルの作成</dt><dd>メインダイアグラムと同じようにできる</dd>
 		<dt>FK制約の作成</dt><dd>メインダイアグラムと同じようにできる</dd>
 		<dt>あれこれ</dt><dd>だいたいメインダイアグラムと同じようにできる</dd>
 	</dl>
+	<p>
+		(*1): 現時点(0.4.4)では、new VirtualDiagram()してもすぐに開かないので、Outline上の仮想ダイアグラムをダブルクリックして開いてください。
+	</p>
 	<h3 id="badvdiagram">仮想ダイアグラムのバッドノウハウ</h3>
 	<dl class="keymainlist">
 		<dt>仮想ダイアグラムの削除</dt><dd>できないので、XML技で該当の vdiagram タグを削除</dd>
