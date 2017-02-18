@@ -218,6 +218,7 @@ org.docksidestage
     }
 }
 </code></pre>
+	<h3 id="transactionstage">トランザクションはTransactionStage</h3>
 	<p>
 		Actionとは違い、トランザクションはデフォルトではかかっていません。バッチ処理は細かくトランザクションを分ける可能性が非常に高いからです。
 		なので、TransactionStage を DI して、うまくトランザクションをロジックの中に組み込みましょう
@@ -233,10 +234,6 @@ org.docksidestage
 		する例外のメッセージをいかにデバッグしやすいものにするかに注力しましょう。
 		<span class="frm">(例外のきっかけになった値をメッセージに載せる)</span>
 	</p>
-	<h3 id="endtitleroll">EndTitleRollを活用しよう</h3>
-	<p>
-		TODO jflute now writing
-	</p>
 	<h3 id="jobassist">JobAssistも使える</h3>
 	<p>
 		Action の ActionAssist と同じような感じで、Job も JobAssist
@@ -247,10 +244,84 @@ org.docksidestage
 		jobパッケージの下に、Assistで終わる名前のクラスであれば、Quick Component
 		として認識されるので、JobクラスでDIして利用することができます。
 	</p>
-
-	<h2 id="noticelog">Jobの実行ログ</h2>
+	<h3 id="letsendtitleroll">EndTitleRollを活用しよう</h3>
 	<p>
-		TODO jflute now writing: INFOログでいい感じの情報が...
+		例えば、どの会員を処理した？何件処理した？何件中何件は失敗した？などの情報をログとして残すことは、バッチの実装における必須要件とも言えるでしょう。
+		自前でログに出してもOKではありますが、LastaJobではそういった情報を出力するための領域が用意されています。
+	</p>
+	<div class="detailpage"><a href="#noticelog">this - Jobの実行通知ログ</a></div>
+<pre><span class="codetitle">e.g. simple EndTitleRoll on Job @Java</span><code>
+<span class="localvar">runtime</span>.<span class="point">showEndTitleRoll</span>(<span class="localvar">data</span> -&gt; {
+    <span class="localvar">data</span>.register(<span class="literal">"targetMember"</span>, <span class="localvar">memberId</span>);
+});
+</code></pre>
+	<h2 id="noticelog">Jobの実行通知ログ</h2>
+	<h3 id="beginendlog">開始ログ、終了ログ</h3>
+	<p>
+		バッチで不可欠な、実行通知ログがデフォルトで組み込まれています。
+		INFOレベルなので、本番でも出力されます。<span class="frm">(設定次第ですが、LastaFlute の Startup のデフォルト設定ではINFOも本番出力)</span>
+	</p>
+	<dl class="keymainlist">
+		<dt>開始ログ</dt><dd>cron(時間)とJobクラスなどの情報</dd>
+		<dt>終了ログ</dt><dd>Jobクラスなどの情報に加えて、Jobの結果</dd>
+	</dl>
+	<p>
+		Jobの結果ではシステム的な情報が表示されます。
+	</p>
+	<dl class="keymainlist">
+		<dt>パフォーマンスビュー</dt><dd>そのJobの実行にどれだけ時間がかかったか？</dd>
+		<dt>SQL発行回数</dt><dd>そのJobの実行でどれだけDBアクセスしたか？</dd>
+		<dt>Jobのランタイム情報</dt><dd>LaJobRuntime の toString()</dd>
+		<dt>EndTitleRoll</dt><dd>Jobクラスの中で指定された業務上の結果</dd>
+	</dl>
+<pre><span class="codetitle">e.g. Job Notice Log @Log</span><code>
+<span class="abbreviation">...</span> INFO  (<span class="abbreviation">...</span>) - #flow #job ...Running job: * * * * * SeaJob@run()
+
+<span class="abbreviation">...</span>
+
+<span class="abbreviation">...</span> INFO  (<span class="abbreviation">...</span>) - #flow #job ...Finishing job: SeaJob@run()
+[Job Result]
+ performanceView: 00m01s328ms
+ sqlCount: {total=3, selectCB=1, entityUpdate=2, queryUpdate=0, outsideSql=0, procedure=0}
+ runtime: Cron4jRuntime:{* * * * *, SeaJob@run(), params={}}@74469155
+ endTitleRoll:
+   targetMember: 3
+</code></pre>
+	<h3 id="endtitleroll">EndTitleRoll</h3>
+	<p>
+		EndTitleRoll は、Jobクラスの中で指定します。
+		例えば、どの会員を処理した？何件処理した？何件中何件は失敗した？など、仕組みの中では判別できない業務情報を載せると良いでしょう。
+	</p>
+<pre><span class="codetitle">e.g. EndTitleRoll on Job @Java</span><code>
+@Override
+<span class="keyword">public void</span> run(LaJobRuntime <span class="localvar">runtime</span>) {
+    <span class="keyword">int</span> <span class="localvar">memberId</span> = 3; <span class="comment">// #simple_for_example</span>
+    <span class="attribute">stage</span>.required(tx -&gt; {
+        Member <span class="localvar">before</span> = <span class="attribute">memberBhv</span>.selectByPK(<span class="localvar">memberId</span>).get();
+        updateMember(<span class="localvar">before</span>.getMemberId());
+        restoreMember(<span class="localvar">before</span>.getMemberId(), <span class="localvar">before</span>.getMemberName()); <span class="comment">// for test</span>
+    });
+    <span class="localvar">runtime</span>.<span class="point">showEndTitleRoll</span>(<span class="localvar">data</span> -&gt; {
+        <span class="localvar">data</span>.register(<span class="literal">"targetMember"</span>, <span class="localvar">memberId</span>);
+    });
+}
+</code></pre>
+	<p>
+		自前で出さずに、EndTitleRollとして出力するメリットは:
+	</p>
+	<dl class="textlist">
+		<dt>どんな情報をログに出しているかわかりやすい</dt>
+		<dd>プログラムの中にあれこれ挟むのではなく、最後に register するのでログ要件のレビューもしやすい。</dd>
+		<dt>他のログと紛れない</dt>
+		<dd>別々のJobが同時に実行されていても、一回の終了ログでまとめて出すことで他のログと紛れない。</dd>
+		<dt>UnitTestでテストしやすくなる</dt>
+		<dd>EndTitleRoll自体を、UnitTestの中で参照してアサートすることができる。</dd>
+	</dl>
+	<h3 id="exceptionlogging">例外ログ</h3>
+	<p>
+		例外が発生したら、ERRORレベルで例外メッセージとスタックトレースなどの情報が出力されます。
+		ゆえに、Jobクラスの中で自前でtry-catchしてエラーログに出力する必要はありません。
+		<span class="frm">(処理を続行するような場合はまたちょっと話は別ですが、処理が中断して良い状態であればthrowしちゃってOK)</span>
 	</p>
 
 	<h2 id="unittest">JobクラスのUnitTest</h2>
