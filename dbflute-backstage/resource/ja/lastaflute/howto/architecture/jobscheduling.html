@@ -222,6 +222,21 @@ org.docksidestage
 		Actionとは違い、トランザクションはデフォルトではかかっていません。バッチ処理は細かくトランザクションを分ける可能性が非常に高いからです。
 		なので、TransactionStage を DI して、うまくトランザクションをロジックの中に組み込みましょう
 	</p>
+	<h3 id="systemexception">システム例外のcatchは不要</h3>
+	<p>
+		Actionと同じく、システム例外(要はバグ)は自分で catch
+		してログに出す必要はありません。そのまま throw すれば、LastaJob が catch して ERROR
+		レベルでログを出力します。
+	</p>
+	<p>
+		Jobの実行管理情報を付与して出力してくれるので、アプリでは throw
+		する例外のメッセージをいかにデバッグしやすいものにするかに注力しましょう。
+		<span class="frm">(例外のきっかけになった値をメッセージに載せる)</span>
+	</p>
+	<h3 id="endtitleroll">EndTitleRollを活用しよう</h3>
+	<p>
+		TODO jflute now writing
+	</p>
 	<h3 id="jobassist">JobAssistも使える</h3>
 	<p>
 		Action の ActionAssist と同じような感じで、Job も JobAssist
@@ -232,19 +247,15 @@ org.docksidestage
 		jobパッケージの下に、Assistで終わる名前のクラスであれば、Quick Component
 		として認識されるので、JobクラスでDIして利用することができます。
 	</p>
-	<h3 id="endtitleroll">EndTitleRollを活用しよう</h3>
-	<p>
-		TODO jflute now writing
-	</p>
 
 	<h2 id="noticelog">Jobの実行ログ</h2>
 	<p>
-		TODO jflute now writing
+		TODO jflute now writing: INFOログでいい感じの情報が...
 	</p>
 
 	<h2 id="unittest">JobクラスのUnitTest</h2>
 	<p>
-		TODO jflute now writing
+		TODO jflute now writing: MockJobRuntime.of() が使えます
 	</p>
 
 	<h2 id="jobmanager">JobManagerでマネジメント</h2>
