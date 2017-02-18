@@ -81,14 +81,22 @@
 		<dt>ノートの削除</dt><dd>ダイアグラム上の Note を洗濯して削除ボタン</dd>
 	</dl>
 	<p>
-		TODO jflute now making...
+		ノートは、DBコメントでもないので、DDLには一切反映されず SchemaHTML にも載りませんが、"図上で補足したい"
+		というようなコメントがあったら、ノートに書くと良いでしょう。
 	</p>
 	<h3 id="tablegroupoperation">テーブルグループの操作</h3>
 	<p>
 		<span class="frm">※現時点 (0.4.4) あまり良い動作をしないので積極的な利用はオススメしません。仮想ダイアグラムを使いましょう。</span>
 	</p>
 	<p>
-		TODO jflute now making...
+		TODO jflute now writing...
+	</p>
+	<h3 id="imageondiagramoperation">ダイアグラム上の画像埋め込み</h3>
+	<p>
+		<span class="frm">画像を埋め込んで何が嬉しいんだ？という話もあります</span>
+	</p>
+	<p>
+		TODO jflute now writing...
 	</p>
 
 	<h2 id="tableoutlinesearch">テーブルのOutline検索 <span class="frm">*Point</span></h2>
@@ -122,16 +130,36 @@
 	<h3 id="whatisvdiagram">そもそも仮想ダイアグラムとは？</h3>
 	<p>
 		そもそも仮想ダイアグラム (Virtual Diagram) とは、一部のテーブルだけで構成できるダイアグラムです。
-		実体を管理せず、テーブルを仮想的に参照して独自の視点を持った別のモデリングビューを表現できるものです。
+		実体を管理せず、テーブルを仮想的に参照して別のモデリングビューを表現できるものです。
 		例えば、ダイアグラム上でテーブルを削除しても、ダイアグラムから消えるだけで実体は削除されません。
 	</p>
 	<p>
-		例えば、会員系ダイアグラム、商品系ダイアグラムというように業務カテゴリごとに分けます。
+		例えば、会員系、商品系というように業務カテゴリごとに分けることを想定しています。
+	</p>
+	<p>
+		ちょうど、Seaという名前の仮想ダイアグラムに、PURCHASEテーブルを含めようと、Outlineのテーブルオブジェクトをドラッグ&ドロップしようとしてるところですね。
+	</p>
+	<p class="imgbox">図 : 仮想ダイアグラムの概観
+		<a href="../../../../../data/snapshot/helper/erflute/erflute-howto-vdiagram-overview-snapshot.png" title="仮想ダイアグラムの概観"><img src="../../../../../data/snapshot/helper/erflute/erflute-howto-vdiagram-overview-snapshot.png" alt="仮想ダイアグラムの概観" width="550" height="360" /></a>
 	</p>
 	<h3 id="maindiagram">対してメインダイアグラム</h3>
 	<p>
 		対して、デフォルトのダイアグラムを、メインダイアグラム (Main Diagram)
-		と呼びます。こちらは実体を直接管理しているので、例えばダイアグラム上でテーブルの削除をすると、そのまま実体の削除になります
+		と呼びます。実体を直接管理しているので、例えばダイアグラム上でテーブルの削除をすると、そのまま実体の削除になります
+	</p>
+	<h3 id="lookvdiagram">仮想ダイアグラムの見た目</h3>
+	<p>
+		仮想ダイアグラムは、メインのダイアグラムとは別のタブで開かれます。
+	</p>
+	<p class="imgbox">図 : 仮想ダイアグラムのタブ
+		<a href="../../../../../data/snapshot/helper/erflute/erflute-howto-vdiagram-tab-snapshot.png" title="仮想ダイアグラムのタブ"><img src="../../../../../data/snapshot/helper/erflute/erflute-howto-vdiagram-tab-snapshot.png" alt="仮想ダイアグラムのタブ" width="550" height="200" /></a>
+	</p>
+	<p>
+		Outline の Virtual Diagram にて管理されます。ダブルクリックすることで開けます。
+		<span class="frm">(何か描画がおかしくなったら、もう一度ここをダブルクリックすると良いでしょう)</span>
+	</p>
+	<p class="imgbox">図 : 仮想ダイアグラムのOutline
+		<a href="../../../../../data/snapshot/helper/erflute/erflute-howto-vdiagram-outline-snapshot.png" title="仮想ダイアグラムのOutline"><img src="../../../../../data/snapshot/helper/erflute/erflute-howto-vdiagram-outline-snapshot.png" alt="仮想ダイアグラムのOutline" width="550" height="200" /></a>
 	</p>
 	<h3 id="howtovdiagram">仮想ダイアグラムの使い方</h3>
 	<dl class="keymainlist">
