@@ -78,6 +78,7 @@
 </code></pre>
 
 	<h2 id="scheduling">Jobのスケジューリング</h2>
+	<h3 id="schedulerpackage">AllJobSchedulerのパッケージ</h3>
 	<p>
 		app.job.AllJobScheduler クラスを作成して、Jobクラスを cron 登録します。
 	</p>
@@ -96,6 +97,7 @@ org.docksidestage
  |-dbflute
  |-mylasta
 </code></pre>
+	<h3 id="schedulerimpl">AllJobSchedulerの実装</h3>
 	<p>
 		AllJobScheduler は、LaJobSchedulerインターフェースを implements します。
 	</p>
@@ -133,12 +135,50 @@ org.docksidestage
 		ここで、cron(起動時間)をハードコードするのか、configから取るのか、はたまた別のところから取るのかはアプリの自由です。
 		必要に応じて調整しましょう。
 	</p>
+	<p>
+		同じJobクラスを複数登録できます。クラスは同じでも、パラメーターを変えたりして、少し違う挙動をする別のJobとして振る舞えるようにしています。
+		その場合、内部管理的にも別Job扱いとなります。ゆえに、例えば "同じJob"
+		という表現をするときは、明示的にクラスという言葉が付いていなければ、登録単位で同じかどうかを示すます。
+	</p>
+	<h3 id="concurrenttype">二重起動防止のタイプ</h3>
+	<p>
+		register()メソッドでは、必ず二重起動防止のタイプを指定します。
+	</p>
+	<dl class="keymainlist">
+		<dt>waitIfConcurrent()</dt><dd>同じJobが実行中だったら先Jobが終わるのを待つ</dd>
+		<dt>quitIfConcurrent()</dt><dd>同じJobが実行中だったら後Jobが実行を静かに諦める</dd>
+		<dt>errorIfConcurrent()</dt><dd>同じJobが実行中だったら後Jobがエラーになる</dd>
+	</dl>
+	<p>
+		同じJob同士での二重起動防止ですが、厳密にはJobクラス単位ではなく、cronに登録した単位です。
+		同じJobクラスを違うパラメーターで複数登録できますが、その場合は別Job扱いとなります。
+	</p>
+	<h3 id="variousoption">様々なオプション</h3>
+	<p>
+		それぞれのJobに対して、様々なオプションを付与することができます。
+	</p>
+	<dl class="shortkeymainlist">
+		<dt>op.title(...)</dt><dd>人が見るための、Jobのタイトル文字列 <span class="frm">(Job管理画面などで使うこと想定)</span></dd>
+		<dt>op.uniqueBy(...)</dt><dd>Job特定のための、Jobのユニークコード <span class="frm">(アプリが付与する不変の文字列を想定)</span></dd>
+		<dt>op.params(...)</dt><dd>Jobに与えるパラメーター <span class="frm">(検索範囲の日付などを想定)</span></dd>
+	</dl>
+	<p>
+		ユニークコードは、JobManagerでJobを探すのに使えます。
+		Jobを特定するためのキーは、デフォルトで JobKey
+		が付与されていますが、再起動のたびに変わる内部管理用の文字列です。
+		システム外からもJobを制御するために不変のコードを付与したい場合は、ユニークコードを使うと良いでしょう。
+	</p>
+	<p>
+		タイトルやユニークコードは、それぞれ LaScheduledJob から取得できます。
+		パラメーターは、Jobクラスの中で LaJobRuntime から取得できます。
+	</p>
 
 	<h2 id="howtojob">Jobの実装の仕方</h2>
+	<h3 id="jobpackage">Jobクラスのパッケージ</h3>
 	<p>
 		app.job の下に Job クラスを作成します。
 	</p>
-<pre><span class="codetitle">e.g. AllJobScheduler package @Directory</span><code>
+<pre><span class="codetitle">e.g. Job package @Directory</span><code>
 org.docksidestage
  |-app <span class="comment">// application package</span>
  |  |-<span class="subpoint">job</span>
@@ -152,6 +192,7 @@ org.docksidestage
  |-dbflute
  |-mylasta
 </code></pre>
+	<h3 id="jobimpl">Jobクラスの実装</h3>
 	<p>
 		Job は、LaJobインターフェースを implements します。
 	</p>
@@ -177,6 +218,34 @@ org.docksidestage
     }
 }
 </code></pre>
+	<p>
+		Actionとは違い、トランザクションはデフォルトではかかっていません。バッチ処理は細かくトランザクションを分ける可能性が非常に高いからです。
+		なので、TransactionStage を DI して、うまくトランザクションをロジックの中に組み込みましょう
+	</p>
+	<h3 id="jobassist">JobAssistも使える</h3>
+	<p>
+		Action の ActionAssist と同じような感じで、Job も JobAssist
+		が使えます。再利用するようなものではないけど、クラス分けして整理整頓したいという場合にどんどん利用していきましょう。
+	</p>
+	<div class="relatedpage"><a href="../impldesign/actiondesign.html">Actionの実装デザイン</a></div>
+	<p>
+		jobパッケージの下に、Assistで終わる名前のクラスであれば、Quick Component
+		として認識されるので、JobクラスでDIして利用することができます。
+	</p>
+	<h3 id="endtitleroll">EndTitleRollを活用しよう</h3>
+	<p>
+		TODO jflute now writing
+	</p>
+
+	<h2 id="noticelog">Jobの実行ログ</h2>
+	<p>
+		TODO jflute now writing
+	</p>
+
+	<h2 id="unittest">JobクラスのUnitTest</h2>
+	<p>
+		TODO jflute now writing
+	</p>
 
 	<h2 id="jobmanager">JobManagerでマネジメント</h2>
 	<p>
@@ -193,8 +262,9 @@ org.docksidestage
 		find した <em class="mark">LaScheduledJob</em> で、個々の Job に対して操作することもできます。
 	</p>
 	<dl class="shortkeymainlist">
-		<dt>getJobKey()</dt><dd>JobKeyを取得</dd>
-		<dt>getJobUnique()</dt><dd>アプリ指定のユニークコードを取得 <span class="frm">(あれば)</span></dd>
+		<dt>getJobKey()</dt><dd>Job特定のための、内部発行したJobキーを取得</dd>
+		<dt>getJobTitle()</dt><dd>人が見るための、アプリ指定のタイトルを取得 <span class="frm">(あれば)</span></dd>
+		<dt>getJobUnique()</dt><dd>Job特定のための、アプリ指定のユニークコードを取得 <span class="frm">(あれば)</span></dd>
 		<dt>getCronExp()</dt><dd>cron設定を取得</dd>
 		<dt>getJobType()</dt><dd>Jobコンポーネントの型を取得</dd>
 		<dt>isExecutingNow()</dt><dd>このJobがいま動いているかどうか？</dd>
@@ -205,6 +275,102 @@ org.docksidestage
 		<dt>becomeNonCron()</dt><dd>このJobをcronなし状態にする、勝手には動かない <span class="frm">(launchNow()だけで動かせる)</span></dd>
 		<dt>isUnscheduled()</dt><dd>このJobがunscheduleされたかどうか？</dd>
 	</dl>
+
+	<div class="inucolumn">
+		<h2 id="batchscreen">バッチ管理画面の作成</h2>
+		<p>
+			バッチが落ちたときにリカバリ実行するためなど、様々な場面でバッチ管理画面があると役に立ちます。
+			cronを一時的に5分後に設定して再起動してリリースして終わったら元に戻す...なんて運用はしたくないものです。
+		</p>
+		<p>
+			画面を作ることも想定して、LastaJob は LastaFlute の上で動いています。バッチだから Tomcat
+			じゃなくても良いのでは？と普通は思いますが、バッチ管理画面とセットになっていた方が環境構築の手間も省けるので何かと世話ないのです。
+			<span class="frm">(プロセス分割とかしないシンプルな構成であれば)</span>
+		</p>
+		<p>
+			例えば、Job一覧画面を作成するのであれば、Actionクラスで JobManager@getJobList()
+			を呼んで画面に表示すればOKです。JobManager が Job のデータベースの入り口のようなものです。
+		</p>
+		<p>
+			そこで選択されたJobを実行するのであれば、Actionクラスで JobManager@findJobByなんとか()
+			を呼んで、LaScheduledJob@launchNow() を呼べばOKです。isExecutingNow()
+			で実行状態も確認できるので、細かい制御も入れることができます。
+		</p>
+		<p>
+			Jobの実行中にアプリを再起動しないように、実行状態を表示しておくのも良いでしょう。再起動する前提で、すべての Job
+			を一気に unschedule するのも良いでしょう。現場の要件に合わせてうまく JobManager を使っていきましょう。
+		</p>
+	</div>
+
+	<div class="inucolumn">
+		<h2 id="outsidecron">外だしスケジューラー方式</h2>
+		<p>
+			例えば、バッチサーバーをスケールさせたり、Jobごとに実行プロセスを分けてリリースのライフサイクルで互いに影響し合わないようにするなど、
+			インフラ的な解決が必要な場合は、LastaJobのスケジューリングの機能は利用せず、別途ツールでスケジューリングをする必要があるでしょう。
+		</p>
+		<p>
+			その場合でも、LastaJob は利用できるでしょう。
+			<em class="keyword">JobをCron設定せずに登録</em> すると、JobManager@launchNow() 経由のみで実行できる状態となります。
+		</p>
+<pre><span class="codetitle">e.g. NonCron Job registration @Java</span><code>
+@Override
+<span class="keyword">public void</span> schedule(LaCron <span class="localvar">cron</span>) {
+    <span class="comment">//cron.register("* * * * *", SeaJob.class, waitIfConcurrent(), ...);</span>
+    <span class="localvar">cron</span>.<span class="point">registerNonCron</span>(<span class="subpoint">SeaJob</span>.<span class="keyword">class</span>, waitIfConcurrent(), op -&gt; {});
+    <span class="abbreviation">...</span>
+}
+</code></pre>
+		<p>
+			外部からJobを特定するための業務上の <em class="mark">Jobユニークコード</em> を設定しておくと良いでしょう。
+		</p>
+<pre><span class="codetitle">e.g. uniqueBy() to specify one Job @Java</span><code>
+@Override
+<span class="keyword">public void</span> schedule(LaCron <span class="localvar">cron</span>) {
+    <span class="localvar">cron</span>.registerNonCron(<span class="subpoint">SeaJob</span>.<span class="keyword">class</span>, waitIfConcurrent(), op -&gt; {
+        op.<span class="point">uniqueBy</span>(<span class="literal">"sea"</span>); <span class="comment">// seaという名前で Job を特定できる</span>
+    });
+    <span class="abbreviation">...</span>
+}
+</code></pre>
+		<p>
+			そして、<em class="keyword">外部のスケジューラーから信号(リクエスト)を受けたら該当の Job を実行する</em> ような Action
+			クラスを一つ作ってしまえばOKです。
+		</p>
+<pre><span class="codetitle">e.g. NonCron Job registration @Java</span><code>
+@Resource
+<span class="keyword">private</span> JobManager <span class="attribute">jobManager</span>;
+
+@Override
+<span class="keyword">public</span> JsonResponse&lt;Void&gt; index(String <span class="localvar">uniqueCode</span>) {
+    LaJobUnique <span class="localvar">jobUnique</span> = LaJobUnique.of(<span class="localvar">uniqueCode</span>);
+    LaScheduledJob <span class="localvar">job</span> = <span class="attribute">jobManager</span>.findJobByUniqueOf(jobUnique).orElseTranslatingThrow(<span class="localvar">cause</span> -&gt; {
+        <span class="abbreviation">...</span> <span class="comment">// 存在しなかった時の処理: クライアントエラーとか!?</span>
+    });
+    <span class="localvar">job</span>.launchNow(); <span class="comment">// Jobの実行！</span>
+    <span class="keyword">return</span> JsonResponse.asEmptyBody();
+}
+</code></pre>
+		<p>
+			でも、これだったら別に Job じゃなくて、普通の Action
+			クラスでバッチ処理を書いても良さそうに一見思えますが、LataJob の Job として実装することにメリットがあります。
+		</p>
+		<dl class="shortkeymainlist">
+			<dt>Jobの二重起動防止</dt><dd>同じJavaVM内での二重起動防止は効く <span class="frm">(Actionにはない)</span></dd>
+			<dt>Jobの状態確認</dt><dd>そのJobがいま実行中か？JobManagerで判別できる <span class="frm">(Actionにはない)</span></dd>
+			<dt>Jobの中断要求</dt><dd>Jobに少し実装入れれば、JobManagerで要求できる <span class="frm">(Actionにはない)</span></dd>
+			<dt>Jobの実行結果ログ</dt><dd>本番想定の通知ログの仕組みが組み込まれている <span class="frm">(Actionにはない)</span></dd>
+			<dt>Jobの一覧管理</dt><dd>Jobの一覧情報をJobManagerから取得できる</dd>
+			<dt>Jobだけの共通処理</dt><dd>JobはJobとまとめっていることで、区別した処理を入れやすい</dd>
+		</dl>
+		<p>
+			なので、JavaでDBアクセスしてバッチ処理を実装する限りは、スケジューリングを外出しにするか LastaJob
+			に任せるかに関わらず、バッチ処理は Job で実装するのが自然でしょう。
+		</p>
+		<p>
+			バッチだけ別の言語!?というのも無きにしも非ずですが、DBアクセスポイントを複数にするとDB変更がしづらくなりますので、やはり LastaFlute
+			を使っているのであれば、その選択肢はあまり考えにくいでしょう。
+		</p>
+	</div>
 <!-- __content-end__ --></div></div>
 
 <div id="sidebar">
