@@ -147,13 +147,13 @@ org.docksidestage
 	<dl class="keymainlist">
 		<dt>waitIfConcurrent()</dt><dd>同じJobが実行中だったら先Jobが終わるのを待つ</dd>
 		<dt>quitIfConcurrent()</dt><dd>同じJobが実行中だったら後Jobが実行を静かに諦める</dd>
-		<dt>errorIfConcurrent()</dt><dd>同じJobが実行中だったら後Jobがエラーになる</dd>
+		<dt>errorIfConcurrent()</dt><dd>同じJobが実行中だったら後Jobがエラーになる <span class="frm">(エラーログに残る)</span></dd>
 	</dl>
 	<p>
 		同じJob同士での二重起動防止ですが、厳密にはJobクラス単位ではなく、cronに登録した単位です。
 		同じJobクラスを違うパラメーターで複数登録できますが、その場合は別Job扱いとなります。
 	</p>
-	<h3 id="variousoption">様々なオプション</h3>
+	<h3 id="variousoption">様々なオプション <span class="frm">(タイトルやパラメーターなど)</span></h3>
 	<p>
 		それぞれのJobに対して、様々なオプションを付与することができます。
 	</p>
@@ -161,6 +161,7 @@ org.docksidestage
 		<dt>op.title(...)</dt><dd>人が見るための、Jobのタイトル <span class="frm">(Job管理画面などで使うこと想定)</span> <span class="frm">(@since 0.2.6)</span></dd>
 		<dt>op.uniqueBy(...)</dt><dd>Job特定のための、Jobのユニークコード <span class="frm">(アプリが付与する不変の文字列を想定)</span></dd>
 		<dt>op.params(...)</dt><dd>Jobに与えるパラメーター <span class="frm">(検索範囲の日付などを想定)</span></dd>
+		<dt>op.triggeredBy(...)</dt><dd>起動のきっかけになるJob (後述) <span class="frm">(ジョブネットを想定)</span></dd>
 	</dl>
 	<p>
 		ユニークコードは、JobManagerでJobを探すのに使えます。
@@ -172,35 +173,46 @@ org.docksidestage
 		タイトルやユニークコードは、それぞれ LaScheduledJob から取得できます。
 		パラメーターは、Jobクラスの中で LaJobRuntime から取得できます。
 	</p>
-	<h3 id="jobrunner">LaJobRunnerのカスタマイズ</h3>
+	<h3 id="noncronjob">CronなしJob (NonCron)</h3>
 	<p>
-		LastaJobでは、Jobを実行する LaJobRunner をカスタマイズすることで、様々な Job
-		に対する共通処理や挙動の変更などを実現できます。LaJobRunner はアプリが new しますので、好きなようにオーバーライドできます。
+		時間起動ではなく、JobManagerによる手動の起動や、NextTriggerによる別Jobからの起動だけで起動するJobを登録したい場合は、registerNonCron()を使います。
 	</p>
-	<p>
-		例えば、すべてのJobでエラーが発生した時にメールを飛ばしたかったら、logJobException()
-		をオーバーライドすると良いでしょう<span class="frm">(@since 0.2.7)</span>。
-	</p>
-<pre><span class="codetitle">e.g. override job runner for error mail sending @Java</span><code>
+<pre><span class="codetitle">e.g. Sea to Land as non-cron in AllJobScheduler @Java</span><code>
 @Override
-<span class="keyword">public</span> LaJobRunner createRunner() {
-    <span class="keyword">return new</span> LaJobRunner() {
-        @Override
-        <span class="keyword">protected void</span> <span class="point">logJobException</span>(LaJobRuntime <span class="localvar">runtime</span>, String <span class="localvar">msg</span>, Throwable <span class="localvar">cause</span>) {
-            <span class="keyword">super</span>.logJobException(<span class="localvar">runtime</span>, <span class="localvar">msg</span>, <span class="localvar">cause</span>); <span class="comment">// これ消さないで！</span>
-            <span class="comment">// 例えば、ここでメールを飛ばすとか！</span>
-            <span class="comment">// msgにはスタックトレースなど含まれているので必要に応じてメール本文に</span>
-        }
-    }.useAccessContext(<span class="localvar">resource</span> -&gt; {
-        <span class="keyword">return</span> <span class="attribute">accessContextLogic</span>.create(<span class="localvar">resource</span>, () -&gt; OptionalThing.empty(), () -&gt; OptionalThing.empty(), () -&gt; <span class="attribute">APP_TYPE</span>);
+<span class="keyword">public void</span> schedule(LaCron <span class="localvar">cron</span>) {
+    cron.<span class="point">registerNonCron</span>(SeaJob.<span class="keyword">class</span>, waitIfConcurrent(), op -&gt; {});
+    <span class="abbreviation">...</span>
+}
+</code></pre>
+	<h3 id="jobnetarekore">NextTrigger (ジョブネット)</h3>
+	<p>
+		例えば、SeaJob が終わったら(成功したら)、LandJob を実行したい、という場合...
+	</p>
+<pre><span class="codetitle">e.g. Sea to Land in AllJobScheduler @Java</span><code>
+@Override
+<span class="keyword">public void</span> schedule(LaCron <span class="localvar">cron</span>) {
+    <span class="subpoint">LaScheduledJob</span> <span class="localvar">seaJob</span> = cron.register(<span class="literal">"* * * * *"</span>, SeaJob.<span class="keyword">class</span>, waitIfConcurrent(), op -&gt; {});
+    <span class="localvar">cron</span>.register(<span class="literal">"* * * * *"</span>, LandJob.<span class="keyword">class</span>, waitIfConcurrent(), <span class="localvar">op</span> -&gt; {
+        <span class="localvar">op</span>.<span class="point">triggeredBy</span>(<span class="localvar">seaJob</span>);
     });
 }
 </code></pre>
 	<p>
-		大抵の場合、DBFluteの共通カラムの設定は、必ずやる必要があるでしょう。
-		LastaFlute の Example では、最初から設定されています。Actionクラスのものと再利用するために、Logicクラスに切り出されています(AccessContextLogic)。
+		これにて、SeaJob が成功したら、LandJob が自動的に起動されるようになります。<span class="frm">@since 0.2.7</span>
 	</p>
-	<div class="relatedpage"><a href="#example">this - Example実装は maihama-orleans にて</a></div>
+	<p>
+		triggeredBy() は複数呼び出せば、起動のきっかけのJobを複数設定することもできます。
+	</p>
+	<p>
+		成功というのは、<em class="keyword">例外が発生していないこと</em> を表しています。
+		もし、"例外は発生させたくないけど、とある状況で次のJobを動かしたくない" という場合は、SeaJobの中で分岐させて runtime.suppressNextTrigger()
+		を呼ぶことで次のJobの起動を抑えることができます。
+	</p>
+	<p>
+		LandJob は cron 設定がされているので、cronで指定された時間が来ても動きます。
+		連動も独立もしています。両方から同時に起動しても二重起動防止の制御は効きます。もし LandJob は、SeaJob
+		からしか呼ばれず、独立して時間起動しないのであれば、LandJob は NonCron で登録すると良いでしょう。
+	</p>
 
 	<h2 id="howtojob">Jobの実装の仕方</h2>
 	<h3 id="jobpackage">Jobクラスのパッケージ</h3>
@@ -294,6 +306,7 @@ app
     <span class="localvar">data</span>.register(<span class="literal">"targetMember"</span>, <span class="localvar">memberId</span>);
 });
 </code></pre>
+
 	<h2 id="noticelog">Jobの実行通知ログ</h2>
 	<h3 id="beginendlog">開始ログ、終了ログ</h3>
 	<p>
@@ -438,6 +451,36 @@ app
 		内容は、runtime の getEndTitleRollMap() から Map で取れます<span class="frm">(@since 0.2.7)</span>。
 	</p>
 
+	<h2 id="jobrunner">LaJobRunnerのカスタマイズ</h2>
+	<p>
+		LastaJobでは、Jobを実行する LaJobRunner をカスタマイズすることで、様々な Job
+		に対する共通処理や挙動の変更などを実現できます。LaJobRunner はアプリが new しますので、好きなようにオーバーライドできます。
+	</p>
+	<p>
+		例えば、すべてのJobでエラーが発生した時にメールを飛ばしたかったら、logJobException()
+		をオーバーライドすると良いでしょう<span class="frm">(@since 0.2.7)</span>。
+	</p>
+<pre><span class="codetitle">e.g. override job runner for error mail sending @Java</span><code>
+@Override
+<span class="keyword">public</span> LaJobRunner createRunner() {
+    <span class="keyword">return new</span> LaJobRunner() {
+        @Override
+        <span class="keyword">protected void</span> <span class="point">logJobException</span>(LaJobRuntime <span class="localvar">runtime</span>, String <span class="localvar">msg</span>, Throwable <span class="localvar">cause</span>) {
+            <span class="keyword">super</span>.logJobException(<span class="localvar">runtime</span>, <span class="localvar">msg</span>, <span class="localvar">cause</span>); <span class="comment">// これ消さないで！</span>
+            <span class="comment">// 例えば、ここでメールを飛ばすとか！</span>
+            <span class="comment">// msgにはスタックトレースなど含まれているので必要に応じてメール本文に</span>
+        }
+    }.useAccessContext(<span class="localvar">resource</span> -&gt; {
+        <span class="keyword">return</span> <span class="attribute">accessContextLogic</span>.create(<span class="localvar">resource</span>, () -&gt; OptionalThing.empty(), () -&gt; OptionalThing.empty(), () -&gt; <span class="attribute">APP_TYPE</span>);
+    });
+}
+</code></pre>
+	<p>
+		大抵の場合、DBFluteの共通カラムの設定は、必ずやる必要があるでしょう。
+		LastaFlute の Example では、最初から設定されています。Actionクラスのものと再利用するために、Logicクラスに切り出されています(AccessContextLogic)。
+	</p>
+	<div class="relatedpage"><a href="#example">this - Example実装は maihama-orleans にて</a></div>
+
 	<h2 id="jobmanager">JobManagerでマネジメント</h2>
 	<p>
 		DIコンポーネントとして、<em class="mark">JobManager</em> が利用できます。
@@ -491,14 +534,37 @@ app
 			例えば、Job一覧画面を作成するのであれば、Actionクラスで JobManager@getJobList()
 			を呼んで画面に表示すればOKです。JobManager が Job のデータベースの入り口のようなものです。
 		</p>
+<pre><span class="codetitle">e.g. getJobList() at Action class @Java</span><code>
+@Execute
+<span class="keyword">public</span> HtmlResponse index() {
+    List&lt;LaScheduledJob&gt; <span class="localvar">jobList</span> = <span class="attribute">jobManager</span>.<span class="point">getJobList()</span>;
+    List&lt;JobRowBean&gt; <span class="localvar">beans</span> = mappingToBeans(<span class="localvar">jobList</span>);
+    <span class="keyword">return</span> asHtml(<span class="attribute">path_Job_JobListHtml</span>).renderWith(<span class="localvar">data</span> -&gt; {
+        <span class="localvar">data</span>.register(<span class="literal">"beans"</span>, <span class="localvar">beans</span>);
+    });
+}
+</code></pre>
 		<p>
-			そこで選択されたJobを実行するのであれば、Actionクラスで JobManager@findJobByなんとか()
-			を呼んで、LaScheduledJob@launchNow() を呼べばOKです。isExecutingNow()
-			で実行状態も確認できるので、細かい制御も入れることができます。
+			そこで選択されたJobを実行するなら、Actionクラスで JobManager@findJobByなんとか()
+			を呼んで、LaScheduledJob@launchNow() を呼べばOKです。
 		</p>
+<pre><span class="codetitle">e.g. launchNow() at Action class @Java</span><code>
+@Execute
+<span class="keyword">public</span> JsonResponse&lt;Void&gt; launch(String <span class="localvar">jobKey</span>) { <span class="comment">// Ajax想定</span>
+    <span class="attribute">jobManager</span>.<span class="point">findJobByKey</span>(LaJobKey.of(<span class="localvar">jobKey</span>)).ifPresent(<span class="localvar">job</span> -&gt; {
+        <span class="localvar">job</span>.launchNow(); <span class="comment">// 実行要求 (別スレッドで実行される)</span>
+    }).orElse(() -&gt; {
+        <span class="keyword">throw</span> <span class="attribute">responseManager</span>.new404(<span class="literal">"Not found the job: "</span> + <span class="localvar">jobKey</span>);
+    });
+    <span class="keyword">return</span> JsonResponse.asEmptyBody();
+}
+</code></pre>
 		<p>
 			Jobの実行中にアプリを再起動しないように、実行状態を表示しておくのも良いでしょう。再起動する前提で、すべての Job
 			を一気に unschedule するのも良いでしょう。現場の要件に合わせてうまく JobManager を使っていきましょう。
+		</p>
+		<p>
+			単純に、<em class="keyword">マスターメンテナンス画面を一つ作るだけ</em> という風に考えてください。
 		</p>
 	</div>
 
