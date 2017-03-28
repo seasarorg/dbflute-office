@@ -1,0 +1,309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,LastaFlute,Java,Lean Startup,Incremental Development" />
+	<style type="text/css" title="currentStyle">@import "../../../../css/sub.css";</style>
+	<title>JSON APIのJSONデザイン | LastaFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-install"><a href="#">Install</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>JSON APIのJSONデザイン</h1>
+	<div class="relatedpage"><a href="../../index.html">LastaFlute</a></div>
+	<p>
+		LastaFluteのドキュメントではありますが、どんなフレームワークを使っていても JSON API
+		を構築するときに通じるお話かもしれません。
+	</p>
+	<p>
+		一方で、jfluteもまだまだ研究中のテーマなので、何か要因が見つかれば随時更新していきます。
+	</p>
+	${indexlist}
+
+	<h2 id="overview">概要</h2>
+	<p>
+		
+	</p>
+	<ul>
+		<li>A. エラー通知: Failure統一パターン？共通ヘッダーパターン？</li>
+		<li>B. JSONのデータ型: 型ありJSON？型なしJSON？</li>
+		<li>C. 日付フォーマット: クライアントフォーマット？サーバーフォーマット？</li>
+		<li>D. メッセージ管理: クライアントメッセージ構築？サーバーメッセージ構築？</li>
+		<li>E. キーのスタイル: キャメルケース？スネークケース？</li>
+	</ul>
+
+	<h2 id="jsonresponse">A. エラー通知 <span class="frm">(Failure統一？共通ヘッダー？)</span></h3>
+	<p>
+		JSON API の処理の中で、エラーが発生したとき...システム例外、クライアント例外、業務例外、バリデーションエラー含めて、正常系のレスポンスを戻せなかったときどうするか？
+	</p>
+	<p>
+		様々なパターンがありますが、ここではざっくりと二つのパターンを紹介します。必ず実装する前に考えましょう。
+		<em class="mark">Failure統一パターン</em> と <em class="mark">共通ヘッダーパターン</em> です。
+	</p>
+	<h3 id="failureunified">Failure統一パターン</h3>
+	<h4>正常系のJSON</h4>
+	<p>
+		正常なときは、普通にその業務の JSON を戻します。
+	</p>
+<pre><span class="codetitle">e.g. Failure統一パターンでの正常系のときのJSON戻り、ここでは商品一覧 @Json</span><code>
+{
+    "productList" : [
+        <span class="abbreviation">...</span>
+    ]
+}
+</code></pre>
+	<h4>エラー系のJSON</h4>
+	<p>
+		エラーのときだけ、共通的なフォーマットで JSON を戻します。
+	</p>
+<pre><span class="codetitle">e.g. Failure統一パターンでのエラーのときのJSON戻り、ここではバリデーションエラー @Json</span><code>
+{
+    "failureType" : VALIDATION_ERROR
+    , "messageMap" : {
+        <span class="abbreviation">...</span>
+    }
+}
+</code></pre>
+	<p>
+		そのとき、どんなエラーだったのかを表す項目を戻します。エラーの場合はメッセージが付きものなのでエラーメッセージも戻します。
+		<span class="frm">(メッセージは、メッセージそのものか？メッセージを示すキーか？デザインに寄ります: 詳しくは "D. メッセージ管理" にて)</span>
+	</p>
+	<h4>HTTPステータスはどのように戻すのか？</h4>
+	<p>
+		HTTPステータスは、正常系は200, エラー系は400系 もしく、500系で戻します。
+	</p>
+	<dl class="lolongvaluemainlist">
+		<dt>正常系</dt><dd>200</dd>
+		<dt>エラー系</dt><dd>バリデーションエラーや業務例外なら400系、システム例外は500系</dd>
+	</dl>
+	<h4>クライアントはどのように判断するのか？</h4>
+	<p>
+		まずは、HTTPステータスで判断します。200ならそのまま業務のJSONとしてパース、400/500系なら統一的なJSONとしてパースして処理。
+	</p>
+	<p>
+		クライアントサイドの実装イメージです。クライアントの共通部品でこのような実装をすると良いでしょう。
+		Javaっぽいコードですが単にExampleロジックを示したいだけなので、参考までにと。実際の要件に照らし合わせて微調整しましょう。
+		また、多くのクライアントの仕組みで正常系とエラー系は自動的に振り分けられると想定されるので、実際にはもっとシンプルになるかと思います。
+	</p>
+<pre><span class="codetitle">e.g. Failure統一パターンでのクライアントサイドのJSONパースの共通部品での実装イメージ @Java?</span><code>
+<span class="keyword">if</span> (HTTP Status: <span class="literal">200</span>) { <span class="comment">// success</span>
+    XxxJsonResult <span class="localvar">result</span> = parseJsonAsSuccess(<span class="localvar">response</span>);
+    <span class="comment">// do process per action</span>
+    <span class="abbreviation">...</span>
+} <span class="keyword">else if</span> (HTTP Status: <span class="literal">400</span>) { <span class="comment">// e.g. validation error, application exception, client exception</span>
+    FailureResult <span class="localvar">result</span> = parseJsonAsFailure(<span class="localvar">response</span>);
+    <span class="comment">// show result.messageMap or do process per result.failureType</span>
+    <span class="abbreviation">...</span>
+} <span class="keyword">else if</span> (HTTP Status: <span class="literal">404</span>) { <span class="comment">// e.g. real not found, invalid parameter</span>
+    showNotFoundError();
+} <span class="keyword">else</span> { <span class="comment">// basically 500, server exception</span>
+    showSystemError();
+}
+</code></pre>
+	<h4>Failure統一パターンのメリット</h4>
+	<p>
+		共通ヘッダーパターンと比べてのメリットを挙げてみます。
+	</p>
+	<dl class="textlist">
+		<dt>正常系のJSONに余計なものがない</dt>
+		<dd>
+			正常系はいたってシンプル、その業務のJSONだけになる。
+		</dd>
+		<dd>
+			共通ヘッダーパターンだと、正常系でもほとんど使わないヘッダーが付くので、
+			その文字列の分、出力処理とパース処理に時間がかかるし、JSON自体のサイズも大きくなる。
+			<span class="frm">(一つ一つは大したことなくても、アクセス数の多いサービスだったり、マイクロサービスアーキテクチャなどに寄せていったりすると、どんどんボトルネックになってくる)</span>
+		</dd>
+		<dt>クライアントサイドがシンプル</dt>
+		<dd>
+			HTTPの仕組みをある程度使うことで、<em class="keyword">既存の仕組みの乗っかって</em> 処理ができる。
+			例えば、アプリケーションサーバーやフレームワーク内で発生する 404 や 500
+			エラーも統一的にハンドリングできる。
+		</dd>
+		<dd>
+			共通ヘッダーパターンだと、200の中でのエラー分岐に加えて、HTTPステータスの分岐も必要になる。
+		</dd>
+		<dt>インフラで正常系の判断がしやすい</dt>
+		<dd>
+			HTTPステータスを使っているので、例えばインフラ側でAPIの結果をキャッシュするなど仕組みを入れる場合に、
+			正常系だけをキャッシュ対象にしたいときなど、HTTPの仕組みだけで判断しやすくなります。
+		</dd>
+	</dl>
+	<p>
+		<span class="frm">※デメリットは "共通ヘッダーパターンのメリットの逆" を考えると良いでしょう。</span>
+	</p>
+	<h4>限定的ヘッダーパターンはまた別</h4>
+	<p>
+		ページングの結果を戻すAPIときに、ページサイズやページ番号を戻すような共通的なヘッダーを付与するのは、
+		Failure統一パターンの中でも利用することはあります。
+		200の結果の中で限定的なスコープで業務的な共通的なヘッダーは、それはそれでまたレイヤの違う話なので、効率的であれば全然使っても良いでしょう。
+	</p>
+	<h4>LastaFluteではどう実装する？</h4>
+	<p>
+		LastaFlute の Example (harbor, maihama)
+		では、デフォルトでFailure統一パターンになっていますので、そちらを参考に。
+		Example からスタートアップした場合は、そのまま [App]ApiFailureHook
+		を育てていけばOKです。
+	</p>
+	<div class="detailpage"><a href="https://github.com/lastaflute/lastaflute-example-harbor/blob/master/src/main/java/org/docksidestage/mylasta/direction/sponsor/HarborApiFailureHook.java#L37">HarborApiFailureHook.java | Github</a></div>
+	<h3 id="commonheader">共通ヘッダーパターン</h3>
+	<h4>正常系、エラー系に関係なく共通ヘッダー</h4>
+	<p>
+		正常系、エラー系に関係なく、一律共通ヘッダー的な項目を追加して、エラーかどうかの判定はすべてアプリ独自の項目で表現する。
+		HTTPステータスは、どんなときでも 200 を戻します<span class="frm">(NullPointerExceptionでも200)</span>。
+	</p>
+<pre><span class="codetitle">e.g. 共通ヘッダーパターンの正常系のときのJSON戻り、ここでは商品一覧 @Json</span><code>
+{
+    "header" : {
+        "failureType" : SUCCESS
+        , "messageMap" : {} <span class="comment">// 正常系はメッセージがないのでだいたい空っぽ</span>
+    }
+    , "body" : {
+        "productList" : [
+            <span class="abbreviation">...</span>
+        ]
+        <span class="abbreviation">...</span>
+    }
+}
+</code></pre>
+<pre><span class="codetitle">e.g. 共通ヘッダーパターンのエラー系のときのJSON戻り、ここではバリデーションエラー @Json</span><code>
+{
+    "header" : {
+        "failureType" : SUCCESS
+        , "messageMap" : {
+            <span class="abbreviation">...</span>
+        }
+    }
+    , "body" : {} <span class="comment">// エラー系はBodyデータがないので空っぽ</span>
+}
+</code></pre>
+	<h4>クライアントはどのように判断するのか？</h4>
+	<p>
+		共通ヘッダーパターンでも、HTTPステータスは無視できません。
+		アプリケーションサーバーやフレームワークのエラーがHTTPステータスで戻ってくる可能性があるからです。
+		<span class="frm">(どれだけ奥深いレイヤまで頑張っても、HTTPである限りはあり得ることなので)</span>
+	</p>
+	<p>
+		クライアントサイドの実装イメージです。クライアントの共通部品でこのような実装をすると良いでしょう。
+		Javaっぽいコードですが単にExampleロジックを示したいだけなので、参考までにと。実際の要件に照らし合わせて微調整しましょう。
+	</p>
+<pre><span class="codetitle">e.g. 共通ヘッダーパターンでのクライアントサイドのJSONパースの共通部品での実装イメージ @Java?</span><code>
+<span class="keyword">if</span> (HTTP Status: <span class="literal">200</span>) { <span class="comment">// success</span>
+    CommonJsonResult <span class="localvar">result</span> = parseJson(<span class="localvar">response</span>);
+    <span class="keyword">if</span> (Business Status: <span class="literal">200</span>) { <span class="comment">// success</span>
+        <span class="comment">// do process per action</span>
+        <span class="abbreviation">...</span>
+    } <span class="keyword">else if</span> (Business Status : <span class="literal">404</span>) { <span class="comment">// e.g. business not found, invalid parameter</span>
+        showNotFoundError();
+    } <span class="keyword">else</span> { <span class="comment">// basically 500, server exception</span>
+        showSystemError();
+    }
+} <span class="keyword">else if</span> (HTTP Status: <span class="literal">400</span>) { <span class="comment">// e.g. validation error, application exception, client exception</span>
+    FailureResult <span class="localvar">result</span> = parseJsonAsFailure(<span class="localvar">response</span>);
+    <span class="comment">// show result.messageMap or do process per result.failureType</span>
+    <span class="abbreviation">...</span>
+} <span class="keyword">else if</span> (HTTP Status: <span class="literal">404</span>) { <span class="comment">// e.g. real not found, invalid parameter</span>
+    showNotFoundError();
+} <span class="keyword">else</span> { <span class="comment">// basically 500, server exception</span>
+    showSystemError();
+}
+</code></pre>
+	<h4>共通ヘッダーパターンのアンチパターン</h4>
+	<p>
+		共通ヘッダーがあると、ついつい色々な項目を付け足したくなります。
+		例えば、"ページングのページサイズ" や "更新件数" など、とある業務に特化しているけれどもわりと多くのAPIで使うものなどを入れていくと、
+		どんどん共通ヘッダーが <em class="mark">最小公倍数化</em> していきます。
+		こうなると、共通ヘッダーを意識せずに実装することができなくなるため、クライアントサイドもサーバーサイドも、いたるところで共通ヘッダーを無視できないジレンマを抱えるでしょう。
+		<span class="frm">(実際に、共通ヘッダーパターンの現場で発生しているのを見かけます)</span>
+	</p>
+	<p>
+		共通ヘッダーをやるなら、<em class="keyword">APIのやり取りをマネジメントするための項目だけに使う</em>
+		つまり、共通部品だけがそれらの項目を利用するという状態をキープするほうが良いでしょう。
+	</p>
+	<p>
+		APIのバージョンを含める、というケースもよく見かけます。これが悪いとは言えませんが、HTTPヘッダーを使うという選択肢もあります。
+		その辺も踏まえてしっかりとデザインすると良いでしょう。
+	</p>
+	<h4>共通ヘッダーパターンのメリット</h4>
+	<p>
+		あまり思いつきませんでした...
+	</p>
+	<dl class="textlist">
+		<dt>正常系のメッセージの共通化</dt>
+		<dd>
+			正常系でもメッセージを共通化できる。
+			<span class="frm">(ただ、正常系でメッセージを戻す場面がそもそもあまり多くはないので、共通化のメリットはあまりないかも。常にメッセージを戻すようなシステムであればというところで)</span>
+		</dd>
+	</dl>
+	<p>
+		<span class="frm">※デメリットは "Failure統一パターンのメリットの逆" を考えると良いでしょう。</span>
+	</p>
+	<h4>LastaFluteではどう実装する？</h4>
+	<p>
+		LastaFluteは、共通ヘッダーパターンに対して積極的なサポートをしていません。
+		もちろん、もともとアプリで全部管理するという話なので、LastaFluteの機能を気にせずやろうと思えばできますが、
+		Exampleとしては用意がありませんので、わりと手続きが必要になるかと思います。
+		<span class="frm">(共通ヘッダー用のResultクラスを作ったり、ApiFailureHookですべて200でも戻すようにしたり)</span>
+	</p>
+	<p>
+		この辺は、今後のフィードバックで共通ヘッダーパターンのメリットがもっと明確になってきたときにサポートを検討しようかなと思っています。
+	</p>
+	<div class="inucolumn">
+		<h3 id="failureorheader">Failure統一？共通ヘッダー？ or ...</h3>
+		<p>
+			jfluteの業務経験としては両方あるので、どちらでも実現はできますが、特になんのしがらみもない環境であれば "Failure統一パターン"
+			を採用します。
+		</p>
+		<p>
+			もし、共通ヘッダーを採用するなら、それこそ jflute にたくさん聞いてください。
+			何も考えずにやるとアンチパターンに陥りやすいし、共通ヘッダー部分のResultクラスをどう表現するか？Actionクラスでどう表現するか？
+			インフラ側でエラーの判断をしてもらうためにはどうするか？などなど、独自でやってへんてこりんになっても悲しいですから。
+		</p>
+		<p>
+			世の中の記事を読んでいると、もっと色々なケースありますよね。HTTPステータスをもっと細かく活用していこうとか、
+			HTTPヘッダーをもっと活用していこうとか。
+		</p>
+	</div>
+	<div class="inucolumn">
+		<h3 id="failureorheader">最初のAPIのデザインが会社標準のデザイン</h3>
+		<p>
+			よくあることです。最初に開発するAPIで決めたデザインが、気づいたら
+		</p>
+		<p>
+			これは、アーキテクチャマネジメントをしっかりやらない限り、自然とそうなりがちです。
+			
+		</p>
+	</div>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">inu</a></li>
+		<li><a href="#">neko</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>
