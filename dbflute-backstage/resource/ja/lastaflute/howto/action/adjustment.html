@@ -73,14 +73,39 @@
 	</p>
 	<h3 id="responsejustbefore">ActionResponseの直前調整</h3>
 	<h3 id="formmapping">Formのマッピングを調整</h3>
+	<p>
+		TODO jflute Eclipse Collections とか
+	</p>
 
 	<h2 id="jsonresource">JsonResourceProvider</h2>
+	<p>
+		JSONにまつわる色々な挙動を "統一的に" 調整できます。
+	</p>
 	<p>
 		Exampleテンプレートとして、MaihamaJsonResourceProvider
 		が用意されていますので、そのProviderクラスを直せば有効になります。
 		<span class="frm">(AssistantDirector で登録されています)</span>
 	</p>
-	<h3></h3>
+	<dl class="longkeymainlist">
+		<dt>nullの項目を出力しない？</dt><dd>isNullsSuppressed()</dd>
+		<dt>改行入りのJSONを出力する？</dt><dd>isPrettyPrintSuppressed()</dd>
+		<dt>JSONマッピングを調整</dt><dd>provideMappingOption()</dd>
+	</dl>
+	<h3 id="nullssuppressed">JSONでnullの項目を出力しない？</h3>
+	<p>
+		省略したいときはtrue。
+	</p>
+	<h3 id="prettyprint">改行入りのJSONを出力する？</h3>
+	<p>
+		デフォルトでは、ローカル開発環境では改行入り、本番では改行なしになっています。
+	</p>
+	<p>
+		もし、本番でも改行入りにしたいときはtrue。
+	</p>
+	<h3 id="jsonmapping">JSONマッピングを調整</h3>
+	<p>
+		TODO jflute スネークケースとか、Eclipse Collections とか
+	</p>
 <!-- __content-end__ --></div></div>
 
 <div id="sidebar">
