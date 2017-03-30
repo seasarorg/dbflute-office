@@ -589,8 +589,8 @@
     "failureType" : VALIDATION_ERROR
     , "messageMap" : {
         "email" : {
-            "EMAIL", null
-            , "LENGTH", 100
+            <span class="subpoint">"EMAIL", null</span>
+            , <span class="subpoint">"LENGTH", 100</span>
         }
         "birthdate" : {
             <span class="abbreviation">...</span>
@@ -619,8 +619,8 @@
 {
     "failureType" : VALIDATION_ERROR
     , "messageMap" : {
-        "email" : ["メアドじゃない", "長っ。100文字までって言わなかったでしょうか？"]
-        , "birthdate" : ["まあ、いいけど"]
+        "email" : , <span class="subpoint">["メアドじゃない", "長っ。100文字までって言わなかったでしょうか？"]</span>
+        , "birthdate" : <span class="subpoint">["まあ、いいけど"]</span>
         , <span class="abbreviation">...</span>
     }
 }
@@ -665,7 +665,41 @@
 
 	<h2 id="keystyle">F. キーのケース: <span class="frm">キャメル？スネーク？</span></h2>
 	<p>
-		TODO jflute now writing: これはどっちもありえる
+		JSONのキーをキャメルにする？スネークにする？
+	</p>
+	<h3 id="keycamel">キャメルケース方式</h3>
+	<p>
+		Javaっぽい。
+	</p>
+<pre><span class="codetitle">e.g. キャメルケース方式 @Json</span><code>
+{
+    "seaId" : <span class="abbreviation">...</span>
+    , "landName" : <span class="abbreviation">...</span>
+    , "piariDate" : <span class="abbreviation">...</span>
+}
+</code></pre>
+	<h3 id="keysnake">スネークケース方式</h3>
+	<p>
+		蛇っぽい。
+	</p>
+<pre><span class="codetitle">e.g. キャメルケース方式 @Json</span><code>
+{
+    "sea_id" : <span class="abbreviation">...</span>
+    , "land_name" : <span class="abbreviation">...</span>
+    , "piari_date" : <span class="abbreviation">...</span>
+}
+</code></pre>
+	<h3 id="keywhich">どっちがいい？</h3>
+	<p>
+		知りません。
+	</p>
+	<h3 id="lastakeystyle">LastaFluteだと、どうなる？</h3>
+	<p>
+		デフォルトでは、JsonResult クラスのプロパティ名通りに出力されます。
+		なので、普通にJavaの慣習どおりに書いたら、自然とキャメルケース方式になります。
+	</p>
+	<p>
+		スネークにしたい場合は、プロパティをスネークケースで宣言をするか、JsonResourceProvider 経由で JsonMappingOption の JsonFieldNaming を指定して自動変換させます。
 	</p>
 
 	<h2 id="messagemanage">G. まだまだありそうだけど？</h2>
