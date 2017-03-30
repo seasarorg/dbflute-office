@@ -600,6 +600,10 @@
 </code></pre>
 	<h4>クライアントメッセージ管理方式のメリット</h4>
 	<dl class="textlist">
+		<dt>クライアントで現象ごとに独自処理できる</dt>
+		<dd>
+			クライアントサイドで、メッセージを表示するだけじゃなく、現象ごとに(エラーメッセージごとに)独自の処理を実行できる。
+		</dd>
 		<dt>クライアントだけで閉じる</dt>
 		<dd>
 			クライアント側のロジックだけで発生するメッセージがあっても、クライアントだけで解決することができる。
@@ -652,7 +656,7 @@
 	</p>
 	<h3 id="lastamessage">LastaFluteだと、どう実装する？</h4>
 	<p>
-		ApiFailureHook で実装すればいいので、どちらでも、という感じですが、Example
+		ApiFailureHook で実装すればいいので "まあ、どちらでも" という感じですが、Example
 		としては実はサーバーメッセージ管理方式になっています<span class="frm">(他の部分は、どちらかというと "元データ方式" なのに)</span>。
 		これは、先の通り、クライアント側にメッセージの機能があるとは限らないので、ひとまずデフォルトではそうしています。
 	</p>
@@ -701,6 +705,7 @@
 	<p>
 		スネークにしたい場合は、プロパティをスネークケースで宣言をするか、JsonResourceProvider 経由で JsonMappingOption の JsonFieldNaming を指定して自動変換させます。
 	</p>
+	<div class="relatedpage"><a href="../adjustment.html#jsonresource">ActionやJSONの調整 - JsonResourceProvider</a></div>
 
 	<h2 id="messagemanage">G. まだまだありそうだけど？</h2>
 	<p>
