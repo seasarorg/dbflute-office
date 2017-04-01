@@ -1,0 +1,282 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,LastaFlute" />
+	<style type="text/css" title="currentStyle">@import "../../../../css/lasub.css";</style>
+	<title>例外ハンドリング (Exception Handling) | LastaFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-install"><a href="#">Install</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>例外ハンドリング (Exception Handling)</h1>
+	<p>
+		LastaFluteの特徴の一つです。
+	</p>
+	<div class="relatedpage"><a href="../../index.html">LastaFluteトップページ</a></div>
+	<div class="relatedpage"><a href="../../tutorial/laimpl.html">LastaFluteの実装チュートリアル</a></div>
+	${indexlist}
+
+	<h2 id="overview">概要</h2>
+	<h3 id="unneededcatch">基本、自分でcatchする必要なし</h3>
+	<p>
+		システム例外も、クライアント例外も、業務例外 (アプリ例外) も、フレームワークが catch して処理 (Handling)
+		をするので、基本的にActionなどで自分でcatchする必要はありません。
+		<span class="frm">(アプリ内で特別に処理が必要なときだけcatch)</span>
+	</p>
+	<h3 id="whocatch">したら、だれがcatchするの？</h3>
+	<p>
+		Actionクラスであれば RequestLoggingFilter, Jobクラスであれば LaJobRunner,
+		AsyncManagerの非同期スレッド内であれば AsyncManager が catch します。
+	</p>
+	<dl class="shortvaluemainlist">
+		<dt>Actionクラス (システム例外)</dt><dd>RequestLoggingFilter <span class="frm">(HTTPステータス: 500)</span></dd>
+		<dt>Actionクラス (クライアント例外)</dt><dd>RequestLoggingFilter <span class="frm">(HTTPステータス: 400 or 404)</span></dd>
+		<dt>Actionクラス (業務例外)</dt><dd>ApplicationExceptionResolver <span class="frm">(HTTPステータス: 400 or ...)</span></dd>
+		<dt>Jobクラス</dt><dd>LaJobRunner</dd>
+		<dt>非同期スレッド</dt><dd>AsyncManager <span class="frm">(AsyncManagerの非同期スレッドなら)</span></dd>
+	</dl>
+
+	<h2 id="syshandling">システム例外ハンドリング</h2>
+	<h3 id="aboutsys">そもそもシステム例外とは？</h3>
+	<p>
+		システムを継続することができないような状況、システムエラーでthrowする例外です。
+	</p>
+	<p>
+		NullPointerException とか、バグやデータ不備など、発生したら何かしらディベロッパーが対応をしないといけない状況のものです。
+		エラーログに出力され、場合によっては緊急通知メールが送られるようなものです。
+	</p>
+	<h3 id="whothrowsys">だれがthrowする？</h3>
+	<p>
+		みんなです。
+	</p>
+	<p>
+		DBに接続できない、SQLが間違っている、NullPointerやっちゃった、フレームワークがバグっている、メモリが足らない、などなど、幾らでも。
+		普通に例外を投げたら基本的にシステム例外です。
+	</p>
+	<h3 id="whocatchsys">だれがcatchする？</h3>
+	<p>
+		Actionクラスであれば、<em class="mark">RequestLoggingFilter</em> が catch
+		します。ServletFilterなので、(ほぼすっぽり)フレームワークを囲ってcatchします。そこでエラーログ (ERRORレベルのログ)
+		が出力されます<span class="frm">(なので、throwしたシステム例外を自分でログ出す必要はありません)</span>。
+		HTTPステータスは500で、web.xml にて定義されたHTML(or JSON)が戻ります。
+	</p>
+	<div class="relatedpage"><a href="./friendlylogging.html#finalexceptionlog">最後の砦として例外メッセージを必ずログに</a></div>
+	<p>
+		Jobクラスであれば、<em class="mark">LaJobRunner</em> が catch
+		します。同様に、エラーログが出力されます。
+		ちなみに、Job内で発生した例外は、例外の種類に関わらずすべてシステム例外として処理されます<span class="frm">(ユーザーがいない世界なので業務例外のリカバリを自分でやらないといけないため)</span>。
+	</p>
+	<div class="relatedpage"><a href="./jobscheduling.html#exceptionlogging">ストレートなジョブ (LastaJob) - 例外ログ</a></div>
+	<p>
+		AsyncManagerを使った非同期スレッドであれば、<em class="mark">AsyncManager</em> (のサブクラス) 自身が catch
+		します。同様に、エラーログが出力され、すべてシステム例外になります。
+		<span class="frm">(自分で起動したスレッド、つまり管理外スレッドだと、エラーログには出力されません。基本、AsyncManagerを使いましょう)</span>
+	</p>
+	<div class="relatedpage"><a href="./asynchronous.html#errorlog">非同期でエラーが発生したら？</a></div>
+	<h3 id="whereiserrorlog">エラーログは、どこに出力される？</h3>
+	<p>
+		logback.xml の設定次第ですが、<em class="mark">[app]_error.log</em> に出力されます。
+	</p>
+	<h3 id="syshttpstatus">システム例外のHTTPステータスは？</h3>
+	<p>
+		500 になります。RequestLoggingFilterにて、そのように制御されます。
+	</p>
+	<h3 id="sysresponse">システム例外のレスポンスは？</h3>
+	<p>
+		web.xml に定義されている、500 に対応するリソースがレスポンスになります。
+		500.html だったらエラー画面、500.json であればエラー用のJSONが戻ります。
+	</p>
+	<p>
+		通常、システムエラーのときは、ユーザー(人)に対して詳しい情報を教える必要はありません。
+		とういかセキュリティ上、教えてはいけません。JSON APIであっても、BtoC
+		なら誰でも叩けますし、内部向けでもサーバーのエラーログに出力されていればクライアント(プログラム)に教える必要はないでしょう。
+		なので、固定のレスポンスで問題ないと想定されます<span class="frm">(例外の種類ごとにレスポンスを変更する必要はない)</span>。
+	</p>
+	<h3 id="realerroronly">本当にエラーのものだけエラーログに</h3>
+	<p>
+		エラーログでいちばん大切なこと。
+	</p>
+	<p>
+		対応しなくても良いような例外 (業務例外など) がエラーログに出力されると...エラーログが発生して "ざわっ"
+		となって緊急対応しようとすると実は重要ではない例外だった "はぁ"
+		の繰り返しが発生し、だんだんエラーログを見なくなります。つまり "ざわざわ"
+		が減ります。すると、本当に重要なエラーを見過ごしてしまう可能性があるのです。
+		最悪のケース、エラーログは大量に吐かれているけど誰も見ず垂れ流しの状態で運用しているなんてことも<span class="frm">(考えたくもない状況)</span>。
+	</p>
+	<p>
+		ゆえに、エラーログに出力されるものは、出たからにはディベロッパーが何かしら対応をして、<em class="keyword">適切に</em>
+		出ないように処置をする、というブランドをキープするのがポイントです。
+	</p>
+	<p>
+		ですが、システム例外なのか業務例外なのか、なかなか微妙で曖昧なものもあります。
+		なので、業務例外の方のログ出力の仕組みも合わせることで、エラーログのブランドを守ります。
+	</p>
+
+	<h2 id="clihandling">クライアント例外ハンドリング</h2>
+	<h3 id="aboutcli">そもそもクライアント例外とは？</h3>
+	<p>
+		(サーバー)システムの不具合ではなく、リクエストを投げたクライアントの不備によって処理が継続できないときに発生させる例外です。
+	</p>
+	<p>
+		ここで言うクライアントとは、ユーザー(人)ではなく、基本的にプログラムを指しています。例えば、JSON API
+		のときに、パースできないJSONのリクエストや、必須の項目が入ってないリクエストなどが来たとき。
+		サーバーサイドHTMLでも、ユーザー(人)が入力しない制御用の項目などがおかしい値になっているリクエストなどが来たときは同じです。
+	</p>
+	<p>
+		サーバーサイドのリカバリは不要ですが、クライアントサイドのリカバリ(バグ修正など)が必要な状況です。
+		ちなみに、クライアント例外なのにサーバーサイドの修正が必要になったら、例外ハンドリング自体がバグっているので、サーバーでの対応が必要です。
+		<span class="frm">(例外ハンドリング自体がバグってない前提で概念の話をしないとややこしくなります)</span>
+	</p>
+	<p>
+		Actionクラスだけの概念で、Jobとか非同期スレッドでは関係ありません。
+		厳密には、クライアントの不備でJobや非同期スレッドが落ちることもあるかもしれませんが、突き返す相手がいないので自分で制御します。
+	</p>
+	<h3 id="whothrowcli">だれがthrowする？</h3>
+	<p>
+		基本的に、フレームワークですが、アプリも明示的にthrowすることもあるでしょう。
+	</p>
+	<p>
+		LastaFluteでは、RequestClientErrorException を継承した例外クラスがthrowされるとクライアント例外になります。
+		リクエストを受け付けるフレームワーク内の部品で、throwすることがあります。代表的な例を以下に挙げます。
+	</p>
+	<dl class="lolongkeymainlist">
+		<dt>RequestJsonParseFailureException</dt><dd>JSONリクエストのパースエラー <span class="frm">(400)</span></dd>
+		<dt>RequestPropertyMappingFailureException</dt><dd>リクエストパラメーターの型変換エラー <span class="frm">(400)</span></dd>
+		<dt>CrossSiteRequestForgeriesForbiddenEx...</dt><dd>CSRFエラー <span class="frm">(403)</span></dd>
+		<dt>Forced404NotFoundException</dt><dd>URLパラメーターの型変換エラー <span class="frm">(404)</span></dd>
+	</dl>
+	<p>
+		<span class="frm">※URLパラメーターの型変換エラーは、後で例外クラスを新しく作るかも...スーパークラスを直接投げちゃってるなぁ</span>
+	</p>
+	<h3 id="whocatchcli">だれがcatchする？</h3>
+	<p>
+		システム例外と同様に、Actionクラスであれば、<em class="mark">RequestLoggingFilter</em> が catch
+		します。HTTPステータスは 400, 403, 404 で、レスポンスはケースバイケースなので後述。
+	</p>
+	<h3 id="cliresponse">クライアント例外のレスポンスは？</h3>
+	<p>
+		基本的には、web.xml に定義されている、400 や 404 に対応するリソースがレスポンスになります。
+		400.html だったらエラー画面、400.json であればエラー用のJSONが戻ります。
+	</p>
+	<p>
+		サーバーサイドHTMLであれば、システム例外と同様、固定のレスポンスで問題ないと想定されます。クライアントに "どうダメだったのか？"
+		を教えてあげた方が良さそうに思えますが、公開されているシステムだと、セキュリティ上あまり詳しくは教えないほうが良いので、やはりサーバーのログを確認してもらうのが良いでしょう。
+	</p>
+	<p>
+		JSON APIのときも、固定的で良いとは考えられますが、業務例外の 400 と合わせた
+		JSON を戻すほうがクライアントは扱いやすいので、ApiFailureHook
+		でレスポンスを差し替えてあげると良いでしょう。
+		LastaFluteのExampleデフォルトでは、すでにそのように実装されています。
+	</p>
+	<div class="relatedpage"><a href="../action/apifailure.html#hookclientexception">忘れられないApiFailureHook - クライアント例外をHook</a></div>
+	<h3 id="cli400or404">400, 404の違いは？</h3>
+	<p>
+		ひとつは、URLは合っていてもパラメーターに不備あるようなものは 400 (Bad Request)
+		にして、URLが合っていないようなものは 404 (Not Found) にする、という考え方を基本としています。通常、URLが間違っていれば自然とアプリケーションサーバーの機能などで 404
+		になりますが、URLパラメーターが絡むと、一度フレームワークの中で入っての判断になるので専用の制御で 404 を表現しています。
+	</p>
+	<p>
+		もうひとつは、ダメなリクエストだってことを教えてあげたほうが良いのか？教えずに "そんなリクエストを受け付けるActionはない"
+		と隠蔽したほうが良いのか？そこの違いです。URLは合っていてActionクラスまで動いていたとしても、400
+		を戻すと "そのパラメーターがDBに存在している" ということが判明してしまうと良くないです。
+	</p>
+	<p>
+		例えば、URLにユーザー名を入れて画面を表示するような場合、ユーザーが存在する場合とユーザーが存在しない場合で挙動が同じだと、そのユーザーの存在がバレてしまいます。
+		それはセキュリティ的に良くありません。そういう場合は、プログラムで明示的に 404 を戻すと良いでしょう。
+		その観点の応用で、LastaFluteでは明らかに "いたずら" (攻撃的なリクエスト) と言えるようなリクエストが来たときは 404
+		にしています。
+	</p>
+
+	<h2 id="bizhandling">業務例外ハンドリング <span class="frm">(アプリ例外)</span></h2>
+	<h3 id="aboutbiz">そもそも業務例外とは？</h3>
+	<p>
+		システムの挙動しては問題はなく、業務上の都合で処理を継続できないような "正常なレアケース"
+		で発生させる例外です。アプリケーション例外、アプリ例外、ビジネス例外とも呼ばれます。<span class="frm">(ここでは基本的に業務例外と呼びます)</span>
+	</p>
+	<p>
+		なかなか曖昧ではありますが、発生しても特にディベロッパーが何か対応をしないといけないわけではない状況ではなく、
+		ユーザーが自分でリカバリできる状況のものです。
+		例えば、すれ違い更新 (による排他制御例外) など、業務上仕方なく発生するようなもので、メッセージさえ戻せばユーザーがやり直したりすることができるもの。
+	</p>
+	<h3 id="abstractbiz">業務例外はなかなか曖昧です</h3>
+	<p>
+		例えば、サーバーサイドHTMLで一覧画面から詳細画面へ遷移するときに、リクエストのGETパラメーターの値を "いたずら"
+		で存在しない値 (-999999 とか) に変更されたりすると、DBに値が存在していなくて詳細画面が開けません。
+		ただ、"いたずら" じゃなくても "すれ違い" でそれが発生する可能性もあります。
+	</p>
+	<p>
+		いたずらだからクライアントエラーなのか？スレ違いだから業務例外なのか？
+		こういった場合は、
+	</p>
+	<h3 id="whocatchbiz">だれがcatchする？</h3>
+	<p>
+		Actionクラスであれば、<em class="mark">ApplicationExceptionResolver</em> が catch
+		します。
+	</p>
+	<p>
+		Jobクラスや非同期スレッドの場合は、リカバリーするユーザーがいないので、(アプリが実装する)その処理のトップの部分で自分で処理する必要があります。
+	</p>
+	<h3 id="whereisinfolog">通知ログは、どこに出力される？</h3>
+	<p>
+		logback.xml の設定次第ですが、<em class="mark">[app]_error.log</em> に出力されます。
+	</p>
+	<h3 id="extendsbiz">業務例外と認識されるためには？</h3>
+	<p>
+		LaApplicationException を継承した例外は、業務例外として認識されます。
+		必ずユーザー向けメッセージが必要な業務例外であれば、MessagingApplicationException
+		を継承すると良いでしょう。
+	</p>
+<pre><span class="codetitle">e.g. ユーザー向けメッセージを必要とする業務例外の定義 @Java</span><code>
+<span class="keyword">public class</span> SeaLandPiariException <span class="keyword">extends</span> MessagingApplicationException {
+    <span class="abbreviation">...</span>
+}
+</code></pre>
+	<h3 id="embeddedbiz">組み込み業務例外</h3>
+	<p>
+		LastaFluteがデフォルトで
+	</p>
+<pre><span class="codetitle">e.g. XXXXXXX @Java</span><code>
+TODO jflute
+</code></pre>
+	<h3 id="messagebiz">メッセージ通知だけ業務例外</h3>
+	<h3 id="dbflutebiz">DBFluteの業務例外</h3>
+	<h3 id="whereisinfolog">通知ログは、どこに出力される？</h3>
+
+	<h2 id="makeappexception">アプリで独自の例外クラス作る？</h2>
+	<p>
+		TODO jflute
+	</p>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">inu</a></li>
+		<li><a href="#">neko</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>
