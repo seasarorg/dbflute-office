@@ -36,6 +36,7 @@
 	${indexlist}
 
 	<h2 id="overview">概要</h2>
+	<h3 id="atfirst">まず、これを決めましょう</h3>
 	<p>
 		JSON APIを作ろうとしている人は、実装する前に必ずこれを決めましょう。
 	</p>
@@ -52,6 +53,34 @@
 		<span class="frm">※というか、JSON APIじゃなくても(サーバーサイドHTMLでも)、Ajax で JsonResponse
 		を受け取るメソッドをたくさん作るのであれば同じことです。</span>
 	</p>
+	<h3 id="forspecified">どちらかと言うと、特定クライアント向けAPI</h3>
+	<p>
+		ただ、特定クライアント向けAPIと外部クライアント向けAPIで色々と変わるかもしれません。
+		ここでは、どちらかと言うと、特定クライアント向けAPIを想定しています。つまり、Webアプリの JavaScript や iPhone, Android
+		など、サービスを作る上での構成アプリの一つだったり、サービス外でも社内の別のサービスだったり、クライアントを特定できるケースでのAPIです。
+	</p>
+	<div class="inucolumn">
+		<h3 id="firstapiforever">最初のAPIのデザインが会社標準デザイン</h3>
+		<p>
+			よくあることです。最初に開発するAPIで決めたデザインが、気づいたら会社標準のデザインになっていた、なんてことよくあります。
+			これは、アーキテクチャマネジメントをしっかりやらない限り、自然とそうなりがちです。
+			その流れで、自然と外部(他社)に公開するAPIもそれになっていたってことも。
+		</p>
+		<p>
+			もう一度利用され始めた API のデザインは、変えられません。公開APIでなくても、クライアントサイドを修正するコストを払えないでしょう。
+			もう、向こう5年10年変わらないかもしれません。
+			<span class="frm">(多くの現場で、クライアントサイドとサーバーサイドで組織が違ったり、リリースタイミングが違ったりするので、なおさら足並み揃えて変更するというのは無理でしょう)</span>
+		</p>
+		<p>
+			そしてよくあるが、最初に開発したAPIの業務に引きづられたデザイン、それがそのまま全体の標準に。
+			でも、標準化するというのも呼び出す側からすると嬉しいことで非常に大切なことなので、一概に悪いわけではないです。
+			ただ、それがチグハグだと良くない...。
+		</p>
+		<p>
+			いま決めるものが、5年10年の会社の標準のJSONデザインになる(かもしれない)。
+			その覚悟を持って、<em class="keyword">しっかりと思想を持ってデザインすること！</em>
+		</p>
+	</div>
 
 	<h2 id="jsonnuance">A. そもそもJSONをどんなニュアンスで戻す？</h2>
 	<h3 id="resourceordisplay">元データ方式？表示データ方式？</h3>
@@ -137,8 +166,8 @@
 	</p>
 <pre><span class="codetitle">e.g. Failure統一パターンでのエラーのときのJSON戻り、ここではバリデーションエラー @Json</span><code>
 {
-    "failureType" : VALIDATION_ERROR
-    , "messageMap" : {
+    "cause" : "VALIDATION_ERROR"
+    , "errors" : {
         <span class="abbreviation">...</span>
     }
 }
@@ -171,11 +200,11 @@
     <span class="abbreviation">...</span>
 } <span class="keyword">else if</span> (HTTP Status: <span class="literal">400</span>) { <span class="comment">// e.g. validation error, application exception, client exception</span>
     FailureResult <span class="localvar">result</span> = parseJsonAsFailure(<span class="localvar">response</span>);
-    <span class="comment">// show result.messageMap or do process per result.failureType</span>
+    <span class="comment">// show result.errors or do process per result.cause</span>
     <span class="abbreviation">...</span>
 } <span class="keyword">else if</span> (HTTP Status: <span class="literal">404</span>) { <span class="comment">// e.g. real not found, invalid parameter</span>
     showNotFoundError();
-} <span class="keyword">else</span> { <span class="comment">// basically 500, server exception</span>
+} <span class="keyword">else</span> { <span class="comment">// basically 500 or other client errors</span>
     showSystemError();
 }
 </code></pre>
@@ -239,7 +268,7 @@
 <pre><span class="codetitle">e.g. 共通ヘッダーパターンの正常系のときのJSON戻り、ここでは商品一覧 @Json</span><code>
 {
     "header" : {
-        "failureType" : SUCCESS
+        "resultStatus" : SUCCESS
         , "messageMap" : {} <span class="comment">// 正常系はメッセージがないのでだいたい空っぽ</span>
     }
     , "body" : {
@@ -256,7 +285,7 @@
 <pre><span class="codetitle">e.g. 共通ヘッダーパターンのエラー系のときのJSON戻り、ここではバリデーションエラー @Json</span><code>
 {
     "header" : {
-        "failureType" : VALIDATION_ERROR
+        "resultStatus" : VALIDATION_ERROR
         , "messageMap" : {
             <span class="abbreviation">...</span>
         }
@@ -282,7 +311,7 @@
         <span class="abbreviation">...</span>
     } <span class="keyword">else if</span> (Business Status : <span class="literal">404</span>) { <span class="comment">// e.g. business not found, invalid parameter</span>
         showNotFoundError();
-    } <span class="keyword">else</span> { <span class="comment">// basically 500, server exception</span>
+    } <span class="keyword">else</span> { <span class="comment">// basically 500 or other client errors</span>
         showSystemError();
     }
 } <span class="keyword">else if</span> (HTTP Status: <span class="literal">400</span>) { <span class="comment">// e.g. validation error, application exception, client exception</span>
@@ -291,7 +320,7 @@
     <span class="abbreviation">...</span>
 } <span class="keyword">else if</span> (HTTP Status: <span class="literal">404</span>) { <span class="comment">// e.g. real not found, invalid parameter</span>
     showNotFoundError();
-} <span class="keyword">else</span> { <span class="comment">// basically 500, server exception</span>
+} <span class="keyword">else</span> { <span class="comment">// basically 500 or other client errors</span>
     showSystemError();
 }
 </code></pre>
@@ -586,16 +615,16 @@
 	</p>
 <pre><span class="codetitle">e.g. クライアントメッセージ管理方式で、バリデーションエラーを戻す @Json</span><code>
 {
-    "failureType" : VALIDATION_ERROR
-    , "messageMap" : {
-        "email" : {
-            <span class="subpoint">"EMAIL", null</span>
-            , <span class="subpoint">"LENGTH", 100</span>
-        }
-        "birthdate" : {
-            <span class="abbreviation">...</span>
-        }
-    }
+    <span class="localvar">cause</span> : <span class="literal">"VALIDATION_ERROR"</span>
+    , <span class="localvar">errors</span> : [
+         , <span class="localvar">field</span> : <span class="literal">"product_name"</span>
+         , <span class="localvar">code</span> : <span class="literal">"REQUIRED"</span>
+         , <span class="localvar">values</span> : []
+    ], [
+         , <span class="localvar">field</span> : <span class="literal">"product_count"</span>
+         , <span class="localvar">code</span> : <span class="literal">"MAX"</span>
+         , <span class="localvar">values</span> : [<span class="literal">"100"</span>] <span class="comment">// 数値の最大値</span>
+    ]
 }
 </code></pre>
 	<h4>クライアントメッセージ管理方式のメリット</h4>
@@ -621,12 +650,14 @@
 	</p>
 <pre><span class="codetitle">e.g. サーバーメッセージ管理方式で、バリデーションエラーを戻す @Json</span><code>
 {
-    "failureType" : VALIDATION_ERROR
-    , "messageMap" : {
-        "email" : , <span class="subpoint">["メアドじゃない", "長っ。100文字までって言わなかったでしょうか？"]</span>
-        , "birthdate" : <span class="subpoint">["まあ、いいけど"]</span>
-        , <span class="abbreviation">...</span>
-    }
+    "cause" : "VALIDATION_ERROR"
+    , "errors" : [
+        field : "email"
+        , messages : <span class="subpoint">["メアドじゃない", "長っ。100文字までって言わなかったでしょうか？"]</span>
+    ], [
+        field : "birthdate"
+        , messages : <span class="subpoint">["まあ、いいけど"]</span>
+    ]
 }
 </code></pre>
 	<h4>サーバーメッセージ管理方式のメリット</h4>
@@ -666,6 +697,7 @@
 		に定義されている自然言語のメッセージを、キーと値だけにしてクライアントに戻せるようにすると良いでしょう。
 		<span class="frm">(クライアントサイドとしっかり取り決めをしましょう)</span>
 	</p>
+	<div class="detailpage"><a href="#egfaicli">this - e.g. Failure統一クライアントメッセージ</a></div>
 
 	<h2 id="keycase">F. キーのケース: <span class="frm">キャメル？スネーク？</span></h2>
 	<p>
@@ -777,27 +809,39 @@
 	</ul>
 
 	<div class="inucolumn">
-		<h2 id="firstapiforever">最初のAPIのデザインが会社標準デザイン</h2>
+		<h2 id="egfaicli"><span class="frm">e.g.</span> ふぇいくらパターン</h2>
 		<p>
-			よくあることです。最初に開発するAPIで決めたデザインが、気づいたら会社標準のデザインになっていた、なんてことよくあります。
-			これは、アーキテクチャマネジメントをしっかりやらない限り、自然とそうなりがちです。
-			その流れで、自然と外部(他社)に公開するAPIもそれになっていたってことも。
+			"Failure統一パターンでクライアントメッセージ管理方式" <em class="mark">(通称: ふぇいくらパターン)</em> の Example をここで紹介します。
+			<span class="frm">(身の回りでよく使われるでありながら、よく考えてデザインしてクライアントと共有しないと、"へんてこりん" になりがちだし、実装も少し工夫が必要なので)</span>
 		</p>
 		<p>
-			もう一度利用され始めた API のデザインは、変えられません。公開APIでなくても、クライアントサイドを修正するコストを払えないでしょう。
-			もう、向こう5年10年変わらないかもしれません。
-			<span class="frm">(多くの現場で、クライアントサイドとサーバーサイドで組織が違ったり、リリースタイミングが違ったりするので、なおさら足並み揃えて変更するというのは無理でしょう)</span>
+			詳しくは、専用のページにて。
 		</p>
-		<p>
-			そしてよくあるが、最初に開発したAPIの業務に引きづられたデザイン、それがそのまま全体の標準に。
-			でも、標準化するというのも呼び出す側からすると嬉しいことで非常に大切なことなので、一概に悪いわけではないです。
-			ただ、それがチグハグだと良くない...。
-		</p>
-		<p>
-			いま決めるものが、5年10年の会社の標準のJSONデザインになる(かもしれない)。
-			その覚悟を持って、<em class="keyword">しっかりと思想を持ってデザインすること！</em>
-		</p>
-	</div>
+		<div class="detailpage"><a href="./jsonfaicli.html">JSON API, Failure統一クライアントメッセージ</a></div>
+<pre><span class="codetitle">e.g. "ふぇいくらパターン" で、バリデーションエラーのとき @Json</span><code>
+{
+    <span class="localvar">cause</span> : <span class="literal">"VALIDATION_ERROR"</span>
+    , <span class="localvar">errors</span> : [
+         , <span class="localvar">field</span> : <span class="literal">"product_name"</span>
+         , <span class="localvar">code</span> : <span class="literal">"REQUIRED"</span>
+         , <span class="localvar">values</span> : []
+    ], [
+         , <span class="localvar">field</span> : <span class="literal">"product_count"</span>
+         , <span class="localvar">code</span> : <span class="literal">"MAX"</span>
+         , <span class="localvar">values</span> : [<span class="literal">"100"</span>] <span class="comment">// 数値の最大値</span>
+    ]
+    ], [
+         , <span class="localvar">field</span> : <span class="literal">"member.email"</span>
+         , <span class="localvar">code</span> : <span class="literal">"LENGTH"</span>
+         , <span class="localvar">values</span> : [<span class="literal">"50"</span>] <span class="comment">// 文字列の最大長</span>
+    ]
+    ], [
+         , <span class="localvar">field</span> : <span class="literal">"member.email"</span>
+         , <span class="localvar">code</span> : <span class="literal">"EMAIL"</span>
+         , <span class="localvar">values</span> : []
+    ]
+}
+</code></pre>
 <!-- __content-end__ --></div></div>
 
 <div id="sidebar">
