@@ -122,17 +122,17 @@ org.docksidestage
     }
 }
 </code></pre>
-	<h3 id="urlparam">URL Parameter</h3>
+	<h3 id="pathparam">Path Parameter</h3>
 	<p>
 		e.g. ProductListAction#index()
 	</p>
-<pre><span class="codetitle">e.g. accept URL parameter as required argument @Java</span><code>
+<pre><span class="codetitle">e.g. accept Path parameter as required argument @Java</span><code>
     @Execute
     <span class="keyword">public</span> HtmlResponse index(<span class="point">int pageNumber</span>) { <span class="comment">// /product/list/3</span>
         <span class="abbreviation">...</span>
     }
 </code></pre>
-<pre><span class="codetitle">e.g. accept URL parameter as optional argument @Java</span><code>
+<pre><span class="codetitle">e.g. accept Path parameter as optional argument @Java</span><code>
     @Execute
     <span class="keyword">public</span> HtmlResponse index(<span class="point">OptionalThing&lt;Integer&gt; pageNumber</span>) {
         pageNumber.ifPresent(() -&gt; { <span class="comment">// /product/list/3</span>
@@ -142,7 +142,7 @@ org.docksidestage
         });
     }
 </code></pre>
-<pre><span class="codetitle">e.g. accept URL parameter with more URL @Java</span><code>
+<pre><span class="codetitle">e.g. accept Path parameter with more URL @Java</span><code>
     <span class="comment">// /product/list/mystic/ikspiary/oneman/</span> <span class="comment">(sea=mystic, land=oneman)</span>
     @Execute(<span class="subpoint">urlPattern</span> = <span class="literal">"{}/ikspiary/{}"</span>)
     <span class="keyword">public</span> HtmlResponse index(<span class="subpoint">String sea, String land</span>) {
@@ -156,7 +156,7 @@ org.docksidestage
         <span class="abbreviation">...</span>
     }
 </code></pre>
-<pre><span class="codetitle">e.g. both URL parameter and GET parameter @Java</span><code>
+<pre><span class="codetitle">e.g. both Path parameter and GET parameter @Java</span><code>
     <span class="comment">// e.g. /<span class="abbreviation">...</span>/list/3?favoriteCode=sea&nextName=land</span>
     @Execute
     <span class="keyword">public</span> HtmlResponse index(<span class="subpoint">int pageNumber</span>, <span class="subpoint">ProductSearchForm form</span>) {
