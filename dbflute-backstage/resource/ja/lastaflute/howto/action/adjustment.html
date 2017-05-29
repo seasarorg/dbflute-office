@@ -36,6 +36,7 @@
 		<dt>配列パラメータの上限</dt><dd>provideIndexedPropertySizeLimit()</dd>
 		<dt>HTMLパスのフィルタ</dt><dd>filterHtmlPath()</dd>
 		<dt>HTMLパス探しのリトライ</dt><dd>prepareHtmlRetryWordList()</dd>
+		<dt>強制404ルーティング対象の指定</dt><dd>isForced404NotFoundRouting</dd>
 		<dt>強制ルーティング対象の指定</dt><dd>isForcedRoutingTarget()</dd>
 		<dt>後ろの/不足リダイレクト抑制</dt><dd>isSuppressTrailingSlashRedirect()</dd>
 		<dt>Actionマッピングの調整</dt><dd>customizeActionMappingRequestPath()</dd>
@@ -62,9 +63,13 @@
 	<p>
 		TODO jflute HTMLファイルがなかったときのリトライ調整、これも携帯向けとかで
 	</p>
-	<h3 id="forcedroutingtarget">強制ルーティング対象の指定</h3>
+	<h3 id="forced404notfoundrouting">強制ルーティング対象の指定</h3>
 	<p>
 		TODO jflute .pdf とか拡張子で終わってるURLもActionで受けたいとき、わりと使う
+	</p>
+	<h3 id="forcedroutingtarget">強制404ルーティング対象の指定</h3>
+	<p>
+		TODO jflute もうこのURL来たらダメとか、SwaggerUIとかを指定する想定
 	</p>
 	<h3 id="trailingslashredirect">後ろの'/'不足リダイレクト抑制</h3>
 	<p>
