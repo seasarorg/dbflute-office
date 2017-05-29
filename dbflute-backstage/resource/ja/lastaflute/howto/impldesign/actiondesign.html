@@ -257,7 +257,7 @@
 app
  |-web
  |  |-sea
- |  |  |-SeaAction.java <span class="comment">// use SeaAssist</span>
+ |  |  |-SeaAction.java <span class="comment">// uses SeaAssist</span>
  |  |  |-<span class="point">SeaAssist.java</span>
  |  |  |-SeaForm.java
 </code></pre>
@@ -271,10 +271,10 @@ app
  |  |  |-maihama
  |  |  |  |-<span class="point">ResortAssist.java</span>
  |  |-sea
- |  |  |-SeaAction.java <span class="comment">// use ResortAssist</span>
+ |  |  |-SeaAction.java <span class="comment">// uses ResortAssist</span>
  |  |  |-SeaForm.java
  |  |-land
- |  |  |-LandAction.java <span class="comment">// use ResortAssist</span>
+ |  |  |-LandAction.java <span class="comment">// uses ResortAssist</span>
  |  |  |-LandForm.java
 </code></pre>
 	<h3 id="assistknowweb">AssistクラスはWEBに依存してOK</h3>
@@ -389,14 +389,14 @@ app
  |  |  |-MaihamaBaseAction
  |  |  |-<span class="abbreviation">...</span>
  |  |-sea
- |  |  |-SeaAction <span class="comment">// use base.sea.SeaForm</span>
+ |  |  |-SeaAction <span class="comment">// uses base.sea.SeaForm</span>
  |  |-land
- |  |  |-LandAction <span class="comment">// use base.sea.SeaForm</span>
+ |  |  |-LandAction <span class="comment">// uses base.sea.SeaForm</span>
  |  |-piari
  |  |  |-dstore
- |  |  |  |-PiariDstoreAction <span class="comment">// use PiariForm</span>
- |  |  |-PiariDetailAction <span class="comment">// use PiariForm</span>
- |  |  |-PiariEditAction <span class="comment">// use PiariForm</span>
+ |  |  |  |-PiariDstoreAction <span class="comment">// uses PiariForm</span>
+ |  |  |-PiariDetailAction <span class="comment">// uses PiariForm</span>
+ |  |  |-PiariEditAction <span class="comment">// uses PiariForm</span>
  |  |  |-<span class="subpoint">PiariForm</span> <span class="comment">// cane be recycled in same package</span>
 </code></pre>
 		<p>
