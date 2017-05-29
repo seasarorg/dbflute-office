@@ -67,8 +67,11 @@ src/test/java <span class="comment">// テストクラス置き場</span>
 </code></pre>
 	<h3 id="deftestintro">そもそも ActionDefTest とは？</h3>
 	<p>
-		業務的なUnitTestではなく、Action自体の定義、フレームワークとして使い方、などが合っているかどうかをテストする UnitTest
-		が用意されています。それを <em class="mark">ActionDefTest</em> と呼んでいます。例えば、以下のようなチェック:
+		業務的な UnitTest ではなく、Action自体の定義、フレームワークとして使い方、などが合っているかどうかをテストする UnitTest
+		が用意されています。それを <em class="mark">ActionDefTest</em> と呼んでいます。
+	</p>
+	<p>
+		例えば...
 	</p>
 	<ul>
 		<li>Actionがしっかり初期化できるか？ <span class="frm">(定義の仕方とか間違っていたら落ちる)</span></li>
@@ -118,6 +121,10 @@ src/test/java <span class="comment">// テストクラス置き場</span>
         policeStoryOfJavaClassChase(<span class="keyword">new</span> ActionComponentPolice(tp -&gt; getComponent(tp)));
     }
 </code></pre>
+	<p>
+		できるだけ、画面を実際に動かさなくても色々なミスが検知できるようにしたいところです。
+		<span class="frm">(もちろん、画面を実際に動かすテストはするときはしますが、インクリメンタル開発では毎リリースごと完璧に網羅するのは難しいことなので)</span>
+	</p>
 	<h3 id="hotdeploydestroyer">HotDeployを壊すようなクラス参照してないか？</h3>
 	<p>
 		appパッケージ配下は HotDeploy (アプリを再起動しなくても修正が反映される) になりますが、appの外 (mylasta, dbfluteなど)
@@ -143,6 +150,10 @@ src/test/java <span class="comment">// テストクラス置き場</span>
         policeStoryOfJavaClassChase(<span class="keyword">new</span> HotDeployDestroyerPolice(tp -&gt; getComponent(tp)));
     }
 </code></pre>
+	<p>
+		こういった参照をしてしまっても普通に動いてはしまうので、ぜひともこの UnitTest で検知したいものです。気付いたら HotDeploy
+		が全然効かなくなっていた、とかにならないように。
+	</p>
 	<h3 id="nonactionextendsaction">ActionじゃないのにBaseActionを継承してないか？</h3>
 	<p>
 		つまり、Logicクラスが、Actionのスーパークラスを継承しちゃっていないか？を検知します。
@@ -237,6 +248,7 @@ app
 	</p>
 	<p>
 		policeStoryOf...() のに合う PoliceStory を実装すれば誰でも作ることができます。
+		別のテストクラスにしてもいいですし、集約させるために ActionDefTest に追加してもいいでしょう。
 	</p>
 <!-- __content-end__ --></div></div>
 
