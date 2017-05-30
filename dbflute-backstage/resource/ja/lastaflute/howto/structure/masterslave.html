@@ -305,6 +305,24 @@ app.xml <span class="comment">// 手作り: アプリの Di xml のルート</sp
 		master/slaveをどのように実現しているか次第ですが、RDBのmaster/slave機能の都合上、どうしてもmasterの更新からslaveへの反映までに遅延が発生する可能性があります。
 		それを許容できない検索なのに slave を使ってしまうと、思わぬ事故を引き起こしてしまうかもしれませんので注意しましょう。
 	</p>
+	<h3 id="localenv">ローカル開発環境では、どうする？</h3>
+	<p>
+		ローカル開発環境で、master/slave構成がすんなり構築できるのであれば特に問題はありませんが、そうでない場合はちょっと注意が必要です。
+	</p>
+	<p>
+		その場合、masterもslaveも同じDBを参照すれば、つじつまが合ってテストはおおよそできますが、UnitTest
+		などで、masterとslaveに対するTransactionが同時に発行されるときはちょっと困ります。
+	</p>
+	<p>
+		例えば、UnitTestの中でmasterに対して更新した結果が、slaveに対する検索で参照ができません。
+		同じDBでも、Tranasction が(同時に)別になっているので、masterに対する更新が Commit
+		されるまで、slaveの方の Tranasction ではその更新結果を検索できないのです。
+		そこに依存しているロジックがあると、UnitTestがまともにできないという可能性もあります。
+	</p>
+	<p>
+		しょっちゅう出てくる問題ではないと思うので、問題が出てくるまでお茶を濁すか、ローカルだけは SlaveDBAccessorNothing
+		を使うようにするとか、工夫が必要でしょう。<span class="frm">(ローカルで簡単にmaster/slaveができちゃえば一番世話ないですが)</span>
+	</p>
 <!-- __content-end__ --></div></div>
 
 <div id="sidebar">
