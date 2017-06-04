@@ -113,6 +113,8 @@ dbflute-hands-on
         ListResultBean&lt;Member&gt; memberList = <span class="attribute">memberBhv</span>.selectList(<span class="localvar">cb</span> -&gt; {
             <span class="localvar">cb</span>.setupSelect_MemberStatus();
             <span class="localvar">cb</span>.setupSelect_MemberSecurityAsOne();
+            <span class="localvar">cb</span>.query().addOrderBy_Birthdate_Desc();
+            <span class="localvar">cb</span>.query().addOrderBy_MemberId_Asc();
         });
 
         <span class="comment">// ## Assert ##</span>
@@ -320,6 +322,7 @@ dbflute-hands-on
             Product product = purchase.getProduct().get();
             log(purchase.getProductId(), member.getMemberName(), status.getMemberStatusName(), product.getProductName(),
                     member.getMemberId());
+            assertNotNull(member.getBirthdate());
         });
     }
 
