@@ -71,7 +71,7 @@
          , <span class="localvar">"data"</span> : <span class="literal">(チェックに関連するデータ、長さチェックの最大長など
                   e.g. min : "20", max : "50")</span>
          , <span class="point">"message"</span> : <span class="literal">(自然言語のユーザーメッセージ、利用したければどうぞ)</span>
-    }], [{
+    }, {
         <span class="abbreviation">...</span>
     }]
 }
@@ -111,17 +111,17 @@
          , <span class="localvar">"code"</span> : <span class="literal">"REQUIRED"</span>
          , <span class="localvar">"data"</span> : {}
          , <span class="localvar">"message"</span> : "is required"
-    }], [{
+    }, {
          , <span class="localvar">"field"</span> : <span class="literal">"product_count"</span>
          , <span class="localvar">"code"</span> : <span class="literal">"MAX"</span>
          , <span class="localvar">"data"</span> : { <span class="localvar">max</span> : <span class="literal">"100"</span> } <span class="comment">// 数値の最大値</span>
          , <span class="localvar">"message"</span> : <span class="literal">"should be less than or equal 100"</span>
-    }], [{
+    }, {
          , <span class="localvar">"field"</span> : <span class="literal">"member.email"</span>
          , <span class="localvar">"code"</span> : <span class="literal">"LENGTH"</span>
          , <span class="localvar">"data"</span> : { <span class="localvar">min</span> : <span class="literal">"20"</span>, <span class="localvar">max</span> : <span class="literal">"50"</span> } <span class="comment">// 文字列の最大長</span>
          , <span class="localvar">"message"</span> : <span class="literal">"should be between 20 and 50"</span>
-    }], [{
+    }, {
          , <span class="localvar">"field"</span> : <span class="literal">"member.email"</span>
          , <span class="localvar">"code"</span> : <span class="literal">"EMAIL"</span>
          , <span class="localvar">"data"</span> : {}
@@ -318,7 +318,7 @@ errors.app.double.submit.request=<span class="literal">DOUBLE_SUBMIT :: double s
 	<p>
 		Exampleはこちら:
 	</p>
-	<div class="detailpage"><a href="https://github.com/lastaflute/lastaflute-example-maihama/blob/master/maihama-showbase/src/main/java/org/docksidestage/mylasta/direction/sponsor/ShowbaseApiFailureHook.java">HangarApiFailureHook.java | Github</a></div>
+	<div class="detailpage"><a href="https://github.com/lastaflute/lastaflute-example-maihama/blob/master/maihama-showbase/src/main/java/org/docksidestage/mylasta/direction/sponsor/ShowbaseApiFailureHook.java">ShowbaseApiFailureHook.java | Github</a></div>
 	<div class="relatedpage"><a href="../action/apifailure.html">忘れられないApiFailureHook</a></div>
 	<h3 id="lacommonorapp">commonか？appか？</h4>
 	<p>
@@ -332,7 +332,7 @@ errors.app.double.submit.request=<span class="literal">DOUBLE_SUBMIT :: double s
 		をオーバーライドし、業務例外のメッセージの values を JSON として展開する必要があります。
 		<span class="frm">(業務例外で values を使うときだけの処理ではありますが)</span>
 	</p>
-	<div class="relatedpage"><a href="https://github.com/lastaflute/lastaflute-example-maihama/blob/master/maihama-showbase/src/main/java/org/docksidestage/app/web/base/ShowbaseBaseAction.java#L64">HangarBaseAction.java | Github</a></div>
+	<div class="relatedpage"><a href="https://github.com/lastaflute/lastaflute-example-maihama/blob/master/maihama-showbase/src/main/java/org/docksidestage/app/web/base/ShowbaseBaseAction.java#L64">ShowbaseBaseAction.java | Github</a></div>
 	<h3 id="lacliimpl">クライアントエラーの実装は？ <span class="frm">(クライアント例外)</span></h3>
 	<h4>ApiFailureHookにて</h4>
 	<p>
