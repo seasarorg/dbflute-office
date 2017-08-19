@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,LastaFlute,Java,Lean Startup,Incremental Development,Transaction,トランザクション" />
+	<style type="text/css" title="currentStyle">@import "../../../../css/sub.css";</style>
+	<title>ユーザーメッセージ (UserMessages) | LastaFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-install"><a href="#">Install</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>ユーザーメッセージ (UserMessages)</h1>
+	<div class="relatedpage"><a href="../../index.html">LastaFlute</a></div>
+	<div class="relatedpage"><a href="./lavalidation.html">見通しのValidation</a></div>
+	<div class="relatedpage"><a href="../architecture/exceptionhandling.html">開拓の例外ハンドリング</a></div>
+	<div class="relatedpage"><a href="../objsafeprop.html">LastaFluteのタイプセーフProperties</a></div>
+	${indexlist}
+
+	<h2 id="howtochange">メッセージ修正の仕方</h2>
+	<p>
+		src/main/resources の [app]_message.properties のメッセージを修正します。
+		UTF-8で読み込んでいるので、日本語をユニコードエスケープする必要はありません。
+	</p>
+	<p>
+		文言の修正だけであれば、FreeGenを叩かなくても動作に影響はないですが、[App]Messagesクラスの JavaDoc
+		を更新できるので、一応叩いておくと良いでしょう。
+	</p>
+	<p>
+		マルチプロジェクトの場合、継承関係を構築していますので、うまくプロジェクト間での再利用や、オーバーライドなどを活かしましょう。
+	</p>
+	<div class="relatedpage"><a href="../objsafeprop.html">LastaFluteのタイプセーフProperties</a></div>
+
+	<h2 id="howtoadd">メッセージ追加の仕方</h2>
+	<p>
+		src/main/resources の [app]_message.properties (UTF-8) にメッセージを追加します。
+	</p>
+	<p>
+		追加したら、FreeGenを叩きます。[App]Messagesに add...() メソッドが追加され、アプリで呼べるようになります。
+	</p>
+
+	<h2 id="forproperty">どの項目のためのメッセージか？</h2>
+	<p>
+		[App]Messages で add...() を使うときに、必ず第一引数で <em class="keyword">関連する項目のプロパティ名</em>
+		を指定します。どの項目のためのメッセージか？を表現するためです<span class="frm">(画面側でその名前で制御します)</span>。
+	</p>
+	<p>
+		サーバーサイドHTMLであればHTML上の名前、JSON APIであればJSON上の名前が適しています。
+		自然と、FormクラスやBodyクラスの変数名と同じになることが多いでしょう。
+	</p>
+<pre><span class="codetitle">e.g. property for message @Java</span><code>
+<span class="localvar">messages</span>.addConstraintsRequiredMessage(<span class="literal">"productName"</span>);
+</code></pre>
+	<p>
+		特に項目に依存しないトップレベルのメッセージであれば、_global を指定するのが LastaFlute
+		での慣習です。UserMessages.GLOBAL 定数を使って指定できます。業務例外などではこちらを利用することがほとんどでしょう。
+	</p>
+<pre><span class="codetitle">e.g. property for message @Java</span><code>
+<span class="localvar">messages</span>.addConstraintsRequiredMessage(UserMessages.<span class="attribute">GLOBAL</span>);
+</code></pre>
+	<p>
+		ちなみに、Validatorアノテーションによるメッセージの場合は、アノテーションが付与されているプロパティの名前がそのまま利用されます。
+	</p>
+
+	<h2 id="subjectivemessage">主語ありメッセージ</h2>
+	<p>
+		メッセージを主語ありにしたいときは、メッセージに {item} を付与します。
+	</p>
+<pre><span class="codetitle">e.g. subjective message @[app]_message.properties</span><code>
+constraints.Required.message = <span class="attribute">{item}</span> is required
+</code></pre>
+	<p>
+		[app]_label.properties に定義されている labels.[変数名] に合致するラベルがあれば、その値が表示されます。
+		存在しない場合は、変数名がそのまま表示されます。<span class="frm">(変数名がそのまま表示されていいことはまずないと思うので、labelを用意しましょう)</span>
+	</p>
+
+	<h2 id="variablemessage">動的変数付きメッセージ</h2>
+	<h3 id="indexedvariable">インデックス変数 <span class="frm">e.g. {0} of dreams</span></h3>
+	<p>
+		プログラムからの動的な値をメッセージの中に埋め込みたいときは、
+		中括弧 {} で囲って、その中に番号を付けましょう。e.g. {0}, {1}
+	</p>
+<pre><span class="codetitle">e.g. indexed variable message @[app]_message.properties</span><code>
+errors.maihama = <span class="attribute">{0}</span> of dreams
+</code></pre>
+	<ul class="codeoutro">
+		<li>ゼロ始まりであること <span class="frm">e.g. {0} of dreams, sea of {1}</span></li>
+		<li>抜け番がないこと</li>
+		<li>同じ番号を使わないこと</li>
+	</ul>
+	<p>
+		FreeGenをすると、自動生成された [App]Messages の add...() メソッドの引数で、動的パラメーターを指定することができます。
+	</p>
+	<h4>DBFlute-1.1.4 より</h4>
+	<p>
+		指定された番号の順番で、引数になります。
+	</p>
+	<ul>
+		<li>{0} of {1} であれば、String arg0, String arg1</li>
+		<li>{1} of {0} であっても、String arg0, String arg1</li>
+	</ul>
+	<p>
+		つまり、メッセージ上の番号の出現位置は、引数の順番に関係ありません。
+		これは、以下のことを考慮してあえてこのようにしています。
+	</p>
+	<ul>
+		<li>後からメッセージ(自然言語)の都合で、変数位置を変えてもプログラムに影響がない</li>
+		<li>多言語対応のとき他の言語では入れ替わる可能性があるので、出現位置への意識は少ない方が良い</li>
+	</ul>
+	<p>
+		<span class="frm">※基本的に、LastaFlute-1.0.0 以上であれば DBFlute-1.1.4 以上を利用しましょう。
+		互いに処理を合わせて作っているので、一番スマートに利用できます。</span>
+	</p>
+	<h4>DBFlute-1.1.3 まで</h4>
+	<p>
+		メッセージの出現位置の順番で、引数になります。
+	</p>
+	<ul>
+		<li>{0} of {1} であれば、String arg0, String arg1</li>
+		<li>{1} of {0} だと逆に、String arg1, String arg0</li>
+	</ul>
+	<p>
+		これだと、後からメッセージの都合で変数位置を変えた場合、プログラムの引数指定も修正してあげないといけません。
+	</p>
+	<h3 id="namedvariable">名前付き変数 <span class="frm">(@since LastaFlute-1.0.0)</span></h3>
+	<p>
+		変数に名前を付けることもできます。中括弧 {} で囲って、その中に名前を入れます。e.g. {sea}
+	</p>
+<pre><span class="codetitle">e.g. named variable message @[app]_message.properties</span><code>
+errors.maihama = <span class="attribute">{sea}</span> of dreams
+</code></pre>
+	<ul class="codeoutro">
+		<li>ただし、{item} は予約されている言葉なので、動的パラメーターの名前としては利用できない</li>
+		<li>Javaの引数名で使える文字であること (記号とかは利用できない)</li>
+		<li>同じ名前は使わないこと</li>
+	</ul>
+	<p>
+		同じく、FreeGenをすると、自動生成された [App]Messages の add...() メソッドの引数で、動的パラメーターを指定することができます。
+		指定された名前がそのまま引数名になります。
+	</p>
+	<h4>DBFlute-1.1.4 より</h4>
+	<p>
+		指定された名前がソートされて引数の順番になります。
+	</p>
+	<ul>
+		<li>{sea} of {land} であれば、String land, String sea つまり自然ソート</li>
+		<li>ただ、特別なのもあって、{min} and {max} ならString min, String max</li>
+	</ul>
+	<p>
+		実際に、どうソートされるかはあまり意識する必要はなく、固定化されるということに意義があります。
+		これは、以下のことを考慮してあえてこのようにしています。
+	</p>
+	<ul>
+		<li>後からメッセージ(自然言語)の都合で、変数位置を変えてもプログラムに影響がない</li>
+		<li>多言語対応のとき他の言語では入れ替わる可能性があるので、出現位置への意識は少ない方が良い</li>
+		<li>☆多言語対応のとき他の言語で入れ替わっても、正確にマッピングできるようにするため</li>
+	</ul>
+	<p>
+		<span class="frm">※基本的に、LastaFlute-1.0.0 以上であれば DBFlute-1.1.4 以上を利用しましょう。
+		互いに処理を合わせて作っているので、一番スマートに利用できます。</span>
+	</p>
+	<h4>DBFlute-1.1.3 まで</h4>
+	<p>
+		メッセージの出現位置の順番で、引数になります。
+	</p>
+	<ul>
+		<li>{sea} of {land} であれば、String sea, String land</li>
+		<li>{land} of {sea} だと逆に、String land, String sea</li>
+	</ul>
+	<p>
+		これだと、後からメッセージの都合で変数位置を変えた場合、プログラムの引数指定も修正してあげないといけません。
+		また、内部的な話ですが、多言語対応のときに他の言語で入れ替わったときに、正確にマッピングができません。
+	</p>
+	<h4>もろもろ補足</h4>
+	<p>
+		古いバージョン <span class="frm">(@before LastaFlute-1.0.0)</span> では、名前付きパラメーターが利用できません。
+		FreeGenで自動生成はされますが、実際に処理をすると NumberFormatException が発生します。
+		厳密には、Validatorアノテーションによるメッセージでは利用できますが、messages.add...()メソッドによるメッセージでは利用できません。
+		そのときはインデックス変数を使いましょう。
+	</p>
+	<p>
+		ちなみに、組み込みのメッセージ (Hibernate Validator のアノテーションに対応したメッセージ)
+		に関しては、渡せるパラメーターが固定化されているので、そちらで使うことは基本的になく、アプリ独自のメッセージを追加するときに使うことが想定されます。
+	</p>
+	<p>
+		あと、メッセージに変数をたくさん付けることはあまりないと思うので、インデックス変数で十分かもしれません。
+		Hibernate Validator の都合により、名前付き変数もサポートしているだけと言えるかもです。
+	</p>
+
+	<h2 id="i18n">メッセージの多言語対応</h2>
+	<p>
+		TODO jflute now writing... [app]_message_ja.properties を作って、UserLocale...
+	</p>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">inu</a></li>
+		<li><a href="#">neko</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>
