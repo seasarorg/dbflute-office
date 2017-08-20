@@ -44,20 +44,29 @@
 	<h3 id="inherits">LastaFlute,SAFluteでメッセージの逆転インデックス変数</h3>
 	<p>
 		LastaFlute, SAFluteを使っていて、[app]_message.properties
-		に以下のようなインデックス変数の番号と出現位置が逆転したメッセージを利用されている方がいたら要注意。
+		に以下のようなインデックス変数の番号と出現位置が逆転したメッセージを利用されている方がいたらちょっと着目お願いします。
 	</p>
 <pre><span class="codetitle">e.g. indexed variable message @[app]_message.properties</span><code>
 <span class="comment"># {0} {1} ではなく、{1} {0} という定義順になっている </span>
 errors.maihama = <span class="attribute">{1}</span> of dreams, <span class="attribute">{0}</span> of wonder
 </code></pre>
 	<p>
+		新しいDBFluteだと、add...() メソッドの引数が逆に自動生成されます。詳しくはこちら:
+	</p>
+	<div class="detailpage"><a href="../../../lastaflute/howto/action/usermessages.html#variablemessage">ユーザーメッセージ - 動的変数付きメッセージ</a></div>
+	<p>
 		恐らく、ほとんどこのような状況はないかと想定されます。
 		独自のメッセージを追加すること自体少なければ、動的変数を複数入れることもあまりないでしょうし、入れたとしても順序を逆転させていなければ特に問題はありません。
 	</p>
 	<p>
-		万が一、このように定義している場合、逆転して変数がマッピングされて画面に表示されてしまう可能性がありますので、詳しくはこちらをご覧ください。
+		また、このように定義している場合でも、もともと、LastaFlute でも SAFlute でも第一引数が{0}にマッピングされるので、
+		どちらかというと、古いDBFluteの自動生成された引数に合わせて値を指定すると、逆に表示されてしまっていたはずです。
+		つまり、新しいDBFluteだと表示の不具合が自然解決されます。<span class="frm">(なので、今回修正しました)</span>
 	</p>
-	<div class="detailpage"><a href="../../../lastaflute/howto/action/usermessages.html#variablemessage">ユーザーメッセージ - 動的変数付きメッセージ</a></div>
+	<p>
+		ただ、もし、その不具合をわかっていて、プログラム側で "あえて逆に実装している箇所" があったら、
+		逆転して変数がマッピングされて画面に表示されてしまう可能性があります。
+	</p>
 	<p>
 		もし、どうしても以前の挙動に戻したいというのであれば、littleAdjustmentMap.dfprop にて、以下のプロパティを true にします。
 	</p>
