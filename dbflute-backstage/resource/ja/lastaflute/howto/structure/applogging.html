@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,LastaFlute,Java,Lean Startup,Incremental Development" />
+	<style type="text/css" title="currentStyle">@import "../../../../css/sub.css";</style>
+	<title>LastaFluteのアプリログ | LastaFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-install"><a href="#">Install</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>LastaFluteのアプリログ</h1>
+	<p>
+		LastaFluteが出力するアプリケーションのログ (開発、本番含めて) について
+	</p>
+	<div class="relatedpage"><a href="./index.html">LastaFlute</a></div>
+	${indexlist}
+
+	<h2 id="overview">LastaFluteのログ概要</h2>
+	<p>
+		LastaFluteのデフォルトのロギング思想は、おおよそこのようになっています。
+	</p>
+	<h3 id="loggingfw">ロギングフレームワークについて</h3>
+	<p>
+		ロギングフレームワークはこちら:
+	</p>
+	<dl class="lolongvaluemainlist">
+		<dt>ログファサード</dt><dd>Slf4j <span class="frm">(DBFluteなどもこちらを利用)</span></dd>
+		<dt>ログライブラリ</dt><dd>Logback</dd>
+	</dl>
+	<h3 id="exceptionloglevel">例外とログレベルとの関係</h3>
+	<p>
+		アプリの中で発生した例外とログレベルとの関係はこちら:
+	</p>
+	<div class="relatedpage"><a href="../architecture/exceptionhandling.html">開拓の例外ハンドリング</a></div>
+	<dl class="longvaluemainlist">
+		<dt>バリデーションエラー</dt><dd>DEBUG <span class="frm">(ここで、ユーザー入力のバリデーションのことを指している)</span></dd>
+		<dt>業務例外</dt><dd>INFO <span class="frm">(ただし、ログイン認証は含まない)</span></dd>
+		<dt>クライアント例外</dt><dd>INFO <span class="frm">(システム項目のバリデーションも含む)</span></dd>
+		<dt>システム例外</dt><dd>ERROR</dd>
+	</dl>
+	<p>
+		特徴としては:
+	</p>
+	<dl class="textlist">
+		<dt>例外でも正常なイベントであればINFOでは出さない</dt>
+		<dd>例えば、ユーザー入力のバリデーションエラーとか、ログイン認証など</dd>
+		<dt>(そういうもの以外の)業務例外はINFOで出す</dt>
+		<dd>業務例外は、グレーゾーンもあるし、業務改善も必要かもしれないのでINFO</dd>
+		<dt>クライアント例外はINFOで出す</dt>
+		<dd>
+			クライアントバグの可能性を分析するため、サーバーでINFOで残す。
+			例えば、ブラウザ上の JavaScript などであれば、クライアントでログを残せない可能性もあるため。
+			また、公開サーバーであれば、セキュリティ上あまり詳しい情報をレスポンスで戻さないほうが良いため。
+		</dd>
+		<dd>
+			ただ、公開アプリのときに "いたずらリクエスト"
+			で大量発生する可能性はあるので、それが問題になるようであれば、クライアント例外もINFOで出さないように設定の変更を検討すべし。
+		</dd>
+	</dl>
+	<h3 id="loglevelfile">ログレベルとログファイルの関係</h3>
+	<p>
+		ログレベルと出力されるログファイルの関係はこちら:
+	</p>
+	<dl class="lolongvaluemainlist">
+		<dt>DEBUG</dt><dd>app_[アプリ名].log <span class="frm">(開発用のログ、本番では出力されない)</span></dd>
+		<dt>INFO</dt><dd>app_[アプリ名].log <span class="frm">(Jobの起動/終了、業務例外、クライアントエラーなども含む)</span></dd>
+		<dt>WARN</dt><dd>app_[アプリ名].log <span class="frm">(SQL発行し過ぎとか、続行するけど後で直そう的な警告)</span></dd>
+		<dt>ERROR</dt><dd>app_[アプリ名].log + error_[アプリ名].log <span class="frm">(NullPointerとか)</span></dd>
+	</dl>
+	<p>
+		特徴としては:
+	</p>
+	<ul>
+		<li>INFO以上で本番に出力される <span class="frm">(Jobの起動/終了、業務例外やクライアントエラー次第)</span></li>
+		<li>app_ログファイルの流量はあまり多くないことを想定 <span class="frm">(ただし、業務例外やクライアントエラー次第)</span></li>
+		<li>ERRORだけは、緊急性の高いものということで専用ファイルにも出力される</li>
+		<li>WARNだけの専用ファイルは作っていないが、アプリで必要だと思ったら追加してもOK</li>
+	</ul>
+	<h3 id="speciallog">特殊なログとログファイルの関係</h3>
+	<p>
+		メール送信内容のログや、リクエストのIN/OUTのログなどは:
+	</p>
+	<div class="relatedpage"><a href="../action/adjustment.html#inoutlogging">ActionやJSONの微調整 - ActionのInOutのログを出力する？</a></div>
+	<dl class="longvaluemainlist">
+		<dt>メール送信内容</dt><dd>mail_[アプリ名].log <span class="frm">(すごい流量)</span></dd>
+		<dt>リクエストのIN/OUT</dt><dd>(inout_[アプリ名].log) <span class="frm">(すごい流量、デフォルトでは設定されていない)</span></dd>
+	</dl>
+	<p>
+		特徴としては:
+	</p>
+	<ul>
+		<li>app_[アプリ名].logでは出力されず、独立している</li>
+		<li>MailFluteでメール送信すれば、自然と出力されるようになっている</li>
+		<li>IN/OUTログはオプションなので、ログ設定を手動でする必要がある</li>
+	</ul>
+
+	<h2 id="envlogsettings">ログ設定の環境切り替え</h2>
+	<h3 id="envproperties">[app]_env.propertiesで基本的なログ設定</h3>
+	<p>
+		[app]_env.properties にて、基本的なログ設定ができるようになっています。
+		よって、自然と環境切り替えができるようになっています。
+	</p>
+	<div class="relatedpage"><a href="./envswitch.html">LastaFluteの環境切り替え</a></div>
+	<dl class="keymainlist">
+		<dt>log.level</dt><dd>ログレベル <span class="frm">(debug, info)</span></dd>
+		<dt>log.console.level</dt><dd>コンソールに出力するログのログレベル <span class="frm">(本番ではoffにしたいため独立)</span></dd>
+		<dt>log.file.basedir</dt><dd>ログファイルの出力先ディレクトリ</dd>
+	</dl>
+	<p>
+		integration, production など環境ごとに設定がありますので、それぞれ適切に設定しましょう。
+	</p>
+<pre><span class="codetitle">e.g. set appender and logger for in-out logging @[app]_env.properties</span><code>
+# ----------------------------------------------------------
+#                                                       Log
+#                                                      -----
+# The log level for logback
+log.level = debug
+
+# The log console level for logback
+log.console.level = debug
+
+# The log file basedir
+log.file.basedir = /tmp/lastaflute/harbor
+</code></pre>
+	<p>
+		他にも、環境切り替えをしたい項目があれば、logback.xml の方で定義すると良いでしょう。
+	</p>
+	<h3 id="envimpl">環境切り替えの仕組み</h3>
+	<p>
+		なぜ、logback.xml の設定が、[app]_env.properties で利用できるのでしょうか？
+	</p>
+	<p>
+		TODO jflute ...
+	</p>
+
+	<h2 id="detaillogback">Logbackの設定詳細</h2>
+	<p>
+		TODO jflute ...
+	</p>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">inu</a></li>
+		<li><a href="#">neko</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>
