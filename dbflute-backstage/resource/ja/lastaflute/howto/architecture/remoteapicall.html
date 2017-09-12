@@ -118,9 +118,12 @@
 
     @Override
     <span class="keyword">protected void</span> yourDefaultRule(FlutyRemoteApiRule <span class="localvar">rule</span>) {
+        <span class="localvar">rule</span>.sendQueryBy(<span class="keyword">new</span> LaQuerySender(<span class="keyword">new</span> FlVacantRemoteMappingPolicy()));
+
         JsonMappingOption <span class="localvar">jsonMappingOption</span> = <span class="keyword">new</span> JsonMappingOption();
         <span class="localvar">rule</span>.sendBodyBy(<span class="keyword">new</span> LaJsonSender(<span class="attribute">requestManager</span>, <span class="localvar">jsonMappingOption</span>));
         <span class="localvar">rule</span>.receiveBodyBy(<span class="keyword">new</span> LaJsonReceiver(<span class="attribute">requestManager</span>, <span class="localvar">jsonMappingOption</span>));
+
         <span class="localvar">rule</span>.handleFailureResponseAs(FaicliUnifiedFailureResult.<span class="keyword">class</span>);
     }
 
@@ -129,18 +132,22 @@
         <span class="keyword">return</span> <span class="literal">"http://localhost:8090/harbor"</span>;
     }
 
-    <span class="keyword">public</span> HbMypageProductResult requestMypage() {
-        <span class="keyword">return</span> doRequestGet(HbMypageProductResult.<span class="keyword">class</span>, <span class="literal">"/lido/mypage"</span>, moreUrl(), OptionalThing.empty(), <span class="localvar">rule</span> -&gt; {
-            <span class="localvar">rule</span>.sendQueryBy(<span class="keyword">new</span> LaQuerySender(<span class="keyword">new</span> FlVacantRemoteMappingPolicy()));
-        });
+    <span class="keyword">public</span> RemoteMypageProductResult requestMypage() {
+        <span class="keyword">return</span> doRequestGet(RemoteMypageProductResult.<span class="keyword">class</span>, <span class="literal">"/lido/mypage"</span>, noMoreUrl(), noQuery(), <span class="localvar">rule</span> -&gt; {});
     }
 
-    <span class="keyword">public</span> HbSearchPagingResult&lt;HbProductRowResult&gt; requestProductList(HbProductSearchBody <span class="localvar">body</span>) {
-        <span class="keyword">return</span> doRequestPost(<span class="keyword">new</span> ParameterizedRef&lt;HbSearchPagingResult&lt;HbProductRowResult&gt;&gt;() {
+    <span class="keyword">public</span> RemoteSearchPagingResult&lt;HbProductRowResult&gt; requestProductList(RemoteProductSearchBody <span class="localvar">body</span>) {
+        <span class="keyword">return</span> doRequestPost(<span class="keyword">new</span> ParameterizedRef&lt;RemoteSearchPagingResult&lt;RemoteProductRowResult&gt;&gt;() {
         }.getType(), <span class="literal">"/lido/product/list"</span>, moreUrl(<span class="literal">1</span>), <span class="localvar">body</span>, <span class="localvar">rule</span> -&gt; {});
     }
 }
 </code></pre>
+	<ul class="codeoutro">
+		<li>sendQueryBy(): QueryのSenderを指定。ここでは、個別のメソッドで指定</li>
+		<li>sendBodyBy(): BodyのSenderを指定。ここでは、このBehaviorデフォルトとしてJSON送信</li>
+		<li>receiveBodyBy(): Receiverを指定。ここでは、このBehaviorデフォルトとしてJSON受信</li>
+		<li>handleFailureResponseAs(): エラー時のレスポンスを受け取る型を指定。発生した例外から取得できる</li>
+	</ul>
 	<p>
 		yourDefaultRule() で、Behaviorのデフォルトルールを設定しています。ここでは、Sender と Receiver ともに JSON (LaJsonSender, LaJsonReceiver)
 		を指定しています。一方で、Queryパラメーターに関する Sender は指定していないので、GETでリクエストを送るときはメソッドのルールとして LaQuerySender
@@ -206,15 +213,76 @@ org.docksidestage
 </code></pre>
 	<h3 id="implbhvdef">Behaviorクラスの定義</h3>
 	<p>
-		TODO jflute LastaRemoteBehaviorを継承するとか、yourDefaultRule()とか
+		LastaRemoteBehavior を継承して、コンストラクタで RequestManager を受け付けます。
 	</p>
+	<p>
+		そして、以下の二つのメソッドを定義します。
+	</p>
+	<ul>
+		<li>yourDefaultRule() を実装</li>
+		<li>getBaseUrl() を実装</li>
+	</ul>
+<pre><span class="codetitle">e.g. RemoteApi behavior for harbor @Java</span><code>
+<span class="comment">/**
+ * @author jflute
+ */</span>
+<span class="keyword">public class</span> RemoteHarborBhv <span class="keyword">extends</span> LastaRemoteBehavior {
+
+    <span class="keyword">public</span> RemoteHarborBhv(RequestManager <span class="localvar">requestManager</span>) {
+        <span class="keyword">super</span>(<span class="localvar">requestManager</span>);
+    }
+
+    @Override
+    <span class="keyword">protected void</span> yourDefaultRule(FlutyRemoteApiRule <span class="localvar">rule</span>) {
+        <span class="localvar">rule</span>.sendQueryBy(<span class="keyword">new</span> LaQuerySender(<span class="keyword">new</span> FlVacantRemoteMappingPolicy()));
+
+        JsonMappingOption <span class="localvar">jsonMappingOption</span> = <span class="keyword">new</span> JsonMappingOption();
+        <span class="localvar">rule</span>.sendBodyBy(<span class="keyword">new</span> LaJsonSender(<span class="attribute">requestManager</span>, <span class="localvar">jsonMappingOption</span>));
+        <span class="localvar">rule</span>.receiveBodyBy(<span class="keyword">new</span> LaJsonReceiver(<span class="attribute">requestManager</span>, <span class="localvar">jsonMappingOption</span>));
+
+        <span class="localvar">rule</span>.handleFailureResponseAs(FaicliUnifiedFailureResult.<span class="keyword">class</span>);
+    }
+
+    @Override
+    <span class="keyword">protected</span> String getUrlBase() {
+        <span class="keyword">return</span> <span class="literal">"http://localhost:8090/harbor"</span>;
+    }
+
+    <span class="keyword">public</span> RemoteMypageProductResult requestMypage() {
+        <span class="keyword">return</span> doRequestGet(RemoteMypageProductResult.<span class="keyword">class</span>, <span class="literal">"/lido/mypage"</span>, noMoreUrl(), noQuery(), <span class="localvar">rule</span> -&gt; {});
+    }
+
+    <span class="keyword">public</span> RemoteSearchPagingResult&lt;HbProductRowResult&gt; requestProductList(RemoteProductSearchBody <span class="localvar">body</span>) {
+        <span class="keyword">return</span> doRequestPost(<span class="keyword">new</span> ParameterizedRef&lt;RemoteSearchPagingResult&lt;RemoteProductRowResult&gt;&gt;() {
+        }.getType(), <span class="literal">"/lido/product/list"</span>, moreUrl(<span class="literal">1</span>), <span class="localvar">body</span>, <span class="localvar">rule</span> -&gt; {});
+    }
+}
+</code></pre>
 	<h3 id="implbhvdefaultrule">yourDefaultRule()の実装</h3>
 	<p>
-		TODO jflute Sender, Receiver, FailureResponseの設定など
+		ここで、Sender, Receiver, FailureResponseなどを設定します。
+		Behavior内でのすべてのrequestメソッドで有効になるので、統一的なルール、もしくは、多くのrequestメソッドで必要となるルールを設定しましょう。
+	</p>
+	<p>
+		(だいたい)必須のルールは以下の三つ。
+	</p>
+	<dl class="keymainlist">
+		<dt>sendQueryBy()</dt><dd>GET/DELETEリクエストを使うなら必須</dd>
+		<dt>sendBodyBy()</dt><dd>POST/DELETEリクエストを使うなら必須</dd>
+		<dt>receiveBodyBy()</dt><dd>どんなリクエストでも必須</dd>
+	</dl>
+	<p>
+		デフォルトで指定しなかった場合は、メソッドのルールで設定する必要があります。
 	</p>
 	<h3 id="implbhvbaseurl">getBaseUrl()の実装</h3>
 	<p>
-		TODO jflute 実際には、デプロイ環境ごとに変わるので、[app]_env.propertiesから取得するとか
+		その Behavior の request で共通部分の基底URLを return
+		します。Behaviorの粒度が1サーバー1Behaviorであれば、コンテキストパスまでを指定します。
+		<span class="frm">(e.g. http://localhost:8090/harbor)</span> 
+	</p>
+	<p>
+		実際には、ローカル開発用URLと検証環境用URLと本番用URLと、テスト環境都合でデプロイ環境ごとにURLは変わる可能性があるので、[app]_env.properties
+		に定義して、configから取得して環境切り替えできるようにするのが現実的でしょう。<span class="frm">(本番でもlocalhostなんてことはあまりないかと)</span>
 	</p>
 	<h3 id="implbhvrequestmethod">requestメソッドの実装</h3>
 	<p>
@@ -223,8 +291,75 @@ org.docksidestage
 
 	<h2 id="howtounittest">UnitTestのやり方</h2>
 	<p>
-		TODO jflute MockHttpClientクラスについて
+		MockHttpClientクラスを使って、このようにテストをすると良いでしょう。
 	</p>
+<pre><span class="codetitle">e.g. RemoteApi behavior for harbor @Java</span><code>
+<span class="comment">/**
+ * @author jflute
+ */</span>
+<span class="keyword">public class</span> RemoteHarborBhvTest <span class="keyword">extends</span> UnitFortressTestCase {
+
+    @Resource
+    <span class="keyword">private</span> RequestManager <span class="attribute">requestManager</span>;
+
+    <span class="keyword">public void</span> test_requestProductList_basic() {
+        <span class="comment">// ## Arrange ##</span>
+        HbProductSearchBody <span class="localvar">body</span> = <span class="keyword">new</span> HbProductSearchBody();
+        <span class="localvar">body</span>.<span class="attribute">productName</span> = <span class="literal">"S"</span>;
+        String <span class="localvar">json</span> = <span class="literal">"{pageSize=4, currentPageNumber=1, allRecordCount=20, allPageCount=5, rows=[]}"</span>;
+        MockHttpClient <span class="localvar">client</span> = MockHttpClient.create(<span class="localvar">resopnse</span> -&gt; {
+            <span class="localvar">resopnse</span>.peekRequest(<span class="localvar">request</span> -&gt; {
+                assertContainsAll(<span class="localvar">request</span>.getBody().get(), <span class="literal">"productName"</span>, <span class="localvar">body</span>.<span class="attribute">productName</span>);
+            });
+            <span class="localvar">resopnse</span>.asJsonDirectly(<span class="localvar">json</span>, <span class="localvar">request</span> -&gt; <span class="keyword">true</span>);
+        });
+        registerMock(<span class="localvar">client</span>);
+        RemoteHarborBhv <span class="localvar">bhv</span> = <span class="keyword">new</span> RemoteHarborBhv(<span class="attribute">requestManager</span>);
+        inject(<span class="localvar">bhv</span>);
+
+        <span class="comment">// ## Act ##</span>
+        HbSearchPagingResult<HbProductRowResult> <span class="localvar">result</span> = <span class="localvar">bhv</span>.requestProductList(<span class="localvar">body</span>);
+
+        <span class="comment">// ## Assert ##</span>
+        assertEquals(<span class="literal">4</span>, <span class="localvar">result</span>.<span class="attribute">pageSize</span>);
+        assertEquals(<span class="literal">5</span>, <span class="localvar">result</span>.<span class="attribute">allPageCount</span>);
+        assertEquals(<span class="literal">20</span>, <span class="localvar">result</span>.<span class="attribute">allRecordCount</span>);
+        assertEquals(<span class="literal">5</span>, <span class="localvar">result</span>.<span class="attribute">allPageCount</span>);
+        assertEquals(<span class="literal">0</span>, <span class="localvar">result</span>.<span class="attribute">rows</span>.size());
+    }
+
+    <span class="keyword">public void</span> test_validationError_basic() {
+        <span class="comment">// ## Arrange ##</span>
+        HbProductSearchBody <span class="localvar">body</span> = <span class="keyword">new</span> HbProductSearchBody();
+        String <span class="localvar">json</span> = <span class="literal">"{cause=VALIDATION_ERROR, errors : [{field=productName, code=LENGTH, data={min:0,max:10}}]}"</span>;
+        MockHttpClient <span class="localvar">client</span> = MockHttpClient.create(<span class="localvar">resopnse</span> -&gt; {
+            <span class="localvar">resopnse</span>.asJsonDirectly(<span class="localvar">json</span>, <span class="localvar">request</span> -&gt; <span class="keyword">true</span>).httpStatus(<span class="literal">400</span>);
+        });
+        registerMock(<span class="localvar">client</span>);
+        RemoteHarborBhv <span class="localvar">bhv</span> = <span class="keyword">new</span> RemoteHarborBhv(<span class="attribute">requestManager</span>);
+        inject(<span class="localvar">bhv</span>);
+
+        <span class="comment">// ## Act ##</span>
+        assertException(RemoteApiHttpClientErrorException.<span class="keyword">class</span>, () -&gt; <span class="localvar">bhv</span>.requestProductList(<span class="localvar">body</span>)).handle(<span class="localvar">cause</span> -&gt; {
+            <span class="comment">// ## Assert ##</span>
+            FaicliUnifiedFailureResult <span class="localvar">result</span> = (FaicliUnifiedFailureResult) <span class="localvar">cause</span>.getFailureResponse().get();
+            log(<span class="localvar">result</span>);
+            assertEquals(FaicliUnifiedFailureType.<span class="attribute">VALIDATION_ERROR</span>, <span class="localvar">result</span>.<span class="attribute">cause</span>);
+            assertHasOnlyOneElement(<span class="localvar">result</span>.<span class="attribute">errors</span>);
+            FaicliFailureErrorPart <span class="localvar">errorPart</span> = <span class="localvar">result</span>.<span class="attribute">errors</span>.get(<span class="literal">0</span>);
+            assertEquals(<span class="literal">"productName"</span>, <span class="localvar">errorPart</span>.<span class="attribute">field</span>);
+            assertEquals(<span class="literal">"LENGTH"</span>, <span class="localvar">errorPart</span>.<span class="attribute">code</span>);
+            assertEquals(<span class="literal">0</span>, toInteger(<span class="localvar">errorPart</span>.<span class="attribute">data</span>.get(<span class="literal">"min"</span>))); <span class="comment">// because it may be decimal type</span>
+            assertEquals(<span class="literal">10</span>, toInteger(<span class="localvar">errorPart</span>.<span class="attribute">data</span>.get(<span class="literal">"max"</span>))); <span class="comment">// me too</span>
+        });
+    }
+}
+</code></pre>
+	<ul class="codeoutro">
+		<li>実際には、JSONはハードコードではなく、ファイル取得の方が良いでしょう <span class="frm">(そのための asJson(path) がある)</span></li>
+		<li>peekRequest()で、想定通りのリクエストを送っているかのアサートもすると良いでしょう</li>
+		<li>ここでは、一つのRemoteApiしか呼ばないので、asJson()のリクエストのマッチングは固定でtrue</li>
+	</ul>
 
 	<h2 id="autogenerated">自動生成を見越して</h2>
 	<p>
