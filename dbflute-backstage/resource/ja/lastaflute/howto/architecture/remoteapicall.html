@@ -165,7 +165,7 @@
 		pom.xml に lasta-remoteapi を定義します。
 	</p>
 <pre><span class="codetitle">e.g. Lasta RemoteApi dependency @pom.xml</span><code>
-&lt;lasta.remoteapi.version&gt;<span class="literal">0.2.2</span>&lt;/lasta.job.version&gt;
+&lt;lasta.remoteapi.version&gt;<span class="literal">0.2.6</span>&lt;/lasta.job.version&gt;
 
 <span class="abbreviation">...</span>
 
@@ -263,16 +263,33 @@ org.docksidestage
 		ここで、Sender, Receiver, FailureResponseなどを設定します。
 		Behavior内でのすべてのrequestメソッドで有効になるので、統一的なルール、もしくは、多くのrequestメソッドで必要となるルールを設定しましょう。
 	</p>
+<pre><span class="codetitle">e.g. RemoteApi yourDefaultRule() @Java</span><code>
+    @Override
+    <span class="keyword">protected void</span> yourDefaultRule(FlutyRemoteApiRule <span class="localvar">rule</span>) {
+        <span class="localvar">rule</span>.sendQueryBy(<span class="keyword">new</span> LaQuerySender(<span class="keyword">new</span> FlVacantRemoteMappingPolicy()));
+
+        JsonMappingOption <span class="localvar">jsonMappingOption</span> = <span class="keyword">new</span> JsonMappingOption();
+        <span class="localvar">rule</span>.sendBodyBy(<span class="keyword">new</span> LaJsonSender(<span class="attribute">requestManager</span>, <span class="localvar">jsonMappingOption</span>));
+        <span class="localvar">rule</span>.receiveBodyBy(<span class="keyword">new</span> LaJsonReceiver(<span class="attribute">requestManager</span>, <span class="localvar">jsonMappingOption</span>));
+
+        <span class="localvar">rule</span>.handleFailureResponseAs(FaicliUnifiedFailureResult.<span class="keyword">class</span>);
+    }
+</code></pre>
 	<p>
 		(だいたい)必須のルールは以下の三つ。
 	</p>
-	<dl class="keymainlist">
+	<dl class="longkeymainlist">
 		<dt>sendQueryBy()</dt><dd>GET/DELETEリクエストを使うなら必須</dd>
 		<dt>sendBodyBy()</dt><dd>POST/DELETEリクエストを使うなら必須</dd>
 		<dt>receiveBodyBy()</dt><dd>どんなリクエストでも必須</dd>
 	</dl>
 	<p>
 		デフォルトで指定しなかった場合は、メソッドのルールで設定する必要があります。
+	</p>
+	<p>
+		handleFailureResponseAs()は、RemoteApiから戻ってくる(かもしれない)エラーのレスポンスを受け取るクラスを指定します。
+		RemoteApiHttpClientErrorException などから取得できます。
+		必須ではありませんが、エラー情報を使って何かハンドリングをする場合は必要です。<span class="frm">(大抵、必要だと想定されます)</span>
 	</p>
 	<h3 id="implbhvbaseurl">getBaseUrl()の実装</h3>
 	<p>
@@ -284,10 +301,131 @@ org.docksidestage
 		実際には、ローカル開発用URLと検証環境用URLと本番用URLと、テスト環境都合でデプロイ環境ごとにURLは変わる可能性があるので、[app]_env.properties
 		に定義して、configから取得して環境切り替えできるようにするのが現実的でしょう。<span class="frm">(本番でもlocalhostなんてことはあまりないかと)</span>
 	</p>
+<pre><span class="codetitle">e.g. RemoteApi harbor URL from configuration @Java</span><code>
+    @Resource
+    <span class="keyword">private</span> FortressConfig <span class="attirubte">config</span>;
+
+    @Override
+    <span class="keyword">protected</span> String getUrlBase() {
+        <span class="keyword">return</span> <span class="attirubte">config</span>.getRemoteApiBaseUrlHarbor();
+    }
+</code></pre>
 	<h3 id="implbhvrequestmethod">requestメソッドの実装</h3>
 	<p>
 		TODO jflute FormやBody, 引数の指定など
 	</p>
+
+	<h2 id="errorhandling">リモートAPIのエラーハンドリング</h2>
+	<h3 id="exceptionmapping">エラーと例外クラスの対応</h3>
+	<p>
+		エラーと例外クラスの対応はこちらの通り。
+	</p>
+	<dl class="shortvaluemainlist">
+		<dt>クライアントエラー</dt><dd>RemoteApiHttpClientErrorException *A</dd>
+		<dt>サーバーエラー</dt><dd>RemoteApiHttpServerErrorException</dd>
+		<dt>正常時のレスポンス解析エラー</dt><dd>RemoteApiResponseParseFailureException</dd>
+		<dt>エラー時のレスポンス解析エラー</dt><dd>RemoteApiResponseParseFailureException *B</dd>
+		<dt>I/Oエラー</dt><dd>RemoteApiIOException</dd>
+	</dl>
+	<p>
+		*A: 一番、アプリが意識する例外となります。catchして制御することも多いでしょう。
+	</p>
+	<p>
+		*B: 自動的にthrowされる例外ではなく、RemoteApiHttpClientErrorException や
+		RemoteApiHttpServerErrorException の getFailureResponse() の戻り値である OptionalThing
+		に内包される例外となります。alwaysPresent() や orElseTranslatingThrow() などでお目にかかります。
+		<span class="frm">(エラー時のレスポンスは、brokenなことがよくあると想定されるので、元のクライアントエラーやサーバーエラーをキープするために、即時throw例外にしていません)</span>
+	</p>
+	<p>
+		そもそも、クライアントエラーやサーバーエラーとはなんぞや？という場合はこちらのページを。
+	</p>
+	<div class="detailpage"><a href="./exceptionhandling.html">開拓の例外ハンドリング</a></div>
+	<h3 id="errorresponse">エラーレスポンスの受け取り</h3>
+	<p>
+		ルールの設定で、rule.handleFailureResponseAs([受け取りのクラス])
+		を指定していれば、クライアントエラーやサーバーエラーのときのレスポンスデータを指定したクラスで受け取ることができます。
+		<span class="frm">(あまりサーバーエラーのレスポンスを意識して受け取ることはないと思うので、主にはクライアントエラーのときでしょう)</span>
+	</p>
+	<p>
+		yourDefaultRule() で、handleFailureResponseAs() で指定して...
+	</p>
+<pre><span class="codetitle">e.g. set failure response type in yourDefaultRule() @Java</span><code>
+@Override
+<span class="keyword">protected void</span> yourDefaultRule(FlutyRemoteApiRule <span class="localvar">rule</span>) {
+    <span class="abbreviation">...</span>
+    <span class="localvar">rule</span>.<span class="point">handleFailureResponseAs</span>(<span class="subpoint">FaicliUnifiedFailureResult</span>.<span class="keyword">class</span>);
+}
+</code></pre>
+	<p>
+		例外をキャッチして、getFailureResponse()で受け取ります。
+	</p>
+<pre><span class="codetitle">e.g. translate 400 and login failure response to LoginFailureException @Java</span><code>
+<span class="keyword">try</span> {
+    <span class="abbreviation">...</span> <span class="comment">// calling remote API</span>
+} <span class="keyword">catch</span> (RemoteApiHttpClientErrorException <span class="localvar">e</span>) { <span class="comment">// クライアントエラー</span>
+    <span class="keyword">if</span> (<span class="localvar">e</span>.getHttpStatus() == <span class="literal">400</span>) { <span class="comment">// 大抵は、HTTP Statusを指定してから</span>
+        <span class="localvar">e</span>.<span class="point">getFailureResponse()</span>.alwaysPresent(<span class="localvar">response</span> -&gt; { <span class="comment">// 解析エラーなら例外</span>
+            <span class="subpoint">FaicliUnifiedFailureResult</span> <span class="localvar">result</span> = (FaicliUnifiedFailureResult)<span class="localvar">response</span>;
+            <span class="abbreviation">...</span> <span class="comment">// エラーレスポンスのデータを使って業務的な処理</span>
+        }
+    }
+    <span class="keyword">throw</span> <span class="localvar">e</span>; <span class="comment">// 別のエラーのときのthrowを忘れずに</span>
+}
+</code></pre>
+	<ul class="codeoutro">
+		<li>エラーレスポンス自体の解析エラーのときは、getFailureResponse() の戻りが empty になる</li>
+		<li>なので、もし解析エラーをシステム例外にしたくなければ、orElseTranslatingThrow()などで制御</li>
+		<li>フレームワーク組み込みの例外クラスなので、どうしてもObject型からのダウンキャストは必要</li>
+		<li>実際は、failureResponseを取り扱う共通クラスなどを用意したほうが良い</li>
+	</ul>
+	<p>
+		主に、ユーザー入力項目のバリデーションエラーなどで、よく利用されるでしょう。
+	</p>
+	<h3 id="translateexception">例外の翻訳をするのは？</h3>
+	<p>
+		主にクライアントエラーのときは、内容次第で例外を翻訳したいことがあるでしょう。
+		例えば、とあるクライアントエラーを、呼び出し側で都合の良い業務例外に翻訳するなど。
+	</p>
+	<p>
+		RemoteApiHttpClientErrorExceptionから HTTP Status とエラーレスポンスが取得できるので、単純な try/catch
+		で処理しましょう。
+	</p>
+	<p>
+		HTTP Statusだけで例外翻訳するなら...
+	</p>
+<pre><span class="codetitle">e.g. translate 401 response to LoginFailureException @Java</span><code>
+<span class="keyword">try</span> {
+    <span class="abbreviation">...</span> <span class="comment">// calling remote API</span>
+} <span class="keyword">catch</span> (RemoteApiHttpClientErrorException <span class="localvar">e</span>) { <span class="comment">// クライアントエラー</span>
+    <span class="keyword">if</span> (<span class="localvar">e</span>.getHttpStatus() == <span class="literal">401</span>) {
+        <span class="keyword">throw new</span> LoginFailureException(<span class="literal">"...your message"</span>, <span class="localvar">e</span>);
+    }
+    <span class="keyword">throw</span> <span class="localvar">e</span>; <span class="comment">// 別のエラーのときのthrowを忘れずに</span>
+}
+</code></pre>
+	<p>
+		HTTP Statusに加えてエラーレスポンスの中身も見て例外翻訳するなら... <span class="frm">(ふぁいくらパターンなど)</span>
+	</p>
+	<div class="relatedpage"><a href="../impldesign/jsonfaicli.html">JSON API, Failure統一クライアントメッセージ</a></div>
+<pre><span class="codetitle">e.g. translate 400 and login failure response to LoginFailureException @Java</span><code>
+<span class="keyword">try</span> {
+    <span class="abbreviation">...</span> <span class="comment">// calling remote API</span>
+} <span class="keyword">catch</span> (RemoteApiHttpClientErrorException <span class="localvar">e</span>) { <span class="comment">// クライアントエラー</span>
+    <span class="keyword">if</span> (<span class="localvar">e</span>.getHttpStatus() == <span class="literal">400</span>) {
+        <span class="localvar">e</span>.getFailureResponse().alwaysPresent(<span class="localvar">response</span> -&gt; {
+            <span class="keyword">if</span> (<span class="attribute">errorResponseAgent</span>.isBusinessErrorLoginFailure(<span class="localvar">response</span>)) {
+                <span class="keyword">throw new</span> LoginFailureException(<span class="literal">"...your message"</span>, <span class="localvar">e</span>);
+            }
+        });
+    }
+    <span class="keyword">throw</span> <span class="localvar">e</span>; <span class="comment">// 別のエラーのときのthrowを忘れずに</span>
+}
+</code></pre>
+	<ul class="codeoutro">
+		<li>rule.handleFailureResponseAs() で、エラーレスポンスの受け取りクラスを指定していることが前提</li>
+		<li>alwaysPresent()で、エラーレスポンス自体のパースエラーのときはシステム例外としてthrowしている</li>
+		<li>errorResponseAgentはただのExampleだが、どうせ他でも使うことが多いので判定は共通化した方が良い</li>
+	</ul>
 
 	<h2 id="howtounittest">UnitTestのやり方</h2>
 	<p>
