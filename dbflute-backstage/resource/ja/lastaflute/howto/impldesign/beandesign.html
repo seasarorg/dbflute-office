@@ -201,6 +201,67 @@
     }
 }
 </code></pre>
+
+	<h2 id="latostring">気軽なtoString()</h2>
+	<p>
+		Beanクラスは、何かとデバッグログで出力される機会があります。中のデータを出力しておくことで、デバッグに役立つことが多々あります。
+	</p>
+	<p>
+		そこで、toString() をオーバーライドして、Lato.string(this)
+		という風に実装すれば、リフレクションで Bean の中身の情報を出力してくれます。
+		一番外側のクラスにだけ付けておけば、ネストしたクラスの中身も出力してくれます。
+	</p>
+	<p>
+		LastaFluteの補完テンプレートを入れていれば、<em class="mark">_lato</em> でサクッと補完できます。
+	</p>
+<pre><span class="codetitle">e.g. javadoc has e.g.default values @Java</span><code>
+<span class="keyword">public class</span> MaihamaBody {
+
+    @Required
+    <span class="keyword">public</span> String <span class="attribute">title</span>;
+
+    @Required
+    @Valid
+    <span class="keyword">public</span> SeaPart <span class="attribute">sea</span>;
+
+    <span class="keyword">public static class</span> SeaPart {
+
+        @Required
+        @Valid
+        <span class="keyword">public</span> ShowPart <span class="attribute">docksideStage</span>;
+
+        @Required
+        @Valid
+        <span class="keyword">public</span> ShowPart <span class="attribute">hangarStage</span>;
+
+        <span class="keyword">public static class</span> ShowPart {
+
+            @Required
+            <span class="keyword">public</span> String <span class="attribute">showName</span>;
+
+            @Required
+            <span class="keyword">public</span> CDef.ShowType <span class="attribute">showType</span>;
+        }
+    }
+
+    @NotNull
+    <span class="keyword">public</span> List&lt;HotelPart&gt; <span class="attribute">hotels</span>;
+
+    <span class="keyword">public static class</span> HotelPart {
+        
+        @Required
+        <span class="keyword">public</span> String <span class="attribute">hotelName</span>;
+
+        @Required
+        <span class="keyword">public</span> CDef.HotelType <span class="attribute">hotelType</span>;
+    }
+
+    @Override <span class="comment">// _lato => ctrl+space でこれら全部補完</span>
+    <span class="keyword">public</span> String toString() { <span class="comment">// 一番外側のクラスだけオーバーライドでOK</span>
+        <span class="keyword">return</span> <span class="point">Lato</span>.string(<span class="keyword">this</span>);
+    }
+}
+</code></pre>
 <!-- __content-end__ --></div></div>
 
 <div id="sidebar">
