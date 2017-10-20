@@ -42,10 +42,9 @@
 	<h2 id="overview">いきなりまとめ</h2>
 	<h3 id="proposal">実装デザインの提案</h3>
 	<dl class="keymainlist">
-		<dt>ネストした構造</dt><dd>再利用しないのであれば <em class="mark">インナークラス</em> で定義</dd>
-		<dt>そのインナークラスの名前</dt><dd><em class="mark">...Part</em> で終わる</dd>
-		<dt>JavaDocコメントのe.g.</dt><dd><em class="mark">e.g.</em> でデフォルト値 (いーじーでふぉるとち) を書く</dd>
-		<dt>気軽なtoString()</dt><dd><em class="mark">Lato</em> で気軽にtoString()をオーバーライド</dd>
+		<dt><a href="#nestedexp">ネストした構造の表現</a></dt><dd><em class="mark">インナークラス</em> で定義、クラス名は <em class="mark">...Part</em> で終わる</dd>
+		<dt><a href="#egdefault">JavaDocでe.g.デフォルト値</a></dt><dd><em class="mark">e.g.</em> でデフォルト値 (いーじーでふぉるとち) を書く <span class="frm">(for Swagger)</span></dd>
+		<dt><a href="#latostring">気軽なtoString()</a></dt><dd><em class="mark">Lato</em> で気軽にtoString()をオーバーライド</dd>
 	</dl>
 
 	<h2 id="nestedexp">ネストした構造の表現</h2>
@@ -135,7 +134,7 @@
 		<dt>どちらもネスト利用</dt><dd>Partという名前のまま独立クラスに</dd>
 	</dl>
 
-	<h2 id="javadocegdefault">JavaDocでe.g.デフォルト値</h2>
+	<h2 id="egdefault">JavaDocでe.g.デフォルト値</h2>
 	<p>
 		JavaDocには、e.g. 形式でデフォルト値を書くことをオススメします。
 	</p>
