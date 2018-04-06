@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="keywords" content="DBFlute,LastaFlute,Thymeleaf" />
+	<style type="text/css" title="currentStyle">@import "../../../../css/sub.css";</style>
+	<title>LastaFlute の Thymeleaf | LastaFlute</title>
+</head>
+<body>
+<div id="container" class="ct-manual">
+<div id="mainbar"><div id="header">
+	<a href="#">DBFlute<span>DB変更に強いO/Rマッパー</span></a>
+	<img src="../../../../image/logo-content.gif" alt="logo"/>
+	<ul>
+		<li class="hd-introduction"><a href="#">Introduction</a></li>
+		<li class="hd-tutorial"><a href="#">Tutorial</a></li>
+		<li><ul><li class="hd-architect"><a href="#">for Architect</a></li><li class="hd-developer"><a href="#">for Developer</a></li></ul></li>
+		<li class="hd-environment"><a href="#">Environment</a></li>
+		<li><ul><li class="hd-install"><a href="#">Install</a></li><li class="hd-upgrade"><a href="#">Upgrade</a></li></ul></li>
+		<li class="hd-manual"><a href="#">Manual</a></li>
+	</ul>
+</div>
+
+<div id="content"><!-- __content-start__ -->
+	<h1>LastaFlute の Thymeleaf</h1>
+	<div class="relatedpage"><a href="../../index.html">LastaFlute</a></div>
+	${indexlist}
+
+	<h2 id="overview">概要</h2>
+	<h3 id="usethymeleaf">Thymeleafを利用</h3>
+	<p>
+		LastaFluteで、サーバーサイドHTMLでWebアプリを作成する場合、Thymeleaf
+		がオススメです。Exampleでも Thymeleaf を利用しています。
+	</p>
+	<p>
+		LastaFlute と Thymeleaf の連携ライブラリ <em class="smallmark">Lasta Thymeleaf</em> も提供しています。
+	</p>
+	<h3 id="architecture">Lasta Thymeleafのアーキテクチャ</h3>
+	<p>
+		TODO jflute now writing...
+	</p>
+	<h3 id="collaboration">Thymeleafとの主な連携</h3>
+	<p>
+		LastaFlute と Thymeleaf で行っている主な連携は以下のとおりです。
+	</p>
+	<dl class="keymainlist">
+		<dt>return asHtml()</dt><dd>ActionResponse で Thymeleaf のテンプレート解釈</dd>
+		<dt>[App]HtmlPath</dt><dd>HTMLテンプレートのファイルパス定義の自動生成</dd>
+		<dt>la:xxx</dt><dd>スムーズに連携するためのオリジナル属性</dd>
+		<dt>la:property</dt><dd>入力項目の関連付け</dd>
+		<dt>la:optionCls</dt><dd>リストボックスなどの表示で、区分値の CDef との連携</dd>
+		<dt>la:errors</dt><dd>バリデーションエラー時などに、[app]_message.propertiesとの連携</dd>
+		<dt>#{labels.xxx}</dt><dd>項目名などの表示で、[app]_label.propertiesとの連携</dd>
+		<dt>la:token</dt><dd>二度押し防止トークン用のinputタグ制御</dd>
+		<dt>#handy.format()</dt><dd>日付フォーマットなど、[app]_config.propertiesとの連携</dd>
+		<dt>development.here</dt><dd>開発モードの連動</dd>
+	</dl>
+
+	<h2 id="genhtmlpath">HTMLのパス定義を自動生成</h2>
+	<p>
+		JavaプログラムからHTMLテンプレートのファイルを指定するとき、ファイル名をハードコードするのではなく、自動生成された定義を利用します。
+		自動生成の仕組みを利用して、HTMLテンプレートとプログラム上の指定にズレが発生しないようにしています。
+	</p>
+<pre><span class="codetitle">e.g. you can use Template Path for HtmlResponse @Java</span><code>
+    @Execute
+    <span class="keyword">public</span> HtmlResponse index() {
+        <span class="abbreviation">...</span>
+        <span class="keyword">return</span> asHtml(<span class="point">path_Mypage_MypageHtml</span>); <span class="comment">// is static definition</span>
+    }
+</code></pre>
+	<p>
+		まず、HTMLテンプレートを作成 <span class="frm">(まだ空っぽでもOK)</span>
+	</p>
+	<p>
+		WEB-INF/viewの下であればファイル名や配置ディレクトリは任意ですが、対応する Action
+		クラスがわかるような名前を付けましょう。例えば、以下のように。
+	</p>
+	<dl class="lolongkeymainlist">
+		<dt>product/<em class="mark">product_list</em>.html</dt><dd>/product/list/</dd>
+		<dt>profile/<em class="mark">profile_password_change</em>.html</dt><dd>/profile/password/change/</dd>
+		<dt>mypage/<em class="mark">mypage</em>.html</dt><dd>/mypage/</dd>
+	</dl>
+<pre><span class="codetitle">e.g. Template File Location @Directory</span><code>
+src/main/webapp
+ |-WEB-INF
+    |-view <span class="comment">// HtmlTemplateの配置場所</span>
+    |  |-product <span class="comment">// productパッケージに対応</span>
+    |  |  |-<span class="subpoint">product_list.html</span>     <span class="comment">// /product/list/</span>
+    |  |  |-product_purchase.html <span class="comment">// /product/purchase/</span>
+    |  |
+    |  |-profile
+    |  |  |-<span class="subpoint">profile_password_change.html</span> <span class="comment">// /profile/password/change/</span>
+    |  |  |-profile_withdrawal.html      <span class="comment">// /profile/withdrawal/</span>
+    |  |
+    |  |-mypage
+    |  |  |-<span class="subpoint">mypage.html</span> <span class="comment">// /mypage/</span>
+    |  |
+    |  |-root.jsp <span class="comment">// '/'</span>
+    |
+    |-web.xml
+</code></pre>
+	<p>
+		そして、DBFlute の FreeGen を叩くと、パス定義が自動生成されて、Actionクラスで補完できるようになります。
+		<span class="frm">(自動生成された定義は Action クラスが implements しているのでそのまま補完できます)</span>
+	</p>
+
+	<h2 id="laattr">LastaFluteオリジナル属性</h2>
+	<p>
+		TODO jflute
+	</p>
+	<h3 id="laproperty">la:property</h3>
+	<h3 id="laerrors">la:errors</h3>
+	<h3 id="laoptioncls">la:optionCls</h3>
+
+	<h2 id="prepare">Lasta Thymeleafの環境準備</h3>
+	<p>
+		Lasta Thymeleaf を使った "Exampleプロジェクト" (e.g. harbor, dockside)
+		からスタートアップすれば自然と組み込まれていますが、もしゼロから準備するのであれば、このようになります。
+	</p>
+	<h3 id="dependslathyme">lasta-thymeleafの依存ライブラリ定義</h3>
+	<p>
+		pom.xml に lasta-remoteapi を定義します。
+	</p>
+<pre><span class="codetitle">e.g. Lasta Thymeleaf dependency @pom.xml</span><code>
+&lt;lasta.thymeleaf.version&gt;<span class="literal">0.3.1</span>&lt;/lasta.thymeleaf.version&gt;
+
+<span class="abbreviation">...</span>
+
+&lt;dependency&gt;
+    &lt;groupId&gt;<span class="literal">org.lastaflute.html</span>&lt;/groupId&gt;
+    &lt;artifactId&gt;<span class="literal">lasta-thymeleaf</span>&lt;/artifactId&gt;
+    &lt;version&gt;<span class="literal">${lasta.thymeleaf.version}</span>&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+	<h3 id="assistlathyme">AssistantDirectorで組み込み</h3>
+	<p>
+		AssistantDirector の prepareWebDirection() にて LastaThymeleaf を組み込みます。
+	</p>
+<pre><span class="codetitle">e.g. Lasta Thymeleaf in AssistantDirector @Java</span><code>
+@Override
+protected void prepareWebDirection(FwWebDirection direction) {
+    direction.directRequest(createUserLocaleProcessProvider(), createUserTimeZoneProcessProvider());
+    <span class="abbreviation">...</span>
+    <span class="subpoint">direction.directHtmlRendering(createHtmlRenderingProvider());</span>
+}
+
+<span class="abbreviation">...</span>
+
+protected HtmlRenderingProvider createHtmlRenderingProvider() {
+    return <span class="point">new ThymeleafRenderingProvider()</span>.asDevelopment(config.isDevelopmentHere());
+}
+
+<span class="abbreviation">...</span>
+</code></pre>
+	<h3 id="lastaflutemap">lastafluteMap.dfpropで自動生成定義</h3>
+	<p>
+		HTMLテンプレートのパス定義が自動生成されるようにするために、lastafluteMap.dfprop の freeGenList に <em class="mark">html</em> を追加します。
+	</p>
+<pre><span class="codetitle">e.g. add html to freeGenList @lastafluteMap.dfprop</span><code>
+; appMap = <span class="keyword">map:</span>{
+    ; harbor = <span class="keyword">map:</span>{
+        ; path = ..
+        ; freeGenList = <span class="keyword">list:</span>{ env ; <span class="abbreviation">...</span> ; template ; <span class="point">html</span> ; doc ; <span class="abbreviation">...</span> }
+        ; propertiesHtmlList = <span class="keyword">list:</span>{ env ; config ; label ; message }
+    }
+}
+</code></pre>
+<!-- __content-end__ --></div></div>
+
+<div id="sidebar">
+	<ul>
+		<li><a href="#">inu</a></li>
+		<li><a href="#">neko</a></li>
+	</ul>
+</div>
+<div id="footer">
+	<ul>
+		<li><a href="#">SiteMap</a></li>
+		<li><a href="https://www.seasar.org/issues/browse/DBFLUTE">BTS</a></li>
+		<li><a href="http://d.hatena.ne.jp/jflute">Author's Blog</a></li>
+	</ul>
+</div>
+</div>
+</body>
+</html>
