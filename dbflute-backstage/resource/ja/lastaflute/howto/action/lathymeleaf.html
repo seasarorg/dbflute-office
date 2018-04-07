@@ -37,10 +37,27 @@
 	<p>
 		LastaFlute と Thymeleaf の連携ライブラリ <em class="smallmark">Lasta Thymeleaf</em> も提供しています。
 	</p>
-	<h3 id="architecture">Lasta Thymeleafのアーキテクチャ</h3>
+	<h3 id="usefreegen">FreeGenを使ってタイプセーフ指定</h3>
 	<p>
-		TODO jflute now writing...
+		DBFluteのFreeGenの仕組みを使って、HTMLテンプレートの指定をタイプセーフにします。
 	</p>
+	<ol>
+		<li>ThymeleafのHTMLテンプレートを作成 <span class="frm">(src/main/webapp/WEB-INF/view配下)</span></li>
+		<li>DBFlute の FreeGen を叩く <span class="frm">(manage.sh 12)</span></li>
+		<li>Actionクラスで自動生成されたパス定義を利用 <span class="frm">(asHtml(path_...))</span></li>
+	</ol>
+<pre><span class="codetitle">e.g. you can use Template Path for HtmlResponse @Java</span><code>
+@Execute
+<span class="keyword">public</span> HtmlResponse index() {
+    <span class="abbreviation">...</span>
+    <span class="keyword">return</span> asHtml(<span class="point">path_Mypage_MypageHtml</span>);
+}
+</code></pre>
+	<h3 id="architecture">Lasta Thymeleafのアーキテクチャ</h3>
+	<p class="imgbox">
+		<a href="../../../../data/model/lastaflute/thymeleaf/lastaflute-thymeleaf-architecture-map.png" title="LastaFlute Thymeleaf Architecture"><img src="../../../../data/model/lastaflute/thymeleaf/lastaflute-thymeleaf-architecture-map.png" alt="LastaFlute Thymeleaf Architecture" width="550" height="380" /></a>
+	</p>
+
 	<h3 id="collaboration">Thymeleafとの主な連携</h3>
 	<p>
 		LastaFlute と Thymeleaf で行っている主な連携は以下のとおりです。
@@ -52,24 +69,26 @@
 		<dt>la:property</dt><dd>入力項目の関連付け</dd>
 		<dt>la:optionCls</dt><dd>リストボックスなどの表示で、区分値の CDef との連携</dd>
 		<dt>la:errors</dt><dd>バリデーションエラー時などに、[app]_message.propertiesとの連携</dd>
-		<dt>#{labels.xxx}</dt><dd>項目名などの表示で、[app]_label.propertiesとの連携</dd>
 		<dt>la:token</dt><dd>二度押し防止トークン用のinputタグ制御</dd>
+		<dt>#{labels.xxx}</dt><dd>項目名などの表示で、[app]_label.propertiesとの連携</dd>
 		<dt>#handy.format()</dt><dd>日付フォーマットなど、[app]_config.propertiesとの連携</dd>
 		<dt>development.here</dt><dd>開発モードの連動</dd>
 	</dl>
 
 	<h2 id="genhtmlpath">HTMLのパス定義を自動生成</h2>
+	<h3 id="genconcept">自動生成のコンセプト</h3>
 	<p>
 		JavaプログラムからHTMLテンプレートのファイルを指定するとき、ファイル名をハードコードするのではなく、自動生成された定義を利用します。
 		自動生成の仕組みを利用して、HTMLテンプレートとプログラム上の指定にズレが発生しないようにしています。
 	</p>
 <pre><span class="codetitle">e.g. you can use Template Path for HtmlResponse @Java</span><code>
-    @Execute
-    <span class="keyword">public</span> HtmlResponse index() {
-        <span class="abbreviation">...</span>
-        <span class="keyword">return</span> asHtml(<span class="point">path_Mypage_MypageHtml</span>); <span class="comment">// is static definition</span>
-    }
+@Execute
+<span class="keyword">public</span> HtmlResponse index() {
+    <span class="abbreviation">...</span>
+    <span class="keyword">return</span> asHtml(<span class="point">path_Mypage_MypageHtml</span>);
+}
 </code></pre>
+	<h3 id="genhowto">自動生成のやり方</h3>
 	<p>
 		まず、HTMLテンプレートを作成 <span class="frm">(まだ空っぽでもOK)</span>
 	</p>
@@ -105,14 +124,50 @@ src/main/webapp
 		そして、DBFlute の FreeGen を叩くと、パス定義が自動生成されて、Actionクラスで補完できるようになります。
 		<span class="frm">(自動生成された定義は Action クラスが implements しているのでそのまま補完できます)</span>
 	</p>
-
-	<h2 id="laattr">LastaFluteオリジナル属性</h2>
+	<h3 id="gentiming">自動生成のタイミング</h3>
 	<p>
-		TODO jflute
+		少なくとも、自動生成してからでないと Action の実装は完結しません。
 	</p>
+	<p>
+		自動生成は中身を見ませんので、<em class="keyword">とりあえず空っぽの状態でHTMLテンプレートのファイルだけ作って自動生成をしておいて、Actionの実装をしながらテンプレートも同時に実装していく</em>
+		というやり方でも良いでしょう。
+	</p>
+	<h3 id="gitconflict">コンフリクトはしない？</h3>
+	<p>
+		自動生成されるクラスは単純な定義だけなので、基本的にGitの機能で自動マージされますので、気にせずトピックブランチでコミットしてOKでしょう。
+		もし、同じディレクトリに同じファイル名を作った場合は、そもそもHTMLテンプレート自体がコンフリクトするでしょう。
+	</p>
+
+	<h2 id="laoriginal">LastaFluteオリジナル表現</h2>
 	<h3 id="laproperty">la:property</h3>
-	<h3 id="laerrors">la:errors</h3>
+	<p>
+		入力項目のinputタグと、Formのプロパティを紐付ける属性です。
+	</p>
+<pre><span class="codetitle">e.g. la:property as productName @Html</span><code>
+&lt;input type=<span class="literal">"text"</span> <span class="point">la:property</span>=<span class="literal">"productName"</span>/&gt;
+</code></pre>
+	<p>
+		リクエスト時は対応するFormのプロパティにマッピングされ、レスポンス時は対応するFormのプロパティの値が表示されます。
+		<span class="frm">(単に、name属性とvalue属性で、同じプロパティ名を二回書くのを省略しているだけとも言えます)</span>
+	</p>
 	<h3 id="laoptioncls">la:optionCls</h3>
+	<p>
+		リストボックスのoptionタグを、CDef や AppCDef の区分値を使って構築する属性です。
+	</p>
+<pre><span class="codetitle">e.g. la:optionCls as productStatus @Html</span><code>
+&lt;select la:property=<span class="literal">"productStatus"</span>&gt;
+    &lt;option value="" th:text=<span class="literal">"#{labels.listbox.caption.tell}"</span>>&lt;/option&gt;
+    &lt;option <span class="point">la:optionCls</span>=<span class="literal">"ProductStatus"</span>>&lt;/option&gt;
+&lt;/select&gt;
+</code></pre>
+	<p>
+		CDef や AppCDef は、sponsor.[App]ListedClassificationProvider にて解決されます。
+		アプリのクラスなので、新しくも NamedCls を使ったり、全体の優先順位を変えたりなど、自由にカスタマイズできます。
+	</p>
+	<h3 id="laerrors">la:errors</h3>
+	<h3 id="latoken">la:token</h3>
+	<h3 id="labels">#{labels.xxx}</h3>
+	<h3 id="handyformat">#handy.format()</h3>
 
 	<h2 id="prepare">Lasta Thymeleafの環境準備</h3>
 	<p>
@@ -154,6 +209,10 @@ protected HtmlRenderingProvider createHtmlRenderingProvider() {
 
 <span class="abbreviation">...</span>
 </code></pre>
+	<p>
+		asDevelopment()で、[app]_env.properties の development.here (開発環境かどうか？)
+		のプロパティと連動させるのがオススメです。
+	</p>
 	<h3 id="lastaflutemap">lastafluteMap.dfpropで自動生成定義</h3>
 	<p>
 		HTMLテンプレートのパス定義が自動生成されるようにするために、lastafluteMap.dfprop の freeGenList に <em class="mark">html</em> を追加します。
