@@ -254,6 +254,7 @@ src/main/java
 	<p>
 		ここでは、Thymeleafテンプレートを想定します。
 	</p>
+	<div class="relatedpage"><a href="./lathymeleaf.html">LastaFlute の Thymeleaf</a></div>
 	<h3 id="htmlname">HTMLテンプレートのファイル名</h3>
 	<p>
 		関連するActionクラスを識別できる名前にします。<em class="keyword">(規約)</em>
@@ -281,6 +282,10 @@ src/main/java
 		まだ、ラフスケッチ中なので、中身はシンプルな状態で。この時点では真っ白でもOKです。
 		ここでは、<em class="mark">何も表示されないと悲しい</em> ので、一覧を表示するHTMLだけちょこっと書いておきましょう。
 	</p>
+	<p>
+		LastaFluteオリジナルの属性が利用されていますので、ぜひ注目しましょう。
+	</p>
+	<div class="relatedpage"><a href="./lathymeleaf.html#laoriginal">LastaFlute の Thymeleaf - LastaFluteオリジナル表現</a></div>
 <pre><span class="codetitle">e.g. execute FreeGen @Command</span><code>
 &lt;!DOCTYPE html&gt;
 &lt;html lang="ja" xmlns:th="http://www.thymeleaf.org"&gt;
@@ -376,6 +381,7 @@ src/main/java
 		それでは、HTMLテンプレートもできたことなので、そのファイルをプログラムから指定するためのパス定義を自動生成してみましょう。
 		LastaFluteでは、ファイルパスをハードコードしたりしません。
 	</p>
+	<div class="relatedpage"><a href="./lathymeleaf.html#genhtmlpath">LastaFlute の Thymeleaf - HtmlPathを自動生成しよう</a></div>
 	<p>
 		manageタスク (DBFluteクライアントの manage.bat|sh) の 12 (freegen) を叩いて、FreeGen を実行すると、そのHTMLテンプレートに対応するパス定義が自動生成されます。
 		ここでは <em class="mark">HarborHtmlPath</em> に <em class="mark">path_Sea_SeaLandHtml</em> というパス定義が追加されるでしょう。
