@@ -287,12 +287,42 @@ LoginManager  <span class="comment">// ログインの操作が定義されて�
 		ただ、画面が増えたときにそのテーブルのデータもメンテナンスしてあげないといけないので、インクリメンタル開発の現場ではちょっと運用が煩雑になります。
 		アノテーション方式であればプログラム作成時に自然と権限が付与されるので、定義し忘れのトラブルは少ないでしょう。
 	</p>
-
-	<h2 id="nondb">DB以外のもので認証するなら？</h2>
+	<h3 id="permissionbyblog">アクセス権限まとめブログ</h3>
 	<p>
-		LogicAssistクラスにて、DBに検索している箇所を別の認証サービスを使ったプログラムに差し替えます。
-		Assistクラスを使う側(Actionなど)では、DBなのか別の認証サービスなのかは意識しないようにするのがオススメです。
+		ユーザーの方が、アクセス権限に関してブログでまとめて頂いています。
+		そちらもぜひ参考にすると良いでしょう。
 	</p>
+	<div class="detailpage"><a href="#userblog">this - ユーザーの方のブログをご紹介</a></div>
+
+	<h2 id="nondb">RDB以外のもので認証するなら？</h2>
+	<p>
+		LoginAssistクラスにて、RDBに検索している箇所を別の認証サービスを使ったプログラムに差し替えます。
+		Assistクラスを使う側(Actionなど)では、RDBなのか別の認証サービスなのかは意識しないようにするのがオススメです。
+	</p>
+	<p>
+		具体的には、LoginAssistクラスの checkCredential() や resolveCredential() や doFindLoginUser()
+		で、RDBにアクセスしてユーザーを認証している処理を、別のものに差し替えます。
+	</p>
+	<p>
+		例えば、RemoteAPi を使って認証することも想定されます。
+	</p>
+	<div class="relatedpage"><a href="./remoteapicall.html">定まったリモートAPI呼び出し (RemoteApi Call)</a></div>
+
+	<div class="inucolumn">
+		<h2 id="userblog">ユーザーの方のブログをご紹介</h2>
+		<p>
+			実際に業務で LastaFlute を利用されていた方が素敵なブログを書いてくださっているのでご紹介します。
+			ありがとうございます！<span class="frm">(リンクの承諾も頂いています)</span> 
+		</p>
+		<ul>
+			<li><a href="http://oza-note.xyz/authority-management-by-lastaflute">LastaFluteでアクセス権限管理   | おざノート</a></li>
+		</ul>
+		<p>
+			アクセス権限以外の話題も書いてくださっています。
+		</p>
+		<div class="relatedpage"><a href="../action/lathymeleaf.html#userblog">LastaFlute の Thymeleaf - ユーザーの方のブログをご紹介</a></div>
+		<div class="relatedpage"><a href="../startup/multi.html#userblog">Startup as Multi-Project - ユーザーの方のブログをご紹介</a></div>
+	</div>
 <!-- __content-end__ --></div></div>
 
 <div id="sidebar">
