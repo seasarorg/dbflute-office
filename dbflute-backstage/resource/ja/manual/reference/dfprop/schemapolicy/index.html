@@ -231,8 +231,8 @@
 		<dt>lowerCaseBasis</dt><dd>テーブル名は小文字 <span class="frm">(SQL上の名前で判定)</span></dd>
 		<dt>identityIfPureIDPK</dt><dd>FKではない ID で終わる単一PKカラムにはIdentityが付与される</dd>
 		<dt>hasCommonColumn</dt><dd>共通カラムを持っている</dd>
-		<dt>hasAlias</dt><dd>別名が存在する <span class="frm">(DBコメントの一部を別名として認識する設定が前提)</span></dd>
-		<dt>hasComment</dt><dd>テーブルのコメントが存在する (別名部分を除く)</dd>
+		<dt>hasAlias</dt><dd>別名がある <span class="frm">(DBコメントの一部を別名として認識する設定が前提)</span></dd>
+		<dt>hasComment</dt><dd>コメントがある (別名部分を除く)</dd>
 	</dl>
 	<p>
 		upperCaseBasis, lowerCaseBasis の大文字小文字判定では、DBFluteが管理するSQL上のテーブル名 (ConditionBeanのSQLで利用)
@@ -287,7 +287,7 @@
 		<dt>identityIfPureIDPK</dt><dd>FKでない ID で終わる単一PKならIdentityが付与される <span class="frm">@since 1.1.8</span></dd>
 		<dt>hasCommonColumn</dt><dd>共通カラムを持っているはず <span class="frm">e.g. ... then hasCommonColumn</span></dd>
 		<dt>hasAlias</dt><dd>別名がある <span class="frm">e.g. ... then hasAlias</span> <span class="frm">@since 1.1.8</span></dd>
-		<dt>hasComment</dt><dd>コメントがある <span class="frm">e.g. ... then hasComment</span> <span class="frm">@since 1.1.8</span></dd>
+		<dt>hasComment</dt><dd>コメントがある (別名部分を除く) <span class="frm">e.g. ... then hasComment</span> <span class="frm">@since 1.1.8</span></dd>
 	</dl>
 	<h4>then の "isあり" 表現  <span class="frm">(then.itemvalue)</span></h4>
 	<p>
@@ -374,8 +374,8 @@
 	<dl class="keymainlist">
 		<dt>upperCaseBasis</dt><dd>カラム名は大文字 <span class="frm">(SQL上の名前で判定)</span></dd>
 		<dt>lowerCaseBasis</dt><dd>カラム名は小文字 <span class="frm">(SQL上の名前で判定)</span></dd>
-		<dt>hasAlias</dt><dd>別名が存在する <span class="frm">(DBコメントの一部を別名として認識する設定が前提)</span></dd>
-		<dt>hasComment</dt><dd>カラムのコメントが存在する (別名部分を除く)</dd>
+		<dt>hasAlias</dt><dd>別名がある <span class="frm">(DBコメントの一部を別名として認識する設定が前提)</span></dd>
+		<dt>hasComment</dt><dd>コメントがある (別名部分を除く)</dd>
 	</dl>
 	<p>
 		<span class="frm">(tableMapの方とほぼ同じ)</span>
@@ -437,8 +437,8 @@
 		<dt>classification</dt><dd>区分値 <span class="frm">e.g. then classification</span></dd>
 		<dt>upperCaseBasis</dt><dd>カラム名が大文字 <span class="frm">e.g. then upperCaseBasis</span> <span class="frm">@since 1.1.8</span></dd>
 		<dt>lowerCaseBasis</dt><dd>カラム名が小文字 <span class="frm">e.g. then lowerCaseBasis</span> <span class="frm">@since 1.1.8</span></dd>
-		<dt>hasAlias</dt><dd>別名が存在する <span class="frm">e.g. then hasAlias</span> <span class="frm">@since 1.1.8</span></dd>
-		<dt>hasComment</dt><dd>コメントが存在する <span class="frm">e.g. then hasComment</span> <span class="frm">@since 1.1.8</span></dd>
+		<dt>hasAlias</dt><dd>別名がある <span class="frm">e.g. then hasAlias</span> <span class="frm">@since 1.1.8</span></dd>
+		<dt>hasComment</dt><dd>コメントがある (別名部分を除く) <span class="frm">e.g. then hasComment</span> <span class="frm">@since 1.1.8</span></dd>
 	</dl>
 	<p>
 		加えて、他のテーブルのカラムと比較をするような横断的なものがあります。<span class="frm">@since 1.1.8</span>
@@ -497,6 +497,30 @@
 	<h4>補足コメント (期待値など)</h4>
 	<p>
 		tableMapの方とまったく同じです。
+	</p>
+
+	<h2 id="migration">運用途中からの導入</h2>
+	<h3 id="migfirstdate">これから追加するテーブルやカラムだけチェック</h3>
+	<p>
+		運用途中から SchemaPolicyCheck を導入する場合、"既存のテーブルはなかなか修正できないけど、これから追加するテーブルはチェックしたい"
+		ということになります。
+	</p>
+	<p>
+		そこで、statement の if で利用できる firstDate を使うと良いでしょう。
+		<em class="keyword">指定された日付以降に追加されたテーブルやカラムはチェックする</em> という条件が書けます。
+	</p>
+<pre><span class="codetitle">e.g. firstDateを使って、これから追加されるテーブルだけチェック @schemaPolicyMap.dfprop</span><code>
+<span class="comment"># 2018/05/04より未来に追加されたテーブルは、FK制約名は FK_[テーブル名] で始まること</span>
+; <span class="keyword">if</span> <span class="point">firstDate</span> <span class="keyword">is</span> <span class="attribute">after:</span><span class="literal">2018/05/04</span> <span class="keyword">then</span> fkName <span class="keyword">is</span> <span class="attribute">prefix:</span>FK_<span class="attribute">$$table$$</span>
+</code></pre>
+	<h3 id="migstatementthen">一部のテーブルだけピンポイントで除外する</h3>
+	<p>
+		どうしても直せない一部のテーブルは、tableExceptListで完全に除外してしまうか、statement の if で除外してしまうと良いでしょう。
+		できるだけ後者で実現する方が他のチェックが掛かるので望ましいですが、あまりに複雑になってしまうと良くないので数が少なければ割り切って前者でも良いでしょう。
+	</p>
+	<p>
+		(themeListの) theme は絞り込み条件が書けませんが、同じチェックが statement の then の theme
+		で指定できるものもあるので、statement方式に移行することで一部のものだけ除外を実現できます。と良いでしょう。 
 	</p>
 
 	<h2 id="example">Example</h2>
