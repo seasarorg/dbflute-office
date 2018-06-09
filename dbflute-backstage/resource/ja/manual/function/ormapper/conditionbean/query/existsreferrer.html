@@ -64,7 +64,7 @@ cb.q <span class="comment">// .q と打って enter</span>
 cb.query()
 --
 
-<span class="comment">// .ex まで打つと関連テーブル選択、続けて Pu (Purchase) で enter</span>
+<span class="comment">// .ex で関連テーブル選択、続けて Pu (Purchase) で enter</span>
 cb.query().exPu
 --
 
@@ -82,7 +82,7 @@ cb.query().existsPurchase(<span class="localvar">purchaseCB</span> -&gt; {
 })
 </code></pre>
 	<p>
-		Lambda引数名では、subCBは使わず "テーブルが識別できるCB名" が推奨されます。
+		Lambda引数名では、subCBは使わず "テーブルを識別できるCB名" が推奨されます。
 	</p>
 	<div class="relatedpage"><a href="../../../../../tutorial/onjava8.html#naming">DBFlute on Java8 - たかが変数名、されど変数名</a></div>
 	<p>
