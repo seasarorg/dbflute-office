@@ -208,6 +208,37 @@ Integer price = <span class="abbreviation">...</span>;
     });
 }
 </code></pre>
+	<h3 id="inscopesubquery">existsではなくinScopeSubQueryで</h3>
+	<p>
+		SQLとして、<em class="mark">exists (select ...)</em> ではなく <em class="mark">in (select ...)</em> で実行したい場合、ExistsReferrer
+		のオプションで実現できます。これを InScopeSubQuery を呼びます。
+	</p>
+	<p>
+		exists で利用する ConditionBean にて、useInScopeSubQuery() を呼ぶと、そのサブクエリはSQL上において in (select ...) 方式になります。
+	</p>
+<pre><span class="codetitle">e.g. InScopeSubQueryを指定したExistsReferrer {MEMBER, PURCHASE} @Java</span><code>
+cb.query().existsPurchase(purchaseCB -&gt; {
+    purchaseCB.<span class="point">useInScopeSubQuery()</span>;
+    purchaseCB.query().setPurchasePrice_GreaterEqual(<span class="literal">2000</span>);
+});
+</code></pre>
+<pre><span class="codetitle">e.g. InScopeSubQueryになったSQL @DisplaySql</span><code>
+<span class="abbreviation">...</span>
+  <span class="keyword">from</span> MEMBER dfloc
+ <span class="keyword">where</span> dfloc.MEMBER_ID <span class="keyword">in</span> (<span class="keyword">select</span> sub1loc.MEMBER_ID
+                             <span class="keyword">from</span> PURCHASE sub1loc
+                            <span class="keyword">where</span> sub1loc.PURCHASE_PRICE &gt;= <span class="literal">2000</span>
+       )
+</code></pre>
+	<p>
+		リレーションシップの関係性によって、InScopeSubQueryの方がパフォーマンスが良いと想定される場面で利用します。
+		基点テーブルが他の絞り込み条件でどれだけ絞り込まれるか？サブクエリの中の条件でどれだけ子テーブルが絞り込まれるか？
+		この辺がポイントになると想定されます。
+	</p>
+	<p>
+		言葉のニュアンスとしては、ExistsReferrerという "子テーブルが存在するかどうか"
+		という絞り込みに対して、実現方法が "exists" (デフォルト) と "in (select ...)" の二つがあるという風に言えます。
+	</p>
 
 	<h2 id="methodspec">メソッド仕様</h2>
 	<h3 id="basicspec">基本仕様</h3>
@@ -244,14 +275,6 @@ Integer price = <span class="abbreviation">...</span>;
 		否定条件の対象値の列挙として、NotExistsReferrer もあります。条件が否定になっただけで仕様は ExistsReferrer
 		と全く同じです。cb.query().exists... ではなく cb.query().notExists... と書きます。
 	</p>
-
-	<h2 id="inscoperelation">代替方法：InScopeRelation</h2>
-	<p>
-		全く同じ結果を返す別の方法として、InScopeRelation
-		があります。DBFluteとしては、基本的に "子テーブルの条件で絞り込み" をする場合は、ExistsReferrer
-		を基本にすることをお奨めしています。
-	</p>
-	<div class="relatedpage"><a href="./inscoperelation.html">InScopeRelation</a></div>
 <!-- __content-end__ --></div></div>
 
 <div id="sidebar">

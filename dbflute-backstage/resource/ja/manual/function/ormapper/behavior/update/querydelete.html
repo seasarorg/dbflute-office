@@ -4,9 +4,9 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
-	<meta name="keywords" content="DBFlute,Behavior,queryDelete,CBによる更新,ConditionBeanで更新,ConditionBeanでupdate,条件更新,子テーブル削除" />
+	<meta name="keywords" content="DBFlute,Behavior,queryDelete,CBによる削除,ConditionBeanで削除,ConditionBeanでdelete,条件削除,子テーブル削除" />
 	<style type="text/css" title="currentStyle">@import "../../../../../../css/sub.css";</style>
-	<title>queryDelete(entity, cb) | DBFlute</title>
+	<title>queryDelete(cb) | DBFlute</title>
 </head>
 <body>
 <div id="container" class="ct-manual">
@@ -24,7 +24,7 @@
 </div>
 
 <div id="content"><!-- __content-start__ -->
-	<h1>queryDelete(entity, cb)</h1>
+	<h1>queryDelete(cb)</h1>
 	${indexlist}
 
 	<h2 id="overview">概要</h2>
@@ -50,7 +50,7 @@
 	</p>
 
 	<h2 id="howto">実装方法</h2>
-	<h3 id="implflow">実装の流れ</h3>
+	<h3 id="implflow">実装の流れ <span class="frm">※1.1.x (Java8版)</span></h3>
 	<p>
 		Behaviorの <em class="keyword">queryDelete()</em>
 		を呼び出し、ConditionBean を指定します。
@@ -58,20 +58,27 @@
 <pre><span class="codetitle">e.g. queryDelete()の実装手順 (Eclipseでコード補完) {MEMBER} @Java</span><code>
 <span class="attribute">memberBhv</span>.quD <span class="comment">// .quD と打って enter</span>
 --
-<span class="attribute">memberBhv</span>.<span class="point">queryDelete</span>(cb);
 
-<span class="comment">// .qu と打つと queryDelete() や queryDelete() など</span>
-<span class="comment">// クエリ更新系のメソッドだけが補完候補に列挙される</span>
+<span class="comment">// メソッドが補完されて、引数の "cbLambda" が選択状態に</span>
+<span class="attribute">memberBhv</span>.<span class="point">queryDelete</span>(cbLambda)
+--
+
+<span class="comment">// cbLambdaの部分で、_ll (補完テンプレートが有効なら)</span>
+<span class="attribute">memberBhv</span>.<span class="point">queryDelete</span>(<span class="subpoint">_ll</span>)
+--
+
+<span class="comment">// Lambda引数名はcbにして...セミコロン ";" を忘れずに</span>
+<span class="attribute">memberBhv</span>.<span class="point">queryDelete</span>(cb -&gt; {
+    <span class="localvar">cb</span>.query().set<span class="abbreviation">...</span> <span class="comment">// tabでカーソル移動してcbで検索条件</span>
+});
 </code></pre>
 	<p>
 		Entity には PK の値も不要です。更新値だけを設定します。
 	</p>
 <pre><span class="codetitle">e.g. 未払い購入のある会員を全て削除 @Java</span><code>
 MemberCB cb = <span class="keyword">new</span> MemberCB();
-cb.query().existsPurchaseList(<span class="keyword">new</span> SubQuery&lt;PurchaseCB&gt;() {
-    <span class="keyword">public void</span> query(PurchaseCB subCB) {
-        subCB.query().<span class="point">setPaymentCompeleteFlg_Equal_False()</span>;
-    }
+cb.query().existsPurchaseList(purchaseCB -&gt; {
+    purchaseCB.query().<span class="point">setPaymentCompeleteFlg_Equal_False()</span>;
 });
 
 <span class="attribute">memberBhv</span>.queryDelete(cb);
@@ -81,11 +88,20 @@ cb.query().existsPurchaseList(<span class="keyword">new</span> SubQuery&lt;Purch
 	</p>
 	<div class="relatedpage"><a href="#dbmsheadache">DBMSによっては制限も</a></div>
 	<div class="relatedpage"><a href="#compoundpk">複合主キーの場合は制限</a></div>
+	<h3 id="implflow">実装の流れ <span class="frm">※1.0.x (Java6版)</span></h3>
+<pre><span class="codetitle">e.g. queryDelete()の実装手順 (Eclipseでコード補完) {MEMBER} @Java</span><code>
+<span class="attribute">memberBhv</span>.quD <span class="comment">// .quD と打って enter</span>
+--
+<span class="attribute">memberBhv</span>.<span class="point">queryDelete</span>(cb);
+
+<span class="comment">// .qu と打つと queryDelete() や queryDelete() など</span>
+<span class="comment">// クエリ更新系のメソッドだけが補完候補に列挙される</span>
+</code></pre>
 
 	<h2 id="methodspec">メソッド仕様</h2>
 	<h3 id="argument">引数</h3>
 	<p>
-		該当のBehaviorに対応するテーブルのConditionBeanになります。
+		該当のBehaviorに対応するテーブルのConditionBeanになります。<span class="frm">(1.1.xよりコールバック)</span>
 	</p>
 	<p>
 		nullを指定した場合は例外発生します。
