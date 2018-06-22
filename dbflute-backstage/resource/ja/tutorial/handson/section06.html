@@ -311,6 +311,11 @@
 		最後に、コンフリクトを直すデコメントをしておきましょう。
 		<span class="frm">(もし、git環境があれば、これもコミット)</span>
 	</p>
+	<h3 id="writeyourdecomment">本気のデコメントをしてみましょう</h3>
+	<p>
+		あなたが "こういうことが書いてあったらいいのに" と思うDBコメントを三つ、デコメントで登録してみましょう。
+		<span class="frm">(もし、git環境があれば、これもコミット)</span>
+	</p>
 	<div class="inucolumn">
 		<h3 id="howtodbcomment">どんなDBコメントを書いたらいいの？</h3>
 		<p>
@@ -425,13 +430,18 @@ PAYMENT_COMPLETE_FLG INTEGER COMME...,
 	<p>
 		Docタスクにて例外が発生し、SchemaPolicyCheckの violation がログに表示されているはずなので、確認してみましょう。
 	</p>
-	<h3 id="revertviolation">元に戻して、おしまいです</h3>
+	<h3 id="revertviolation">元に戻しましょう</h3>
 	<p>
 		確認できたら、replace-schema-10-basic.sqlを元に戻して、ReplaceSchema, JDBC,
 		Docタスクを実行して、また正常に終了することを確認しましょう。
 	</p>
+	<h3 id="makeyourpolicy">本気のポリシーを作ってみましょう</h3>
 	<p>
-		ぜひ、現場でも活用していきましょう。
+		あなたが "これはチェックしたいなぁ" と思うポリシーを三つ、定義してみましょう。
+		そもそもハンズオンで使っている maihamadb がそのポリシーに合わないようであれば、firstDateを使って除外しましょう。
+	</p>
+	<p>
+		既存のDBでもうまく調整してフィットさせることができます。ぜひ現場でも活用していきましょう。
 	</p>
 
 	<h2 id="nextsection">次のセクション</h2>
