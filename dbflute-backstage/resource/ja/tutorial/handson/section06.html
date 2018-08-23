@@ -130,7 +130,7 @@
 	<ol>
 		<li>ロジッククラスにメソッドを定義して実装 (BehaviorはDIを利用)</li>
 		<li>(Eclipseであれば) <em class="bigmark">ctrl + 9</em> で対応するテストクラスを自動生成 (src/test/java に)</li>
-		<li>(IntellJであれば) ...わからないですが、テストクラスのひながた自動生成できるはずです</li>
+		<li>(IntelliJであれば) <em class="bigmark">shift + command + T</em> で対応するテストクラスを自動生成 (src/test/java に)</li>
 		<li>テストメソッドを実装してロジックを検証</li>
 	</ol>
 	<div class="relatedpage"><a href="../../manual/topic/programming/shortcut/uttestcut.html">単体テストショートカット</a></div>
@@ -494,7 +494,7 @@ PAYMENT_COMPLETE_FLG INTEGER COMME...,
 	<h3 id="makeyourpolicy">本気のポリシーを作ってみましょう</h3>
 	<p>
 		さて、あなたが... <em class="keyword">これはチェックしたいなぁ</em> と思う、<em class="mark">価値のあるポリシーを三つ</em> 定義してみましょう。
-		そのポリシーの背景、理由、思いなど、ぜひ一緒にコメントで書いておきましょう。
+		そのポリシーの背景、理由、思いなど、ぜひ一緒にコメント (or <em class="smallmark">補足コメント</em>) で書いておきましょう。
 	</p>
 	<p>
 		もし、ハンズオンで使っている maihamadb がそのポリシーに合わないようであれば、firstDateを使って新規テーブルだけに適用されるようにしてみましょう。
@@ -544,6 +544,32 @@ PAYMENT_COMPLETE_FLG INTEGER COMME...,
 			(ただし、diffmapを壊さないように気をつけましょう)</span>
 		</p>
 	</div>
+
+	<h2 id="onwebflute">WebアプリでのDBFluteを知ろう</h2>
+	<p>
+		さて、だいぶ DBFlute の実装に慣れてきたところで...
+	</p>
+	<ul>
+		<li>Webアプリの中でDBFluteがどのように活用されるのか？</li>
+		<li>Webフレームワークと連携するDBFluteの機能とは？</li>
+	</ul>
+	<p>
+		これらに着目して、<em class="keyword">Webアプリのクラスを実装しながら</em> DBFluteに触れてみましょう。
+		<span class="frm">(業務で使うWebフレームワークと違っていても、DBFluteの役割を学ぶことがここでの大きな目的です)</span>
+	</p>
+	<dl class="valuemainlist">
+		<dt>サーバーサイドHTML</dt><dd><a href="http://dbflute.seasar.org/ja/lastaflute/howto/action/makeashtml.html">Actionの作り方 (HTMLスタイル)</a></dd>
+		<dt>JSON API</dt><dd><a href="http://dbflute.seasar.org/ja/lastaflute/howto/action/makeasjson.html">Actionの作り方 (JSONスタイル)</a></dd>
+	</dl>
+	<p>
+		(DBFluteハンズオンと違い)なぞるだけのハンズオンになっていますので、サーバーサイドHTMLとJSON APIのActionをそれぞれ作って実際に動かしてみましょう。
+		DBFluteのログなどにもぜひ注目です。
+	</p>
+	<p>
+		DBFluteのハンズオンのプロジェクトを修正するものではないので、どこにcloneするか？どこにimportするか？など環境は自由です。
+		単にcloneするだけでもいいですし、forkしても良いでしょう。
+		(Eclipseであれば)DBFluteハンズオンと同じworkspaceに入れても良いでしょう。
+	</p>
 
 	<h2 id="nextsection">次のセクション</h2>
 	<p>
