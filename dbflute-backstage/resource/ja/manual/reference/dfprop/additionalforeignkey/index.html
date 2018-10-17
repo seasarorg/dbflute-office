@@ -402,6 +402,23 @@ cb.setupSelect_MemberAddressAsValid(currentDate);
 		<dt>値候補</dt><dd>true or false</dd>
 		<dt>デフォルト</dt><dd>false</dd>
 	</dl>
+	<h3 id="comment">comment</h3>
+	<p>
+		そのリレーションシップにコメントを付与します。JavaDocなどに利用されるので、業務的な説明や利用上の注意などを書いておくと良いでしょう。
+	</p>
+	<dl class="textlist">
+		<dt>値候補</dt><dd>文字列</dd>
+		<dt>デフォルト</dt><dd>null</dd>
+	</dl>
+<pre><span class="codetitle">e.g. commentで業務的な説明を入れておこう @additionalForeignKeyMap.dfprop</span><code>
+; FK_MEMBER_MEMBER_ADDRESS_AS_VALID = <span class="keyword">map:</span>{
+    ; localTableName  = MEMBER    ; foreignTableName  = MEMBER_ADDRESS
+    ; localColumnName = MEMBER_ID ; foreignColumnName = MEMBER_ID
+    ; fixedCondition = <span class="abbreviation">...</span>
+    ; fixedSuffix = AsValid
+    ; comment = <span class="literal">ここはコメントだよぅ</span>
+}
+</code></pre>
 
 	<h2 id="splitdfprop">dfpropファイルの分割</h2>
 	<h3 id="removeline">ある程度は工夫...</h3>
